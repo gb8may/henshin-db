@@ -1,9 +1,20 @@
 [build]
-  publish = "./"
+  publish = "."
 
 [[plugins]]
 package = "netlify-plugin-bundle-env"
 
-[template.environment]
-  SUPABASE_URL = ""
-  SUPABASE_ANON_KEY = ""
+[plugins.inputs]
+  # pasta onde está o seu index.html e env.js
+  src = "."
+
+  # arquivos onde queremos substituir as variáveis
+  files = [
+    "env.js"
+  ]
+
+  # nomes das variáveis definidas no painel do Netlify
+  include = [
+    "SUPABASE_URL",
+    "SUPABASE_ANON_KEY"
+  ]
