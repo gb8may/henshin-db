@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Henshin DB</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+  </head>
+  <body class="bg-slate-900 text-slate-100">
+    <div class="max-w-md mx-auto h-screen flex flex-col">
+      <!-- HEADER -->
+      <header class="flex items-center justify-center h-14 bg-slate-950/70 border-b border-slate-800">
+        <h1 class="text-lg font-semibold tracking-wide">Henshin Database</h1>
+      </header>
+
+      <!-- TABS -->
+      <nav class="flex justify-between bg-slate-900 px-3 py-2 gap-2 border-b border-slate-800">
+        <button
+          id="tab-characters"
+          class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900"
+        >
+          Personagens
+        </button>
+        <button
+          id="tab-glossary"
+          class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200"
+        >
+          Glossário
+        </button>
+      </nav>
+
+      <!-- SEARCH -->
+      <div class="px-3 py-2 bg-slate-900">
+        <div class="flex items-center gap-2 bg-slate-800 rounded-full px-3 py-2">
+          <span class="text-slate-400 text-sm">🔍</span>
+          <input
+            id="search-input"
+            type="text"
+            placeholder="Buscar…"
+            class="bg-transparent outline-none border-none w-full text-sm text-slate-100 placeholder:text-slate-500"
+          />
+        </div>
+      </div>
+
+      <!-- LISTA -->
+      <main class="flex-1 overflow-y-auto bg-slate-900 px-2 pb-16">
+        <!-- Lista de personagens -->
+        <ul id="list-characters" class="space-y-1"></ul>
+
+        <!-- Lista de glossário -->
+        <ul id="list-glossary" class="space-y-1 hidden"></ul>
+
+        <div id="empty-state" class="hidden text-center text-slate-500 text-sm mt-6">
+          Nenhum resultado encontrado.
+        </div>
+      </main>
+
+      <!-- PAINEL DE DETALHES (overlay) -->
+      <div
+        id="detail-overlay"
+        class="fixed inset-0 bg-black/60 flex justify-center items-end sm:items-center z-50 hidden"
+      >
+        <div class="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-y-auto shadow-xl">
+          <!-- header do detalhe -->
+          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+            <button id="detail-close" class="text-sm text-slate-300 hover:text-white">← Voltar</button>
+            <h2 id="detail-title" class="text-sm font-medium text-slate-200"></h2>
+            <span class="w-10"></span>
+          </div>
+
+          <div id="detail-body" class="px-4 py-4 text-sm text-slate-100 space-y-4"></div>
+        </div>
+      </div>
+
+      <!-- FOOTER -->
+      <footer class="h-10 text-center text-[11px] text-slate-500 flex items-center justify-center">
+        <span>v0.1 · Supabase + HTML</span>
+      </footer>
+    </div>
+
+    <script>
+      // 🔧 CONFIGURAÇÃO SUPABASE
+      const SUPABASE_URL = NETLIFY_ENV_SUPABASE_URL;
+      const SUPABASE_ANON_KEY = NETLIFY_ENV_ANON_KEY;
+
+      // ----------------------------------------------------
+      // ESTADO SIMPLES NA MEMÓRIA
+      // ----------------------------------------------------
+      let currentTab = "characters";
+      let charactersData = [];
+      let glossaryData = [];
+      let currentSearch = "";
+
+      const tabCharactersBtn = document.getElementById("tab-characters");
+      const tabGlossaryBtn = document.getElementById("tab-glossary");
+      const searchInput = document.getElementById("search-input");
+      const listCharactersEl = document.getElementById("list-characters");
+      const listGlossaryEl = document.getElementById("list-glossary");
+      const emptyStateEl = document.getElementById("empty-state");
+      const detailOverlay = document.getElementById("detail-overlay");
+      const detailBody = document.getElementById("detail-body");
+      const detailTitle = document.getElementById("detail-title");
+      const detailClose = document.getElementById("detail-close");
+
+      // ----------------------------------------------------
+      // FUNÇÕES SUPABASE
+      // ----------------------------------------------------
+      async function fetchCharacters(search = "") {
+        try {
+          let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=year.asc`;
+          const term = search.trim();
+          if (term) {
+            const encoded = encodeURIComponent("%" + term + "%");
+            url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},franchise.ilike.${encoded})`;
+          }
+
+          const res = await fetch(url, {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: "Bearer " + SUPABASE_ANON_KEY,
+            },
+          });
+
+          if (!res.ok) {
+            console.error("Erro ao buscar characters:", await res.text());
+            return [];
+          }
+
+          const data = await res.json();
+          charactersData = data;
+          return data;
+        } catch (err) {
+          console.error("Erro fetchCharacters:", err);
+          return [];
+        }
+      }
+
+      async function fetchGlossary(search = "") {
+        try {
+          let url = `${SUPABASE_URL}/rest/v1/glossary?select=*&order=jp.asc`;
+          const term = search.trim();
+          if (term) {
+            const raw = `jp.ilike.%${term}%,romaji.ilike.%${term}%,pt.ilike.%${term}%`;
+            url += `&or=${encodeURIComponent(raw)}`;
+          }
+
+          const res = await fetch(url, {
+            headers: {
+              apikey: SUPABASE_ANON_KEY,
+              Authorization: "Bearer " + SUPABASE_ANON_KEY,
+            },
+          });
+
+          if (!res.ok) {
+            console.error("Erro ao buscar glossary:", await res.text());
+            return [];
+          }
+
+          const data = await res.json();
+          glossaryData = data;
+          return data;
+        } catch (err) {
+          console.error("Erro fetchGlossary:", err);
+          return [];
+        }
+      }
+
+      // ----------------------------------------------------
+      // RENDERIZAÇÃO
+      // ----------------------------------------------------
+      function renderCharactersList() {
+        listCharactersEl.innerHTML = "";
+        if (!charactersData || charactersData.length === 0) {
+          listCharactersEl.classList.remove("block");
+          listCharactersEl.classList.add("hidden");
+          emptyStateEl.classList.remove("hidden");
+          return;
+        }
+        emptyStateEl.classList.add("hidden");
+
+        charactersData.forEach((c) => {
+          const li = document.createElement("li");
+          li.className =
+            "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
+
+          const name = c.name_pt || c.name_en || "Sem nome";
+          const franchise = c.franchise || "";
+          const year = c.year || "";
+          const nameJp = c.name_jp || "";
+
+          li.innerHTML = `
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-slate-50">${name}</span>
+              <span class="text-[11px] text-slate-400 uppercase tracking-wide">${franchise} ${year ? "· " + year : ""}</span>
+              ${
+                nameJp
+                  ? `<span class="text-xs text-slate-300 mt-1">${nameJp}</span>`
+                  : ""
+              }
+            </div>
+          `;
+
+          li.addEventListener("click", () => showCharacterDetail(c));
+          listCharactersEl.appendChild(li);
+        });
+
+        listCharactersEl.classList.remove("hidden");
+      }
+
+      function renderGlossaryList() {
+        listGlossaryEl.innerHTML = "";
+        if (!glossaryData || glossaryData.length === 0) {
+          listGlossaryEl.classList.remove("block");
+          listGlossaryEl.classList.add("hidden");
+          emptyStateEl.classList.remove("hidden");
+          return;
+        }
+        emptyStateEl.classList.add("hidden");
+
+        glossaryData.forEach((g) => {
+          const li = document.createElement("li");
+          li.className =
+            "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
+
+          const jp = g.jp || "";
+          const romaji = g.romaji || "";
+          const pt = g.pt || g.en || "";
+
+          li.innerHTML = `
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-slate-50">${jp}</span>
+              ${
+                romaji
+                  ? `<span class="text-[11px] text-slate-300">${romaji}</span>`
+                  : ""
+              }
+              ${
+                pt
+                  ? `<span class="text-xs text-slate-400 mt-1">${pt}</span>`
+                  : ""
+              }
+            </div>
+          `;
+
+          li.addEventListener("click", () => showGlossaryDetail(g));
+          listGlossaryEl.appendChild(li);
+        });
+
+        listGlossaryEl.classList.remove("hidden");
+      }
+
+      // ----------------------------------------------------
+      // DETALHES
+      // ----------------------------------------------------
+      function showCharacterDetail(c) {
+        detailTitle.textContent = c.name_pt || c.name_en || "Detalhes";
+        const franchise = c.franchise || "";
+        const year = c.year || "";
+        const nameJp = c.name_jp || "";
+        const powers = c.powers || "";
+        const equipment = c.equipment || "";
+        const desc = c.description || "";
+
+        detailBody.innerHTML = `
+          <div class="space-y-1">
+            ${
+              nameJp
+                ? `<div class="text-sm text-slate-200">${nameJp}</div>`
+                : ""
+            }
+            <div class="text-[11px] text-slate-400 uppercase tracking-wide">
+              ${franchise} ${year ? "· " + year : ""}
+            </div>
+          </div>
+
+          ${
+            desc
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Descrição</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${desc}</p>
+                </section>`
+              : ""
+          }
+
+          ${
+            powers
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Poderes</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${powers}</p>
+                </section>`
+              : ""
+          }
+
+          ${
+            equipment
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Equipamentos</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${equipment}</p>
+                </section>`
+              : ""
+          }
+        `;
+
+        detailOverlay.classList.remove("hidden");
+      }
+
+      function showGlossaryDetail(g) {
+        detailTitle.textContent = g.jp || "Detalhe do termo";
+        const romaji = g.romaji || "";
+        const pt = g.pt || "";
+        const en = g.en || "";
+        const explanation = g.explanation || "";
+        const category = g.category || "";
+
+        detailBody.innerHTML = `
+          <div class="space-y-1">
+            ${
+              romaji
+                ? `<div class="text-sm text-slate-200">${romaji}</div>`
+                : ""
+            }
+            ${
+              category
+                ? `<div class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 uppercase tracking-wide">${category}</div>`
+                : ""
+            }
+          </div>
+
+          ${
+            pt
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Português</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${pt}</p>
+                </section>`
+              : ""
+          }
+
+          ${
+            en
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Inglês</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${en}</p>
+                </section>`
+              : ""
+          }
+
+          ${
+            explanation
+              ? `<section class="space-y-1">
+                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Explicação</h3>
+                  <p class="text-sm text-slate-100 leading-relaxed">${explanation}</p>
+                </section>`
+              : ""
+          }
+        `;
+
+        detailOverlay.classList.remove("hidden");
+      }
+
+      function closeDetail() {
+        detailOverlay.classList.add("hidden");
+      }
+
+      // ----------------------------------------------------
+      // TABS + BUSCA
+      // ----------------------------------------------------
+      async function loadCurrentTab() {
+        if (currentTab === "characters") {
+          listGlossaryEl.classList.add("hidden");
+          listCharactersEl.classList.remove("hidden");
+          const data = await fetchCharacters(currentSearch);
+          charactersData = data;
+          renderCharactersList();
+        } else {
+          listCharactersEl.classList.add("hidden");
+          listGlossaryEl.classList.remove("hidden");
+          const data = await fetchGlossary(currentSearch);
+          glossaryData = data;
+          renderGlossaryList();
+        }
+      }
+
+      tabCharactersBtn.addEventListener("click", () => {
+        currentTab = "characters";
+        tabCharactersBtn.className =
+          "flex-1 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900";
+        tabGlossaryBtn.className =
+          "flex-1 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200";
+        loadCurrentTab();
+      });
+
+      tabGlossaryBtn.addEventListener("click", () => {
+        currentTab = "glossary";
+        tabGlossaryBtn.className =
+          "flex-1 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900";
+        tabCharactersBtn.className =
+          "flex-1 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200";
+        loadCurrentTab();
+      });
+
+      searchInput.addEventListener("input", () => {
+        currentSearch = searchInput.value;
+        // Debounce simples / tosco: só recarrega depois de 300ms sem digitar
+        if (searchInput._timer) clearTimeout(searchInput._timer);
+        searchInput._timer = setTimeout(() => {
+          loadCurrentTab();
+        }, 300);
+      });
+
+      detailClose.addEventListener("click", closeDetail);
+      detailOverlay.addEventListener("click", (e) => {
+        if (e.target === detailOverlay) closeDetail();
+      });
+
+      // ----------------------------------------------------
+      // INICIALIZAÇÃO
+      // ----------------------------------------------------
+      (async function init() {
+        await loadCurrentTab();
+      })();
+    </script>
+  </body>
+</html>
