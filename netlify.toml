@@ -2,7 +2,7 @@
   publish = "./"
 
 [[plugins]]
-package = "@netlify/plugin-inject-env"
+package = "netlify-plugin-bundle-env"
 
 [template.environment]
   SUPABASE_URL = ""
