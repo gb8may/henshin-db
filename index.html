@@ -1,386 +1,231 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
-    <meta charset="UTF-8" />
-    <title>Henshin Database</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="https://cdn.tailwindcss.com"></script>
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <title>Henshin Database</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-  <body class="bg-slate-900 text-slate-100">
-    <!-- 🔌 ENV VARS (Netlify injeta aqui) -->
-    <script src="env.js"></script>
+<body class="bg-slate-900 text-slate-100">
+  <div class="max-w-md mx-auto h-screen flex flex-col">
 
-    <div class="max-w-md mx-auto h-screen flex flex-col">
-      <!-- HEADER -->
-      <header class="flex items-center justify-center h-14 bg-slate-950/70 border-b border-slate-800">
-        <h1 class="text-lg font-semibold tracking-wide">Henshin Database</h1>
-      </header>
+    <header class="flex items-center justify-center h-14 bg-slate-950/70 border-b border-slate-800">
+      <h1 class="text-lg font-semibold tracking-wide">Henshin Database</h1>
+    </header>
 
-      <!-- TABS -->
-      <nav class="flex justify-between bg-slate-900 px-3 py-2 gap-2 border-b border-slate-800">
-        <button id="tab-characters" class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900">
-          Personagens
-        </button>
-        <button id="tab-glossary" class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200">
-          Glossário
-        </button>
-      </nav>
+    <nav class="flex justify-between bg-slate-900 px-3 py-2 gap-2 border-b border-slate-800">
+      <button id="tab-characters" class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900">
+        Personagens
+      </button>
+      <button id="tab-glossary" class="flex-1 py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200">
+        Glossário
+      </button>
+    </nav>
 
-      <!-- SEARCH -->
-      <div class="px-3 py-2 bg-slate-900">
-        <div class="flex items-center gap-2 bg-slate-800 rounded-full px-3 py-2">
-          <span class="text-slate-400 text-sm">🔍</span>
-          <input id="search-input" type="text" placeholder="Buscar…" 
-            class="bg-transparent outline-none w-full text-sm text-slate-100 placeholder:text-slate-500" />
-        </div>
+    <div class="px-3 py-2 bg-slate-900">
+      <div class="flex items-center gap-2 bg-slate-800 rounded-full px-3 py-2">
+        <span class="text-slate-400 text-sm">🔍</span>
+        <input id="search-input" type="text" placeholder="Buscar…"
+               class="bg-transparent outline-none w-full text-sm text-slate-100 placeholder:text-slate-500" />
       </div>
-
-      <!-- LISTA -->
-      <main class="flex-1 overflow-y-auto bg-slate-900 px-2 pb-16">
-        <ul id="list-characters" class="space-y-1"></ul>
-        <ul id="list-glossary" class="space-y-1 hidden"></ul>
-
-        <div id="empty-state" class="hidden text-center text-slate-500 text-sm mt-6">
-          Nenhum resultado encontrado.
-        </div>
-      </main>
-
-      <!-- DETALHES (overlay) -->
-      <div id="detail-overlay" class="fixed inset-0 bg-black/60 flex justify-center items-end sm:items-center z-50 hidden">
-        <div class="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-y-auto shadow-xl">
-          <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-            <button id="detail-close" class="text-sm text-slate-300 hover:text-white">← Voltar</button>
-            <h2 id="detail-title" class="text-sm font-medium text-slate-200"></h2>
-            <span class="w-10"></span>
-          </div>
-          <div id="detail-body" class="px-4 py-4 text-sm text-slate-100 space-y-4"></div>
-        </div>
-      </div>
-
-      <!-- FOOTER -->
-      <footer class="h-10 text-center text-[11px] text-slate-500 flex items-center justify-center">
-        <span>v0.1 · Henshin DB</span>
-      </footer>
-
     </div>
 
-    <!-- 🔥 APP SCRIPT -->
-    <script>
-      // Agora as variáveis vêm do env.js
-      const SUPABASE_URL = window.SUPABASE_URL;
-      const SUPABASE_ANON_KEY = window.SUPABASE_ANON_KEY;
+    <main class="flex-1 overflow-y-auto bg-slate-900 px-2 pb-16">
+      <ul id="list-characters" class="space-y-1"></ul>
+      <ul id="list-glossary" class="space-y-1 hidden"></ul>
 
-      let currentTab = "characters";
-      let charactersData = [];
-      let glossaryData = [];
-      let currentSearch = "";
+      <div id="empty-state" class="hidden text-center text-slate-500 text-sm mt-6">
+        Nenhum resultado encontrado.
+      </div>
+    </main>
 
-      const tabCharactersBtn = document.getElementById("tab-characters");
-      const tabGlossaryBtn = document.getElementById("tab-glossary");
-      const searchInput = document.getElementById("search-input");
-      const listCharactersEl = document.getElementById("list-characters");
-      const listGlossaryEl = document.getElementById("list-glossary");
-      const emptyStateEl = document.getElementById("empty-state");
-      const detailOverlay = document.getElementById("detail-overlay");
-      const detailBody = document.getElementById("detail-body");
-      const detailTitle = document.getElementById("detail-title");
-      const detailClose = document.getElementById("detail-close");
+    <div id="detail-overlay"
+         class="fixed inset-0 bg-black/60 flex justify-center items-end sm:items-center z-50 hidden">
+      <div class="bg-slate-900 w-full max-w-md max-h-[90vh] rounded-t-2xl sm:rounded-2xl overflow-y-auto shadow-xl">
+        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
+          <button id="detail-close" class="text-sm text-slate-300 hover:text-white">← Voltar</button>
+          <h2 id="detail-title" class="text-sm font-medium text-slate-200"></h2>
+          <span class="w-10"></span>
+        </div>
+        <div id="detail-body" class="px-4 py-4 text-sm text-slate-100 space-y-4"></div>
+      </div>
+    </div>
 
-      /* -------------------- SUPABASE FETCHERS -------------------- */
+    <footer class="h-10 text-center text-[11px] text-slate-500 flex items-center justify-center">
+      v0.1 · Henshin DB
+    </footer>
 
-      async function fetchCharacters(search = "") {
-        try {
-          let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=year.asc`;
+  </div>
 
-          if (search.trim()) {
-            const encoded = encodeURIComponent("%" + search + "%");
-            url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},franchise.ilike.${encoded})`;
-          }
+  <script>
+    const SUPABASE_URL = "SUA_URL_AQUI";
+    const SUPABASE_ANON_KEY = "SUA_ANON_KEY_AQUI";
 
-          const res = await fetch(url, {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: "Bearer " + SUPABASE_ANON_KEY,
-            },
-          });
+    let currentTab = "characters";
+    let charactersData = [];
+    let glossaryData = [];
+    let currentSearch = "";
 
-          const data = await res.json();
-          charactersData = data;
-          return data;
-        } catch (e) {
-          console.error("Erro characters:", e);
-          return [];
-        }
+    const tabCharactersBtn = document.getElementById("tab-characters");
+    const tabGlossaryBtn = document.getElementById("tab-glossary");
+    const searchInput = document.getElementById("search-input");
+    const listCharactersEl = document.getElementById("list-characters");
+    const listGlossaryEl = document.getElementById("list-glossary");
+    const emptyStateEl = document.getElementById("empty-state");
+    const detailOverlay = document.getElementById("detail-overlay");
+    const detailBody = document.getElementById("detail-body");
+    const detailTitle = document.getElementById("detail-title");
+    const detailClose = document.getElementById("detail-close");
+
+    async function fetchCharacters(search = "") {
+      let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=year.asc`;
+      if (search.trim() !== "") {
+        const encoded = encodeURIComponent("%" + search + "%");
+        url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},franchise.ilike.${encoded})`;
       }
+      const res = await fetch(url, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
+      });
+      charactersData = await res.json();
+      return charactersData;
+    }
 
-      async function fetchGlossary(search = "") {
-        try {
-          let url = `${SUPABASE_URL}/rest/v1/glossary?select=*&order=jp.asc`;
-
-          if (search.trim()) {
-            const term = encodeURIComponent(search);
-            url += `&or=(jp.ilike.%${term}%,romaji.ilike.%${term}%,pt.ilike.%${term}%)`;
-          }
-
-          const res = await fetch(url, {
-            headers: {
-              apikey: SUPABASE_ANON_KEY,
-              Authorization: "Bearer " + SUPABASE_ANON_KEY,
-            },
-          });
-
-          const data = await res.json();
-          glossaryData = data;
-          return data;
-        } catch (e) {
-          console.error("Erro glossary:", e);
-          return [];
-        }
+    async function fetchGlossary(search = "") {
+      let url = `${SUPABASE_URL}/rest/v1/glossary?select=*&order=jp.asc`;
+      if (search.trim() !== "") {
+        const encoded = encodeURIComponent(search);
+        url += `&or=(jp.ilike.%${encoded}%,romaji.ilike.%${encoded}%,pt.ilike.%${encoded}%)`;
       }
+      const res = await fetch(url, {
+        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
+      });
+      glossaryData = await res.json();
+      return glossaryData;
+    }
 
-      /* ---------------------- RENDER LISTS ----------------------- */
-
-      function renderCharactersList() {
-        listCharactersEl.innerHTML = "";
-        if (!charactersData.length) {
-          emptyStateEl.classList.remove("hidden");
-          listCharactersEl.classList.add("hidden");
-          return;
-        }
-
-        emptyStateEl.classList.add("hidden");
-
-        charactersData.forEach((c) => {
-          const name = c.name_pt || c.name_en || "Sem nome";
-          const img = c.image_url || "";
-          const franchise = c.franchise || "";
-          const year = c.year || "";
-          const nameJp = c.name_jp || "";
-
-          const li = document.createElement("li");
-          li.className =
-            "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-
-          li.innerHTML = `
-            <div class="flex items-center gap-3">
-              ${
-                img
-                  ? `<img src="${img}" class="w-12 h-12 rounded-full object-cover border border-slate-700" />`
-                  : `<div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-400">?</div>`
-              }
-              <div class="flex flex-col">
-                <span class="text-sm font-semibold text-slate-50">${name}</span>
-                <span class="text-[11px] text-slate-400 uppercase tracking-wide">${franchise} ${
-            year ? "· " + year : ""
-          }</span>
-                ${
-                  nameJp
-                    ? `<span class="text-xs text-slate-300 mt-1">${nameJp}</span>`
-                    : ""
-                }
-              </div>
-            </div>
-          `;
-
-          li.onclick = () => showCharacterDetail(c);
-          listCharactersEl.appendChild(li);
-        });
-
-        listCharactersEl.classList.remove("hidden");
+    function renderCharactersList() {
+      listCharactersEl.innerHTML = "";
+      if (!charactersData.length) {
+        emptyStateEl.classList.remove("hidden");
+        listCharactersEl.classList.add("hidden");
+        return;
       }
+      emptyStateEl.classList.add("hidden");
 
-      function renderGlossaryList() {
-        listGlossaryEl.innerHTML = "";
-        if (!glossaryData.length) {
-          emptyStateEl.classList.remove("hidden");
-          listGlossaryEl.classList.add("hidden");
-          return;
-        }
-
-        emptyStateEl.classList.add("hidden");
-
-        glossaryData.forEach((g) => {
-          const li = document.createElement("li");
-          li.className =
-            "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-
-          li.innerHTML = `
+      charactersData.forEach(c => {
+        const name = c.name_pt || c.name_en || "";
+        const li = document.createElement("li");
+        li.className = "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
+        li.innerHTML = `
+          <div class="flex items-center gap-3">
+            ${c.image_url ?
+              `<img src="${c.image_url}" class="w-12 h-12 rounded-full object-cover border border-slate-700" />` :
+              `<div class="w-12 h-12 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-400">?</div>`
+            }
             <div class="flex flex-col">
-              <span class="text-sm font-semibold text-slate-50">${g.jp}</span>
-              ${
-                g.romaji
-                  ? `<span class="text-[11px] text-slate-300">${g.romaji}</span>`
-                  : ""
-              }
-              ${
-                g.pt
-                  ? `<span class="text-xs text-slate-400 mt-1">${g.pt}</span>`
-                  : ""
-              }
+              <span class="text-sm font-semibold">${name}</span>
+              <span class="text-[11px] text-slate-400 uppercase tracking-wide">${c.franchise || ""} ${c.year || ""}</span>
             </div>
-          `;
+          </div>`;
+        li.onclick = () => showCharacterDetail(c);
+        listCharactersEl.appendChild(li);
+      });
 
-          li.onclick = () => showGlossaryDetail(g);
-          listGlossaryEl.appendChild(li);
-        });
+      listCharactersEl.classList.remove("hidden");
+    }
 
-        listGlossaryEl.classList.remove("hidden");
+    function renderGlossaryList() {
+      listGlossaryEl.innerHTML = "";
+      if (!glossaryData.length) {
+        emptyStateEl.classList.remove("hidden");
+        listGlossaryEl.classList.add("hidden");
+        return;
       }
+      emptyStateEl.classList.add("hidden");
 
-      /* ------------------------ DETAILS ------------------------- */
+      glossaryData.forEach(g => {
+        const li = document.createElement("li");
+        li.className = "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
+        li.innerHTML = `
+          <div class="flex flex-col">
+            <span class="text-sm font-semibold">${g.jp}</span>
+            ${g.romaji ? `<span class="text-[11px] text-slate-300">${g.romaji}</span>` : ""}
+            ${g.pt ? `<span class="text-xs text-slate-400 mt-1">${g.pt}</span>` : ""}
+          </div>`;
+        li.onclick = () => showGlossaryDetail(g);
+        listGlossaryEl.appendChild(li);
+      });
 
-      function showCharacterDetail(c) {
-        detailTitle.textContent = c.name_pt || c.name_en;
+      listGlossaryEl.classList.remove("hidden");
+    }
 
-        const img = c.image_url || "";
+    function showCharacterDetail(c) {
+      detailTitle.textContent = c.name_pt || c.name_en;
 
-        detailBody.innerHTML = `
-          ${
-            img
-              ? `<div class="w-full overflow-hidden rounded-xl border border-slate-800">
-                   <img src="${img}" class="w-full h-48 object-cover" />
-                 </div>`
-              : ""
-          }
+      detailBody.innerHTML = `
+        ${c.image_url ? `<img src="${c.image_url}" class="w-full h-48 object-cover rounded-xl border border-slate-800" />` : ""}
+        ${c.name_jp ? `<div class="text-sm text-slate-200 mt-2">${c.name_jp}</div>` : ""}
+        <div class="text-[11px] text-slate-400 uppercase tracking-wide">${c.franchise || ""} ${c.year || ""}</div>
+        ${c.description ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Descrição</h3><p class="text-sm mt-1">${c.description}</p></section>` : ""}
+        ${c.powers ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Poderes</h3><p class="text-sm mt-1">${c.powers}</p></section>` : ""}
+        ${c.equipment ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Equipamentos</h3><p class="text-sm mt-1">${c.equipment}</p></section>` : ""}
+      `;
+      detailOverlay.classList.remove("hidden");
+    }
 
-          ${
-            c.name_jp
-              ? `<div class="text-sm text-slate-200 mt-2">${c.name_jp}</div>`
-              : ""
-          }
+    function showGlossaryDetail(g) {
+      detailTitle.textContent = g.jp;
+      detailBody.innerHTML = `
+        ${g.romaji ? `<div class="text-sm text-slate-200">${g.romaji}</div>` : ""}
+        ${g.category ? `<div class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 uppercase tracking-wide mt-1">${g.category}</div>` : ""}
+        ${g.pt ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Português</h3><p class="text-sm mt-1">${g.pt}</p></section>` : ""}
+        ${g.en ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Inglês</h3><p class="text-sm mt-1">${g.en}</p></section>` : ""}
+        ${g.explanation ? `<section><h3 class="text-xs font-semibold text-slate-300 uppercase mt-4">Explicação</h3><p class="text-sm mt-1">${g.explanation}</p></section>` : ""}
+      `;
+      detailOverlay.classList.remove("hidden");
+    }
 
-          <div class="text-[11px] text-slate-400 uppercase tracking-wide">
-            ${c.franchise || ""} ${
-          c.year ? "· " + c.year : ""
-        }
-          </div>
+    function closeDetail() {
+      detailOverlay.classList.add("hidden");
+    }
 
-          ${
-            c.description
-              ? `<section class="mt-4">
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Descrição</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${c.description}</p>
-                </section>`
-              : ""
-          }
-
-          ${
-            c.powers
-              ? `<section>
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mt-4">Poderes</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${c.powers}</p>
-                </section>`
-              : ""
-          }
-
-          ${
-            c.equipment
-              ? `<section>
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mt-4">Equipamentos</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${c.equipment}</p>
-                </section>`
-              : ""
-          }
-        `;
-
-        detailOverlay.classList.remove("hidden");
+    async function loadCurrentTab() {
+      if (currentTab === "characters") {
+        await fetchCharacters(currentSearch);
+        renderCharactersList();
+      } else {
+        await fetchGlossary(currentSearch);
+        renderGlossaryList();
       }
+    }
 
-      function showGlossaryDetail(g) {
-        detailTitle.textContent = g.jp;
-
-        detailBody.innerHTML = `
-          ${
-            g.romaji
-              ? `<div class="text-sm text-slate-200">${g.romaji}</div>`
-              : ""
-          }
-
-          ${
-            g.category
-              ? `<div class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 uppercase tracking-wide mt-1">${g.category}</div>`
-              : ""
-          }
-
-          ${
-            g.pt
-              ? `<section class="mt-4">
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Português</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${g.pt}</p>
-                </section>`
-              : ""
-          }
-
-          ${
-            g.en
-              ? `<section class="mt-4">
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Inglês</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${g.en}</p>
-                </section>`
-              : ""
-          }
-
-          ${
-            g.explanation
-              ? `<section class="mt-4">
-                  <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Explicação</h3>
-                  <p class="text-sm text-slate-100 leading-relaxed mt-1">${g.explanation}</p>
-                </section>`
-              : ""
-          }
-        `;
-
-        detailOverlay.classList.remove("hidden");
-      }
-
-      function closeDetail() {
-        detailOverlay.classList.add("hidden");
-      }
-
-      /* ---------------------- TABS + SEARCH ---------------------- */
-
-      async function loadCurrentTab() {
-        if (currentTab === "characters") {
-          const data = await fetchCharacters(currentSearch);
-          charactersData = data;
-          renderCharactersList();
-        } else {
-          const data = await fetchGlossary(currentSearch);
-          glossaryData = data;
-          renderGlossaryList();
-        }
-      }
-
-      tabCharactersBtn.onclick = () => {
-        currentTab = "characters";
-        tabCharactersBtn.classList.add("bg-slate-100", "text-slate-900");
-        tabGlossaryBtn.classList.remove("bg-slate-100", "text-slate-900");
-        tabGlossaryBtn.classList.add("bg-slate-800", "text-slate-200");
-        loadCurrentTab();
-      };
-
-      tabGlossaryBtn.onclick = () => {
-        currentTab = "glossary";
-        tabGlossaryBtn.classList.add("bg-slate-100", "text-slate-900");
-        tabCharactersBtn.classList.remove("bg-slate-100", "text-slate-900");
-        tabCharactersBtn.classList.add("bg-slate-800", "text-slate-200");
-        loadCurrentTab();
-      };
-
-      searchInput.oninput = () => {
-        currentSearch = searchInput.value;
-        if (searchInput._timer) clearTimeout(searchInput._timer);
-        searchInput._timer = setTimeout(() => loadCurrentTab(), 300);
-      };
-
-      detailClose.onclick = closeDetail;
-      detailOverlay.onclick = (e) => {
-        if (e.target === detailOverlay) closeDetail();
-      };
-
-      /* ------------------------- INIT ---------------------------- */
+    tabCharactersBtn.onclick = () => {
+      currentTab = "characters";
+      tabCharactersBtn.classList.add("bg-slate-100", "text-slate-900");
+      tabGlossaryBtn.classList.remove("bg-slate-100", "text-slate-900");
+      tabGlossaryBtn.classList.add("bg-slate-800", "text-slate-200");
       loadCurrentTab();
-    </script>
-  </body>
+    };
+
+    tabGlossaryBtn.onclick = () => {
+      currentTab = "glossary";
+      tabGlossaryBtn.classList.add("bg-slate-100", "text-slate-900");
+      tabCharactersBtn.classList.remove("bg-slate-100", "text-slate-900");
+      tabCharactersBtn.classList.add("bg-slate-800", "text-slate-200");
+      loadCurrentTab();
+    };
+
+    searchInput.oninput = () => {
+      currentSearch = searchInput.value;
+      clearTimeout(searchInput._timer);
+      searchInput._timer = setTimeout(() => loadCurrentTab(), 300);
+    };
+
+    detailClose.onclick = closeDetail;
+    detailOverlay.onclick = e => { if (e.target === detailOverlay) closeDetail(); };
+
+    loadCurrentTab();
+  </script>
+</body>
 </html>
