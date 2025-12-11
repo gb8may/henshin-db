@@ -53,12 +53,12 @@
     </div>
 
     <main class="flex-1 overflow-y-auto px-2 pb-16">
-      <ul id="list-characters" class="space-y-1 hidden"></ul>
+      <ul id="list-characters" class="space-y-1"></ul>
       <ul id="list-glossary" class="space-y-1 hidden"></ul>
       <ul id="list-collectibles" class="space-y-1 hidden"></ul>
       <ul id="list-publications" class="space-y-1 hidden"></ul>
 
-      <div id="empty-state" class="text-center text-slate-500 text-sm mt-6">
+      <div id="empty-state" class="text-center text-slate-500 text-sm mt-6 hidden">
         Digite algo na busca para começar.
       </div>
     </main>
@@ -111,7 +111,8 @@
     const detailClose = document.getElementById("detail-close");
 
     async function fetchCharacters(search = "") {
-      let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=year.asc`;
+      // lista em ordem alfabética por name_pt (fallback name_en)
+      let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=name_pt.asc,name_en.asc`;
       if (search.trim() !== "") {
         const encoded = encodeURIComponent("%" + search + "%");
         url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},franchise.ilike.${encoded})`;
@@ -220,6 +221,7 @@
 
       charactersData.forEach(c => {
         const name = c.name_pt || c.name_en || "";
+        const civil = c.civil_name || "";
         const li = document.createElement("li");
         li.className =
           "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
@@ -232,6 +234,11 @@
             }
             <div class="flex flex-col min-w-0">
               <span class="text-sm font-semibold truncate">${name}</span>
+              ${
+                civil
+                  ? `<span class="text-[11px] text-slate-300 truncate">${civil}</span>`
+                  : ""
+              }
               <span class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
                 ${(c.franchise || "")}${c.year ? " · " + c.year : ""}
               </span>
@@ -347,6 +354,18 @@
 
       if (c.name_jp) {
         parts.push(`<div class="text-sm text-slate-200 mt-2">${c.name_jp}</div>`);
+      }
+
+      // nome civil e ator
+      if (c.civil_name || c.actor_name) {
+        const civil = c.civil_name ? `<div class="text-xs text-slate-200">Nome civil: ${c.civil_name}</div>` : "";
+        const actor = c.actor_name ? `<div class="text-xs text-slate-200">Ator: ${c.actor_name}</div>` : "";
+        parts.push(`
+          <div class="mt-2 space-y-0.5">
+            ${civil}
+            ${actor}
+          </div>
+        `);
       }
 
       parts.push(`
@@ -507,15 +526,21 @@
 
     async function loadCurrentTab() {
       const search = currentSearch.trim();
+
+      if (currentTab === "characters") {
+        // Personagens: sempre lista completa, ou filtrada se tiver busca
+        await fetchCharacters(search);
+        renderCharactersList();
+        return;
+      }
+
+      // Demais abas continuam dependentes de busca
       if (search === "") {
         showEmptySearchMessage();
         return;
       }
 
-      if (currentTab === "characters") {
-        await fetchCharacters(search);
-        renderCharactersList();
-      } else if (currentTab === "glossary") {
+      if (currentTab === "glossary") {
         await fetchGlossary(search);
         renderGlossaryList();
       } else if (currentTab === "collectibles") {
@@ -576,7 +601,7 @@
     };
 
     setActiveTab(tabCharactersBtn);
-    showEmptySearchMessage();
+    loadCurrentTab();
   </script>
 </body>
 </html>
