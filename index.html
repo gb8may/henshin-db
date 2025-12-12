@@ -1,147 +1,1158 @@
-// ✅ COLLECTIBLES (CORRIGIDO p/ seu schema atual)
-const collectiblesTitle = document.getElementById("collectiblesTitle");
-const collectiblesStatus = document.getElementById("collectiblesStatus");
-const collectiblesList = document.getElementById("collectiblesList");
-const inputCollectiblesSearch = document.getElementById("inputCollectiblesSearch");
-const selectCollectiblesCategory = document.getElementById("selectCollectiblesCategory");
-let collectiblesCache = [];
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Henshin DB</title>
 
-function colDisplayName(it) {
-  return safeText(it.name_pt) || safeText(it.name_en) || safeText(it.name_jp) || "Colecionável";
-}
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-async function openCollectibles() {
-  collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · Colecionáveis`;
-  showView("collectibles");
-  inputCollectiblesSearch.value = "";
-  selectCollectiblesCategory.value = "";
-  await loadCollectibles();
+    <style>
+      :root {
+        --bg: #0b0e14;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.08);
+        --border: rgba(255, 255, 255, 0.12);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --shadow: 0 22px 60px rgba(0, 0, 0, 0.55);
+        --radius: 16px;
+      }
 
-  // filtro principal por item_type (belt/figure/mecha/weapon etc)
-  populateSelect(
-    selectCollectiblesCategory,
-    collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean),
-    "Todos"
-  );
+      * { box-sizing: border-box; }
+      html, body { height: 100%; }
 
-  renderCollectiblesList(filterCollectibles("", ""));
-}
+      body {
+        margin: 0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        background: radial-gradient(1200px 600px at 20% -10%, rgba(123, 92, 255, 0.25), transparent 60%),
+                    radial-gradient(900px 500px at 90% 10%, rgba(0, 192, 255, 0.18), transparent 55%),
+                    var(--bg);
+        color: var(--text);
+        overflow: hidden;
+      }
 
-async function loadCollectibles() {
-  collectiblesStatus.textContent = "Carregando...";
-  collectiblesList.innerHTML = "";
+      .app { height: 100%; display: flex; flex-direction: column; }
 
-  // ⚠️ NÃO inclui "url" aqui (se não existir, a query quebra)
-  const { data, error } = await supabase
-    .from("collectibles")
-    .select("id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes,rarity,status,created_at")
-    .eq("franchise", state.franchise);
+      header {
+        padding: 14px 16px 10px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(10px);
+      }
 
-  if (error) {
-    console.error("Collectibles load error:", error);
-    collectiblesStatus.textContent = `Erro ao carregar colecionáveis: ${error.message}`;
-    collectiblesCache = [];
-    return;
-  }
+      .topbar { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 
-  const list = Array.isArray(data) ? data : [];
-  list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
+      .brand { display: flex; flex-direction: column; gap: 2px; }
+      .brand .title { font-weight: 700; letter-spacing: 0.2px; font-size: 16px; line-height: 1.2; }
+      .brand .subtitle { font-size: 12px; color: var(--muted); line-height: 1.2; }
 
-  collectiblesCache = list;
-  collectiblesStatus.textContent = `${list.length} itens`;
-}
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        font-size: 12px;
+        color: var(--muted);
+        user-select: none;
+      }
 
-function filterCollectibles(q, itemType) {
-  const query = safeText(q).toLowerCase();
-  const t = safeText(itemType).toLowerCase();
+      main {
+        flex: 1;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        padding: 14px 14px 90px;
+      }
 
-  return collectiblesCache.filter((it) => {
-    if (t && safeText(it.item_type).toLowerCase() !== t) return false;
-    if (!query) return true;
+      /* Views + transição */
+      .view { display: none; }
+      .view.active { display: block; }
+      @keyframes viewEnter {
+        from { opacity: 0; transform: translateY(8px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .view.animIn { animation: viewEnter 220ms ease-out; }
 
-    return [
-      it.name_pt, it.name_en, it.name_jp,
-      it.line, it.item_type, it.manufacturer,
-      it.series_code, it.sku_code,
-      it.jp_search, it.notes, it.rarity, it.status,
-      it.year, it.era
-    ].some((v) => safeText(v).toLowerCase().includes(query));
-  });
-}
+      .sectionTitle { margin: 6px 2px 10px; font-weight: 700; font-size: 16px; line-height: 1.2; }
+      .sectionHint { margin: -4px 2px 12px; color: var(--muted); font-size: 13px; line-height: 1.25; }
 
-function renderCollectiblesList(list) {
-  collectiblesList.innerHTML = "";
-  if (!list.length) {
-    collectiblesList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
-    return;
-  }
+      /* ✅ CENTRALIZA OS BOTÕES */
+      .grid { display: grid; gap: 12px; justify-items: center; }
 
-  for (const it of list) {
-    const el = document.createElement("div");
-    el.className = "item";
+      /* ✅ BOTÃO COM CARA DE APP (MENOR + CENTRALIZADO) */
+      .btn {
+        width: min(360px, 92vw);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: var(--panel);
+        color: inherit;
+        font-size: 15px;
+        cursor: pointer;
+        text-align: left;
+      }
+      .btn:active { transform: translateY(1px); }
+      .btn small { font-size: 12px; color: var(--muted); }
 
-    const img = safeText(it.image_url);
-    const name = colDisplayName(it);
-    const year = safeText(it.year);
+      .backRow { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
 
-    const subtitleParts = [];
-    if (hasValue(it.line)) subtitleParts.push(safeText(it.line));
-    if (hasValue(it.item_type)) subtitleParts.push(safeText(it.item_type));
-    if (hasValue(it.manufacturer)) subtitleParts.push(safeText(it.manufacturer));
+      .ghostBtn {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.04);
+        color: inherit;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
+        cursor: pointer;
+      }
+      .ghostBtn:active { transform: translateY(1px); }
 
-    el.innerHTML = `
-      <div class="itemTop">
-        <div class="thumb">
-          ${hasValue(img) ? `<img src="${withCacheBuster(img)}" alt="${escapeHtml(name)}"
-            onerror="this.style.display='none'; this.parentElement.textContent='';" />` : ``}
-        </div>
-        <div class="meta">
-          <div class="nameLine">
-            <div class="name">${escapeHtml(name)}</div>
-            <div class="year">${escapeHtml(year)}</div>
+      .searchBox { display: flex; gap: 10px; align-items: center; margin: 8px 0 12px; }
+
+      input[type="search"], select {
+        width: 100%;
+        border: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.25);
+        color: var(--text);
+        padding: 12px 12px;
+        border-radius: 12px;
+        outline: none;
+        font-size: 14px;
+      }
+
+      .list { display: grid; gap: 10px; }
+
+      .item {
+        border: 1px solid var(--border);
+        background: var(--panel);
+        border-radius: var(--radius);
+        padding: 12px;
+        cursor: pointer;
+      }
+      .item:active { transform: translateY(1px); }
+
+      .itemTop { display: flex; gap: 12px; align-items: center; }
+
+      .thumb {
+        width: 54px;
+        height: 54px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        flex: 0 0 auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .thumb img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+      .meta { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+      .nameLine { display: flex; gap: 10px; align-items: baseline; min-width: 0; }
+
+      .name {
+        font-weight: 700;
+        font-size: 14px;
+        line-height: 1.2;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .year { font-size: 12px; color: var(--muted); flex: 0 0 auto; }
+      .desc { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.3; }
+
+      .pillRow { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .muted { color: var(--muted); }
+
+      footer {
+        position: fixed;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        border-top: 1px solid var(--border);
+        background: rgba(0, 0, 0, 0.5);
+        backdrop-filter: blur(10px);
+        padding: 10px 14px;
+        font-size: 12px;
+        color: var(--muted);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      .modalOverlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.6);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 18px;
+        z-index: 50;
+      }
+      .modalOverlay.show { display: flex; }
+
+      .modal {
+        width: min(520px, 100%);
+        max-height: 84vh;
+        overflow: auto;
+        border-radius: 18px;
+        border: 1px solid var(--border);
+        background: rgba(15, 18, 26, 0.92);
+        box-shadow: var(--shadow);
+        padding: 14px;
+      }
+
+      .modalHeader { display: flex; justify-content: space-between; gap: 10px; align-items: center; margin-bottom: 10px; }
+      .modalTitle { font-weight: 800; font-size: 15px; line-height: 1.2; }
+
+      .closeBtn {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: inherit;
+        border-radius: 12px;
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 13px;
+      }
+
+      /* ✅ Modal image: SEM CORTAR */
+      .modalImage {
+        width: 100%;
+        aspect-ratio: 4 / 5;
+        border-radius: 16px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        overflow: hidden;
+        margin-bottom: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
+      }
+      .modalImage img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
+
+      /* ✅ FICHA TÉCNICA */
+      .specCard {
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 16px;
+        overflow: hidden;
+      }
+      .specRow {
+        display: flex;
+        gap: 10px;
+        padding: 10px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        align-items: flex-start;
+      }
+      .specRow:first-child { border-top: none; }
+      .specKey {
+        flex: 0 0 40%;
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.2;
+        padding-top: 2px;
+      }
+      .specVal {
+        flex: 1;
+        font-size: 13px;
+        line-height: 1.35;
+        color: var(--text);
+        word-break: break-word;
+      }
+
+      .linkBtn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin-top: 10px;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        text-decoration: none;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="app">
+      <header>
+        <div class="topbar">
+          <div class="brand">
+            <div class="title">Henshin DB</div>
+            <div class="subtitle" id="headerSubtitle">Home</div>
           </div>
-          <div class="muted" style="font-size:12px; line-height:1.2;">
-            ${escapeHtml(subtitleParts.join(" · "))}
-          </div>
+          <div class="chip" id="headerChip">Offline</div>
         </div>
+      </header>
+
+      <main>
+        <!-- HOME -->
+        <section class="view active" id="viewHome">
+          <div class="sectionTitle">Temas</div>
+          <div class="sectionHint">Escolha um tema para navegar.</div>
+          <div class="grid" id="homeCategories"></div>
+        </section>
+
+        <!-- FRANCHISE HUB -->
+        <section class="view" id="viewFranchise">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToHome">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="franchiseTitle">Tema</div>
+          <div class="grid">
+            <button class="btn" id="btnGoCharacters">
+              <span>Personagens</span>
+              <small>Lista completa (A–Z)</small>
+            </button>
+
+            <button class="btn" id="btnGoGlossary">
+              <span>Glossário</span>
+              <small>Termos JP → PT/EN</small>
+            </button>
+
+            <button class="btn" id="btnGoPublications">
+              <span>Publicações</span>
+              <small>Livros, mooks, guias</small>
+            </button>
+
+            <button class="btn" id="btnGoCollectibles">
+              <span>Colecionáveis</span>
+              <small>DX, SHF, sofubi, etc.</small>
+            </button>
+          </div>
+        </section>
+
+        <!-- CHARACTERS -->
+        <section class="view" id="viewCharacters">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromCharacters">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="charactersTitle">Personagens</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputCharacterSearch" placeholder="Buscar por nome (EN/PT/JP/romaji)..." />
+          </div>
+
+          <div class="muted" id="charactersStatus"></div>
+          <div class="list" id="charactersList" style="margin-top: 12px;"></div>
+        </section>
+
+        <!-- GLOSSARY -->
+        <section class="view" id="viewGlossary">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromGlossary">Voltar</button>
+          </div>
+
+          <div class="sectionTitle">Glossário</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputGlossarySearch" placeholder="Buscar por JP/romaji/EN/PT..." />
+            <select id="selectGlossaryCategory">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <div class="muted" id="glossaryStatus"></div>
+          <div class="list" id="glossaryList" style="margin-top: 12px;"></div>
+        </section>
+
+        <!-- PUBLICATIONS -->
+        <section class="view" id="viewPublications">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromPublications">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="publicationsTitle">Publicações</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputPublicationsSearch" placeholder="Buscar por título, tipo, ano, editora..." />
+            <select id="selectPublicationsType">
+              <option value="">Todos</option>
+            </select>
+          </div>
+
+          <div class="muted" id="publicationsStatus"></div>
+          <div class="list" id="publicationsList" style="margin-top: 12px;"></div>
+        </section>
+
+        <!-- COLLECTIBLES -->
+        <section class="view" id="viewCollectibles">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromCollectibles">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="collectiblesTitle">Colecionáveis</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputCollectiblesSearch" placeholder="Buscar por nome, linha, fabricante, tipo..." />
+            <select id="selectCollectiblesCategory">
+              <option value="">Todos</option>
+            </select>
+          </div>
+
+          <div class="muted" id="collectiblesStatus"></div>
+          <div class="list" id="collectiblesList" style="margin-top: 12px;"></div>
+        </section>
+      </main>
+
+      <footer>v0.1 · Henshin DB · Author: Mayara Gouveia</footer>
+    </div>
+
+    <!-- MODAL -->
+    <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
+      <div class="modal">
+        <div class="modalHeader">
+          <div class="modalTitle" id="modalTitle">Detalhes</div>
+          <button class="closeBtn" id="modalClose">X</button>
+        </div>
+
+        <div class="modalImage" id="modalImageWrap" style="display:none;">
+          <img id="modalImage" alt="" />
+        </div>
+
+        <div id="modalBody"></div>
+
+        <a class="linkBtn" id="modalLinkBtn" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Abrir link</a>
       </div>
-      ${hasValue(it.notes) ? `<div class="desc">${escapeHtml(it.notes)}</div>` : ``}
-    `;
+    </div>
 
-    el.addEventListener("click", () => {
-      modalTitle.textContent = name;
-      setModalImage(img, name);
-      setModalLink(""); // (no seu schema atual não tem url)
+    <script>
+      const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
+      const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
+      const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const rows = [
-        specRow("Nome (PT)", it.name_pt),
-        specRow("Nome (EN)", it.name_en),
-        specRow("Nome (JP)", it.name_jp),
-        specRow("Linha", it.line),
-        specRow("Tipo", it.item_type),
-        specRow("Fabricante", it.manufacturer),
-        specRow("Ano", it.year),
-        specRow("Era", it.era),
-        specRow("Series code", it.series_code),
-        specRow("SKU", it.sku_code),
-        specRow("Status", it.status),
-        specRow("Raridade", it.rarity),
-        specRow("JP search", it.jp_search),
-        specRow("Notas", it.notes),
-        specRow("Franquia", formatFranchise(it.franchise))
-      ].filter(Boolean).join("");
+      const state = { franchise: null };
 
-      modalBody.innerHTML = renderSpecCard(rows);
-      openModal();
-    });
+      const headerSubtitle = document.getElementById("headerSubtitle");
+      const headerChip = document.getElementById("headerChip");
 
-    collectiblesList.appendChild(el);
-  }
-}
+      const views = {
+        home: document.getElementById("viewHome"),
+        franchise: document.getElementById("viewFranchise"),
+        characters: document.getElementById("viewCharacters"),
+        glossary: document.getElementById("viewGlossary"),
+        publications: document.getElementById("viewPublications"),
+        collectibles: document.getElementById("viewCollectibles")
+      };
 
-inputCollectiblesSearch.addEventListener("input", () =>
-  renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
-);
-selectCollectiblesCategory.addEventListener("change", () =>
-  renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
-);
+      function showView(name) {
+        for (const k in views) {
+          views[k].classList.remove("active", "animIn");
+        }
+        views[name].classList.add("active", "animIn");
+
+        if (name === "home") headerSubtitle.textContent = "Home";
+        if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
+        if (name === "characters") headerSubtitle.textContent = "Personagens";
+        if (name === "glossary") headerSubtitle.textContent = "Glossário";
+        if (name === "publications") headerSubtitle.textContent = "Publicações";
+        if (name === "collectibles") headerSubtitle.textContent = "Colecionáveis";
+      }
+
+      function formatFranchise(key) {
+        if (!key) return "Tema";
+        if (key === "kamen rider") return "Kamen Rider";
+        if (key === "super sentai") return "Super Sentai";
+        if (key === "metal hero") return "Metal Hero";
+        if (key === "ultraman") return "Ultraman";
+        return key;
+      }
+
+      function safeText(v) {
+        if (v === null || v === undefined) return "";
+        return String(v).trim();
+      }
+
+      function hasValue(v) {
+        const s = safeText(v);
+        return s.length > 0 && s.toLowerCase() !== "null";
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
+
+      function specRow(label, value) {
+        const v = safeText(value);
+        if (!hasValue(v)) return "";
+        return `
+          <div class="specRow">
+            <div class="specKey">${escapeHtml(label)}</div>
+            <div class="specVal">${escapeHtml(v)}</div>
+          </div>
+        `;
+      }
+
+      function renderSpecCard(rowsHtml) {
+        const rows = (rowsHtml || "").trim();
+        if (!rows) return `<div class="muted" style="padding: 8px 2px;">Sem detalhes.</div>`;
+        return `<div class="specCard">${rows}</div>`;
+      }
+
+      function slugifyName(name) {
+        return String(name || "")
+          .trim()
+          .toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      function imageUrlForCharacter(nameEn) {
+        const slug = slugifyName(nameEn);
+        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
+      }
+
+      function withCacheBuster(url) {
+        const u = safeText(url);
+        if (!hasValue(u)) return "";
+        const sep = u.includes("?") ? "&" : "?";
+        return `${u}${sep}v=${Date.now()}`;
+      }
+
+      async function pingSupabase() {
+        try {
+          const { error } = await supabase.from("characters").select("id").limit(1);
+          headerChip.textContent = error ? "Conexão com erro" : "Online";
+        } catch {
+          headerChip.textContent = "Offline";
+        }
+      }
+
+      // HOME
+      const homeCategories = document.getElementById("homeCategories");
+
+      function renderHome() {
+        const cats = [
+          { key: "kamen rider", label: "Kamen Rider" },
+          { key: "super sentai", label: "Super Sentai" },
+          { key: "metal hero", label: "Metal Hero" },
+          { key: "ultraman", label: "Ultraman" }
+        ];
+
+        homeCategories.innerHTML = "";
+
+        for (const c of cats) {
+          const btn = document.createElement("button");
+          btn.className = "btn";
+          btn.type = "button";
+          btn.innerHTML = `<span>${c.label}</span><small></small>`;
+          btn.addEventListener("click", () => {
+            state.franchise = c.key;
+            document.getElementById("franchiseTitle").textContent = c.label;
+            showView("franchise");
+          });
+          homeCategories.appendChild(btn);
+        }
+      }
+
+      // NAV HUB
+      document.getElementById("btnBackToHome").addEventListener("click", () => showView("home"));
+
+      document.getElementById("btnGoCharacters").addEventListener("click", async () => openCharacters());
+      document.getElementById("btnGoGlossary").addEventListener("click", async () => openGlossary());
+      document.getElementById("btnGoPublications").addEventListener("click", async () => openPublications());
+      document.getElementById("btnGoCollectibles").addEventListener("click", async () => openCollectibles());
+
+      document.getElementById("btnBackToFranchiseFromCharacters").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise"));
+
+      // MODAL
+      const modalOverlay = document.getElementById("modalOverlay");
+      const modalClose = document.getElementById("modalClose");
+      const modalTitle = document.getElementById("modalTitle");
+      const modalBody = document.getElementById("modalBody");
+      const modalImageWrap = document.getElementById("modalImageWrap");
+      const modalImage = document.getElementById("modalImage");
+      const modalLinkBtn = document.getElementById("modalLinkBtn");
+
+      function openModal() { modalOverlay.classList.add("show"); }
+      function closeModal() { modalOverlay.classList.remove("show"); }
+
+      modalClose.addEventListener("click", closeModal);
+      modalOverlay.addEventListener("click", (e) => { if (e.target === modalOverlay) closeModal(); });
+
+      function setModalLink(url) {
+        const u = safeText(url);
+        if (!hasValue(u)) {
+          modalLinkBtn.style.display = "none";
+          modalLinkBtn.href = "#";
+          return;
+        }
+        modalLinkBtn.style.display = "inline-flex";
+        modalLinkBtn.href = u;
+      }
+
+      function setModalImage(url, alt) {
+        const u = safeText(url);
+        if (!hasValue(u)) {
+          modalImageWrap.style.display = "none";
+          modalImage.src = "";
+          modalImage.alt = "";
+          return;
+        }
+        modalImageWrap.style.display = "block";
+        modalImage.src = withCacheBuster(u);
+        modalImage.alt = safeText(alt) || "";
+        modalImage.onerror = () => { modalImageWrap.style.display = "none"; };
+      }
+
+      // CHARACTERS
+      const charactersTitle = document.getElementById("charactersTitle");
+      const charactersStatus = document.getElementById("charactersStatus");
+      const charactersList = document.getElementById("charactersList");
+      const inputCharacterSearch = document.getElementById("inputCharacterSearch");
+      let charactersCache = [];
+
+      async function openCharacters() {
+        charactersTitle.textContent = `${formatFranchise(state.franchise)} · Personagens`;
+        showView("characters");
+        inputCharacterSearch.value = "";
+
+        await loadCharacters();
+        renderCharactersList(charactersCache);
+      }
+
+      async function loadCharacters() {
+        charactersStatus.textContent = "Carregando...";
+        charactersList.innerHTML = "";
+
+        const { data, error } = await supabase
+          .from("characters")
+          .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description,powers,equipment,civil_name,actor_name,tags,search_terms")
+          .eq("franchise", state.franchise);
+
+        if (error) {
+          charactersStatus.textContent = "Erro ao carregar personagens.";
+          charactersCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
+        charactersCache = list;
+        charactersStatus.textContent = `${list.length} itens`;
+      }
+
+      function filterCharacters(q) {
+        const query = safeText(q).toLowerCase();
+        if (!query) return charactersCache;
+
+        return charactersCache.filter((c) =>
+          [c.name_en, c.name_pt, c.name_jp, c.romaji, c.civil_name, c.actor_name]
+            .some((v) => safeText(v).toLowerCase().includes(query))
+        );
+      }
+
+      function renderCharactersList(list) {
+        charactersList.innerHTML = "";
+        if (!list.length) {
+          charactersList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          return;
+        }
+
+        for (const c of list) {
+          const el = document.createElement("div");
+          el.className = "item";
+
+          const imgUrl = imageUrlForCharacter(c.name_en);
+
+          el.innerHTML = `
+            <div class="itemTop">
+              <div class="thumb">
+                <img src="${imgUrl}" alt="${safeText(c.name_en)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />
+              </div>
+              <div class="meta">
+                <div class="nameLine">
+                  <div class="name">${safeText(c.name_pt) || safeText(c.name_en)}</div>
+                  <div class="year">${hasValue(c.year) ? c.year : ""}</div>
+                </div>
+                <div class="muted" style="font-size:12px; line-height:1.2;">
+                  ${safeText(c.name_en)}
+                </div>
+              </div>
+            </div>
+            ${hasValue(c.description) ? `<div class="desc">${escapeHtml(c.description)}</div>` : ``}
+          `;
+
+          el.addEventListener("click", () => {
+            modalTitle.textContent = safeText(c.name_pt) || safeText(c.name_en) || "Detalhes";
+            setModalImage(imgUrl, c.name_en);
+            setModalLink("");
+
+            const rows = [
+              specRow("Nome (PT)", c.name_pt),
+              specRow("Nome (EN)", c.name_en),
+              specRow("Nome (JP)", c.name_jp),
+              specRow("Romaji", c.romaji),
+              specRow("Franquia", formatFranchise(c.franchise)),
+              specRow("Ano", c.year),
+              specRow("Nome civil", c.civil_name),
+              specRow("Ator", c.actor_name),
+              specRow("Descrição", c.description),
+              specRow("Poderes", c.powers),
+              specRow("Equipamentos", c.equipment)
+            ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
+            openModal();
+          });
+
+          charactersList.appendChild(el);
+        }
+      }
+
+      inputCharacterSearch.addEventListener("input", () => renderCharactersList(filterCharacters(inputCharacterSearch.value)));
+
+      // GLOSSARY
+      const glossaryStatus = document.getElementById("glossaryStatus");
+      const glossaryList = document.getElementById("glossaryList");
+      const inputGlossarySearch = document.getElementById("inputGlossarySearch");
+      const selectGlossaryCategory = document.getElementById("selectGlossaryCategory");
+      let glossaryCache = [];
+
+      async function openGlossary() {
+        showView("glossary");
+        inputGlossarySearch.value = "";
+        selectGlossaryCategory.value = "";
+
+        await loadGlossary();
+        populateGlossaryCategories(glossaryCache);
+        renderGlossaryList(glossaryCache);
+      }
+
+      async function loadGlossary() {
+        glossaryStatus.textContent = "Carregando...";
+        glossaryList.innerHTML = "";
+
+        const { data, error } = await supabase
+          .from("glossary")
+          .select("id,jp,romaji,en,pt,explanation,category");
+
+        if (error) {
+          glossaryStatus.textContent = "Erro ao carregar glossário.";
+          glossaryCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) =>
+          (safeText(a.pt) || safeText(a.en) || safeText(a.jp)).localeCompare(safeText(b.pt) || safeText(b.en) || safeText(b.jp), "pt", { sensitivity: "base" })
+        );
+        glossaryCache = list;
+        glossaryStatus.textContent = `${list.length} termos`;
+      }
+
+      function populateGlossaryCategories(list) {
+        const cats = Array.from(new Set(list.map(x => safeText(x.category)).filter(Boolean))).sort((a,b) => a.localeCompare(b));
+        selectGlossaryCategory.innerHTML = `<option value="">Todas</option>`;
+        for (const c of cats) {
+          const opt = document.createElement("option");
+          opt.value = c;
+          opt.textContent = c;
+          selectGlossaryCategory.appendChild(opt);
+        }
+      }
+
+      function filterGlossary(q, cat) {
+        const query = safeText(q).toLowerCase();
+        const category = safeText(cat).toLowerCase();
+
+        return glossaryCache.filter((t) => {
+          if (category && safeText(t.category).toLowerCase() !== category) return false;
+          if (!query) return true;
+          return [t.jp, t.romaji, t.en, t.pt, t.explanation, t.category]
+            .some((v) => safeText(v).toLowerCase().includes(query));
+        });
+      }
+
+      function renderGlossaryList(list) {
+        glossaryList.innerHTML = "";
+        if (!list.length) {
+          glossaryList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          return;
+        }
+
+        for (const t of list) {
+          const el = document.createElement("div");
+          el.className = "item";
+
+          const title = safeText(t.pt) || safeText(t.en) || safeText(t.jp) || "Termo";
+          el.innerHTML = `
+            <div class="nameLine">
+              <div class="name">${escapeHtml(title)}</div>
+              <div class="year">${escapeHtml(safeText(t.category))}</div>
+            </div>
+            <div class="desc">
+              <div style="margin-bottom:6px;">
+                <span class="pill">${escapeHtml(safeText(t.jp) || "-")}</span>
+                ${hasValue(t.romaji) ? `<span class="pill">${escapeHtml(t.romaji)}</span>` : ``}
+                ${hasValue(t.en) ? `<span class="pill">${escapeHtml(t.en)}</span>` : ``}
+              </div>
+              ${hasValue(t.explanation) ? escapeHtml(t.explanation) : ""}
+            </div>
+          `;
+
+          el.addEventListener("click", () => {
+            modalTitle.textContent = title;
+            setModalImage("", "");
+            setModalLink("");
+
+            const rows = [
+              specRow("JP", t.jp),
+              specRow("Romaji", t.romaji),
+              specRow("EN", t.en),
+              specRow("PT", t.pt),
+              specRow("Categoria", t.category),
+              specRow("Explicação", t.explanation)
+            ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
+            openModal();
+          });
+
+          glossaryList.appendChild(el);
+        }
+      }
+
+      inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
+      selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
+
+      // ✅ PUBLICATIONS (AJUSTADO: NÃO USA colunas que podem não existir)
+      const publicationsTitle = document.getElementById("publicationsTitle");
+      const publicationsStatus = document.getElementById("publicationsStatus");
+      const publicationsList = document.getElementById("publicationsList");
+      const inputPublicationsSearch = document.getElementById("inputPublicationsSearch");
+      const selectPublicationsType = document.getElementById("selectPublicationsType");
+      let publicationsCache = [];
+
+      function pubDisplayTitle(p) {
+        return safeText(p.title_pt) || safeText(p.title_en) || safeText(p.title_jp) || "Publicação";
+      }
+
+      async function openPublications() {
+        publicationsTitle.textContent = `${formatFranchise(state.franchise)} · Publicações`;
+        showView("publications");
+        inputPublicationsSearch.value = "";
+        selectPublicationsType.value = "";
+        await loadPublications();
+        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), "Todos");
+        renderPublicationsList(filterPublications("", ""));
+      }
+
+      async function loadPublications() {
+        publicationsStatus.textContent = "Carregando...";
+        publicationsList.innerHTML = "";
+
+        const { data, error } = await supabase
+          .from("publications")
+          .select("id,title_en,title_pt,title_jp,pub_type,publisher,issue,year,month,isbn,language,franchise,cover_url,notes,url")
+          .eq("franchise", state.franchise);
+
+        if (error) {
+          publicationsStatus.textContent = "Erro ao carregar publicações.";
+          publicationsCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) => {
+          const ay = Number(a.year || 0), by = Number(b.year || 0);
+          if (by !== ay) return by - ay;
+          return pubDisplayTitle(a).localeCompare(pubDisplayTitle(b), "pt", { sensitivity: "base" });
+        });
+
+        publicationsCache = list;
+        publicationsStatus.textContent = `${list.length} itens`;
+      }
+
+      function populateSelect(selectEl, values, allLabel) {
+        const uniq = Array.from(new Set(values.map(v => safeText(v)).filter(Boolean)))
+          .sort((a,b) => a.localeCompare(b));
+        selectEl.innerHTML = `<option value="">${allLabel}</option>`;
+        for (const v of uniq) {
+          const opt = document.createElement("option");
+          opt.value = v;
+          opt.textContent = v;
+          selectEl.appendChild(opt);
+        }
+      }
+
+      function filterPublications(q, pubType) {
+        const query = safeText(q).toLowerCase();
+        const t = safeText(pubType).toLowerCase();
+
+        return publicationsCache.filter((p) => {
+          if (t && safeText(p.pub_type).toLowerCase() !== t) return false;
+          if (!query) return true;
+          return [
+            p.title_pt, p.title_en, p.title_jp,
+            p.pub_type, p.publisher, p.issue,
+            p.year, p.month, p.isbn, p.language,
+            p.notes
+          ].some((v) => safeText(v).toLowerCase().includes(query));
+        });
+      }
+
+      function renderPublicationsList(list) {
+        publicationsList.innerHTML = "";
+        if (!list.length) {
+          publicationsList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          return;
+        }
+
+        for (const p of list) {
+          const el = document.createElement("div");
+          el.className = "item";
+
+          const cover = safeText(p.cover_url);
+          const title = pubDisplayTitle(p);
+          const type = safeText(p.pub_type);
+          const year = safeText(p.year);
+
+          el.innerHTML = `
+            <div class="itemTop">
+              <div class="thumb">
+                ${hasValue(cover) ? `<img src="${cover}" alt="${escapeHtml(title)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />` : ``}
+              </div>
+              <div class="meta">
+                <div class="nameLine">
+                  <div class="name">${escapeHtml(title)}</div>
+                  <div class="year">${escapeHtml(year)}</div>
+                </div>
+                <div class="muted" style="font-size:12px; line-height:1.2;">
+                  ${escapeHtml(type)}${hasValue(p.publisher) ? " · " + escapeHtml(p.publisher) : ""}
+                </div>
+              </div>
+            </div>
+            ${hasValue(p.notes) ? `<div class="desc">${escapeHtml(p.notes)}</div>` : ``}
+          `;
+
+          el.addEventListener("click", () => {
+            modalTitle.textContent = title;
+            setModalImage(cover, title);
+            setModalLink(p.url);
+
+            const rows = [
+              specRow("Título (PT)", p.title_pt),
+              specRow("Título (EN)", p.title_en),
+              specRow("Título (JP)", p.title_jp),
+              specRow("Tipo", p.pub_type),
+              specRow("Editora", p.publisher),
+              specRow("Edição", p.issue),
+              specRow("Ano", p.year),
+              specRow("Mês", p.month),
+              specRow("Idioma", p.language),
+              specRow("ISBN", p.isbn),
+              specRow("Franquia", formatFranchise(p.franchise)),
+              specRow("Notas", p.notes),
+              specRow("URL", p.url)
+            ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
+            openModal();
+          });
+
+          publicationsList.appendChild(el);
+        }
+      }
+
+      inputPublicationsSearch.addEventListener("input", () =>
+        renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
+      );
+      selectPublicationsType.addEventListener("change", () =>
+        renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
+      );
+
+      // ✅ COLLECTIBLES (AJUSTADO: inclui URL e usa cache-buster na imagem)
+      const collectiblesTitle = document.getElementById("collectiblesTitle");
+      const collectiblesStatus = document.getElementById("collectiblesStatus");
+      const collectiblesList = document.getElementById("collectiblesList");
+      const inputCollectiblesSearch = document.getElementById("inputCollectiblesSearch");
+      const selectCollectiblesCategory = document.getElementById("selectCollectiblesCategory");
+      let collectiblesCache = [];
+
+      function colDisplayName(it) {
+        return safeText(it.name_pt) || safeText(it.name_en) || safeText(it.name_jp) || "Colecionável";
+      }
+
+      async function openCollectibles() {
+        collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · Colecionáveis`;
+        showView("collectibles");
+        inputCollectiblesSearch.value = "";
+        selectCollectiblesCategory.value = "";
+        await loadCollectibles();
+        populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), "Todos");
+        renderCollectiblesList(filterCollectibles("", ""));
+      }
+
+      async function loadCollectibles() {
+        collectiblesStatus.textContent = "Carregando...";
+        collectiblesList.innerHTML = "";
+
+        const { data, error } = await supabase
+          .from("collectibles")
+          .select("id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes,rarity,status,url")
+          .eq("franchise", state.franchise);
+
+        if (error) {
+          collectiblesStatus.textContent = "Erro ao carregar colecionáveis.";
+          collectiblesCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
+        collectiblesCache = list;
+        collectiblesStatus.textContent = `${list.length} itens`;
+      }
+
+      function filterCollectibles(q, itemType) {
+        const query = safeText(q).toLowerCase();
+        const t = safeText(itemType).toLowerCase();
+
+        return collectiblesCache.filter((it) => {
+          if (t && safeText(it.item_type).toLowerCase() !== t) return false;
+          if (!query) return true;
+
+          return [
+            it.name_pt, it.name_en, it.name_jp,
+            it.line, it.item_type, it.manufacturer,
+            it.series_code, it.sku_code,
+            it.jp_search, it.notes, it.rarity, it.status,
+            it.year, it.era
+          ].some((v) => safeText(v).toLowerCase().includes(query));
+        });
+      }
+
+      function renderCollectiblesList(list) {
+        collectiblesList.innerHTML = "";
+        if (!list.length) {
+          collectiblesList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          return;
+        }
+
+        for (const it of list) {
+          const el = document.createElement("div");
+          el.className = "item";
+
+          const img = safeText(it.image_url);
+          const name = colDisplayName(it);
+          const year = safeText(it.year);
+          const subtitleParts = [];
+          if (hasValue(it.line)) subtitleParts.push(safeText(it.line));
+          if (hasValue(it.item_type)) subtitleParts.push(safeText(it.item_type));
+          if (hasValue(it.manufacturer)) subtitleParts.push(safeText(it.manufacturer));
+
+          el.innerHTML = `
+            <div class="itemTop">
+              <div class="thumb">
+                ${hasValue(img) ? `<img src="${withCacheBuster(img)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />` : ``}
+              </div>
+              <div class="meta">
+                <div class="nameLine">
+                  <div class="name">${escapeHtml(name)}</div>
+                  <div class="year">${escapeHtml(year)}</div>
+                </div>
+                <div class="muted" style="font-size:12px; line-height:1.2;">
+                  ${escapeHtml(subtitleParts.join(" · "))}
+                </div>
+              </div>
+            </div>
+            ${hasValue(it.notes) ? `<div class="desc">${escapeHtml(it.notes)}</div>` : ``}
+          `;
+
+          el.addEventListener("click", () => {
+            modalTitle.textContent = name;
+            setModalImage(img, name);
+            setModalLink(it.url);
+
+            const rows = [
+              specRow("Nome (PT)", it.name_pt),
+              specRow("Nome (EN)", it.name_en),
+              specRow("Nome (JP)", it.name_jp),
+              specRow("Linha", it.line),
+              specRow("Tipo", it.item_type),
+              specRow("Fabricante", it.manufacturer),
+              specRow("Ano", it.year),
+              specRow("Era", it.era),
+              specRow("Series code", it.series_code),
+              specRow("SKU", it.sku_code),
+              specRow("Status", it.status),
+              specRow("Raridade", it.rarity),
+              specRow("JP search", it.jp_search),
+              specRow("Notas", it.notes),
+              specRow("Franquia", formatFranchise(it.franchise)),
+              specRow("URL", it.url)
+            ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
+            openModal();
+          });
+
+          collectiblesList.appendChild(el);
+        }
+      }
+
+      inputCollectiblesSearch.addEventListener("input", () =>
+        renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
+      );
+      selectCollectiblesCategory.addEventListener("change", () =>
+        renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
+      );
+
+      // Modal ESC
+      document.addEventListener("keydown", (e) => {
+        if (e.key === "Escape") closeModal();
+      });
+
+      function init() {
+        renderHome();
+        showView("home");
+        pingSupabase();
+      }
+
+      init();
+    </script>
+  </body>
+</html>
