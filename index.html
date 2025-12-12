@@ -200,18 +200,6 @@
 
       .desc { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.3; }
 
-      .pillRow { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
-      .pill {
-        display: inline-flex;
-        align-items: center;
-        padding: 6px 10px;
-        border-radius: 999px;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.05);
-        font-size: 12px;
-        color: var(--muted);
-      }
-
       .muted { color: var(--muted); }
 
       footer {
@@ -346,12 +334,12 @@
 
               <button class="btn" id="btnGoPublications">
                 <span>Publicações</span>
-                <small>Filmes, séries, especiais</small>
+                <small>Livros, guias, mooks, etc.</small>
               </button>
 
               <button class="btn" id="btnGoCollectibles">
                 <span>Colecionáveis</span>
-                <small>DX, SHF, sofubi, etc.</small>
+                <small>DX, SHF, sofubi…</small>
               </button>
             </div>
           </div>
@@ -423,9 +411,9 @@
             <div class="sectionTitle" id="collectiblesTitle">Colecionáveis</div>
 
             <div class="searchBox">
-              <input type="search" id="inputCollectiblesSearch" placeholder="Buscar por nome, marca, categoria..." />
-              <select id="selectCollectiblesCategory">
-                <option value="">Todas</option>
+              <input type="search" id="inputCollectiblesSearch" placeholder="Buscar por nome, linha, tipo..." />
+              <select id="selectCollectiblesType">
+                <option value="">Todos</option>
               </select>
             </div>
 
@@ -523,13 +511,12 @@
       }
 
       function normalizeFranchise(v) {
-        // "Kamen Rider", "kamen_rider", "kamen-rider" -> "kamen rider"
         return String(v || "")
           .trim()
           .toLowerCase()
           .replace(/[_-]+/g, " ")
           .replace(/\s+/g, " ")
-          .replace(/[^a-z\s]/g, "")  // mantém simples/seguro
+          .replace(/[^a-z\s]/g, "")
           .trim();
       }
 
@@ -563,20 +550,6 @@
         `;
       }
 
-      function slugifyName(name) {
-        return String(name || "")
-          .trim()
-          .toLowerCase()
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
-      }
-
-      function imageUrlForCharacter(nameEn) {
-        const slug = slugifyName(nameEn);
-        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
-      }
-
       async function pingSupabase() {
         try {
           const { error } = await supabase.from("characters").select("id").limit(1);
@@ -589,32 +562,23 @@
       async function fetchWithFranchiseFallback({ table, select, franchiseKey, statusEl }) {
         const wanted = normalizeFranchise(franchiseKey);
 
-        // 1) tenta filtrado no server (mais rápido)
         try {
           const { data, error } = await supabase.from(table).select(select).eq("franchise", franchiseKey);
-          if (error) {
-            console.warn(`[${table}] eq(franchise) error:`, error);
-          } else if (Array.isArray(data) && data.length > 0) {
-            return data;
-          }
+          if (!error && Array.isArray(data) && data.length > 0) return data;
+          if (error) console.warn(`[${table}] eq(franchise) error:`, error);
         } catch (e) {
           console.warn(`[${table}] eq(franchise) exception:`, e);
         }
 
-        // 2) fallback: busca tudo e filtra client-side por normalização
         try {
           const { data, error } = await supabase.from(table).select(select);
           if (error) {
             console.warn(`[${table}] fallback select error:`, error);
-            if (statusEl) statusEl.textContent = `Erro ao carregar ${table} (verifique tabela/colunas/RLS).`;
+            if (statusEl) statusEl.textContent = `Erro ao carregar ${table} (RLS/colunas).`;
             return [];
           }
           const list = Array.isArray(data) ? data : [];
-          const filtered = list.filter((row) => normalizeFranchise(row.franchise) === wanted);
-          if (filtered.length === 0 && statusEl) {
-            statusEl.textContent = `0 itens — (provável mismatch de franchise). Eu tentei normalizar, mas não bateu.`;
-          }
-          return filtered;
+          return list.filter((row) => normalizeFranchise(row.franchise) === wanted);
         } catch (e) {
           console.warn(`[${table}] fallback exception:`, e);
           if (statusEl) statusEl.textContent = `Erro ao carregar ${table}.`;
@@ -701,18 +665,31 @@
         modalImage.onerror = () => { modalImageWrap.style.display = "none"; };
       }
 
-      // CHARACTERS
+      // CHARACTERS (igual ao teu)
       const charactersTitle = document.getElementById("charactersTitle");
       const charactersStatus = document.getElementById("charactersStatus");
       const charactersList = document.getElementById("charactersList");
       const inputCharacterSearch = document.getElementById("inputCharacterSearch");
       let charactersCache = [];
 
+      function slugifyName(name) {
+        return String(name || "")
+          .trim()
+          .toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      function imageUrlForCharacter(nameEn) {
+        const slug = slugifyName(nameEn);
+        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
+      }
+
       async function openCharacters() {
         charactersTitle.textContent = `${formatFranchise(state.franchise)} · Personagens`;
         showView("characters", "forward");
         inputCharacterSearch.value = "";
-
         await loadCharacters();
         renderCharactersList(charactersCache);
       }
@@ -804,7 +781,7 @@
 
       inputCharacterSearch.addEventListener("input", () => renderCharactersList(filterCharacters(inputCharacterSearch.value)));
 
-      // GLOSSARY
+      // GLOSSARY (igual ao teu)
       const glossaryStatus = document.getElementById("glossaryStatus");
       const glossaryList = document.getElementById("glossaryList");
       const inputGlossarySearch = document.getElementById("inputGlossarySearch");
@@ -886,7 +863,7 @@
             </div>
             <div class="desc">
               <div style="margin-bottom:6px;">
-                <span class="pill">${escapeHtml(safeText(t.jp) || "-")}</span>
+                <span class="pill" style="border-radius:999px; padding:6px 10px; display:inline-flex; border:1px solid var(--border); background:rgba(255,255,255,0.05); font-size:12px; color:var(--muted);">${escapeHtml(safeText(t.jp) || "-")}</span>
                 ${hasValue(t.romaji) ? `<span class="pill">${escapeHtml(t.romaji)}</span>` : ``}
                 ${hasValue(t.en) ? `<span class="pill">${escapeHtml(t.en)}</span>` : ``}
               </div>
@@ -916,7 +893,7 @@
       inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
       selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
 
-      // PUBLICATIONS
+      // PUBLICATIONS (AJUSTADO)
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -930,7 +907,7 @@
         inputPublicationsSearch.value = "";
         selectPublicationsType.value = "";
         await loadPublications();
-        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.type)).filter(Boolean), "Todos");
+        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), "Todos");
         renderPublicationsList(filterPublications("", ""));
       }
 
@@ -938,15 +915,14 @@
         publicationsStatus.textContent = "Carregando...";
         publicationsList.innerHTML = "";
 
-        // ✅ fallback robusto
         const list = await fetchWithFranchiseFallback({
           table: "publications",
-          select: "id,title,franchise,year,type,description,url,cover_url",
+          select: "id,title_en,title_pt,title_jp,franchise,year,month,pub_type,publisher,issue,isbn,language,era,cover_url,notes,url",
           franchiseKey: state.franchise,
           statusEl: publicationsStatus
         });
 
-        list.sort((a, b) => (safeText(b.year)).localeCompare(safeText(a.year)) || safeText(a.title).localeCompare(safeText(b.title)));
+        list.sort((a, b) => (Number(b.year || 0) - Number(a.year || 0)) || safeText(a.title_en).localeCompare(safeText(b.title_en)));
         publicationsCache = list;
         publicationsStatus.textContent = `${list.length} itens`;
       }
@@ -967,9 +943,9 @@
         const t = safeText(type).toLowerCase();
 
         return publicationsCache.filter((p) => {
-          if (t && safeText(p.type).toLowerCase() !== t) return false;
+          if (t && safeText(p.pub_type).toLowerCase() !== t) return false;
           if (!query) return true;
-          return [p.title, p.type, p.year, p.description]
+          return [p.title_en, p.title_pt, p.title_jp, p.pub_type, p.publisher, p.issue, p.year, p.month, p.notes, p.isbn]
             .some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -986,9 +962,9 @@
           el.className = "item";
 
           const cover = safeText(p.cover_url);
-          const title = safeText(p.title) || "Publicação";
-          const type = safeText(p.type);
-          const year = safeText(p.year);
+          const title = safeText(p.title_pt) || safeText(p.title_en) || safeText(p.title_jp) || "Publicação";
+          const type = safeText(p.pub_type);
+          const year = hasValue(p.year) ? String(p.year) : "";
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1001,11 +977,11 @@
                   <div class="year">${escapeHtml(year)}</div>
                 </div>
                 <div class="muted" style="font-size:12px; line-height:1.2;">
-                  ${escapeHtml(type)}
+                  ${escapeHtml(type)}${hasValue(p.publisher) ? " · " + escapeHtml(p.publisher) : ""}
                 </div>
               </div>
             </div>
-            ${hasValue(p.description) ? `<div class="desc">${escapeHtml(p.description)}</div>` : ``}
+            ${hasValue(p.notes) ? `<div class="desc">${escapeHtml(p.notes)}</div>` : ``}
           `;
 
           el.addEventListener("click", () => {
@@ -1014,11 +990,18 @@
             setModalLink(p.url);
 
             modalBody.innerHTML = [
-              kvRow("Título", p.title),
-              kvRow("Tipo", p.type),
+              kvRow("Título (PT)", p.title_pt),
+              kvRow("Título (EN)", p.title_en),
+              kvRow("Título (JP)", p.title_jp),
+              kvRow("Tipo", p.pub_type),
+              kvRow("Editora", p.publisher),
+              kvRow("Issue", p.issue),
               kvRow("Ano", p.year),
-              kvRow("Franquia", formatFranchise(p.franchise)),
-              kvRow("Descrição", p.description),
+              kvRow("Mês", p.month),
+              kvRow("ISBN", p.isbn),
+              kvRow("Idioma", p.language),
+              kvRow("Era", p.era),
+              kvRow("Notas", p.notes),
               kvRow("URL", p.url)
             ].filter(Boolean).join("");
             openModal();
@@ -1031,21 +1014,21 @@
       inputPublicationsSearch.addEventListener("input", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
       selectPublicationsType.addEventListener("change", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
 
-      // COLLECTIBLES
+      // COLLECTIBLES (AJUSTADO)
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
       const inputCollectiblesSearch = document.getElementById("inputCollectiblesSearch");
-      const selectCollectiblesCategory = document.getElementById("selectCollectiblesCategory");
+      const selectCollectiblesType = document.getElementById("selectCollectiblesType");
       let collectiblesCache = [];
 
       async function openCollectibles() {
         collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · Colecionáveis`;
         showView("collectibles", "forward");
         inputCollectiblesSearch.value = "";
-        selectCollectiblesCategory.value = "";
+        selectCollectiblesType.value = "";
         await loadCollectibles();
-        populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.category)).filter(Boolean), "Todas");
+        populateSelect(selectCollectiblesType, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), "Todos");
         renderCollectiblesList(filterCollectibles("", ""));
       }
 
@@ -1053,27 +1036,26 @@
         collectiblesStatus.textContent = "Carregando...";
         collectiblesList.innerHTML = "";
 
-        // ✅ fallback robusto
         const list = await fetchWithFranchiseFallback({
           table: "collectibles",
-          select: "id,name,franchise,year,category,brand,description,image_url,url",
+          select: "id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes,rarity,status,created_at",
           franchiseKey: state.franchise,
           statusEl: collectiblesStatus
         });
 
-        list.sort((a, b) => safeText(a.name).localeCompare(safeText(b.name), "pt", { sensitivity: "base" }));
+        list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
         collectiblesCache = list;
         collectiblesStatus.textContent = `${list.length} itens`;
       }
 
-      function filterCollectibles(q, cat) {
+      function filterCollectibles(q, type) {
         const query = safeText(q).toLowerCase();
-        const c = safeText(cat).toLowerCase();
+        const t = safeText(type).toLowerCase();
 
         return collectiblesCache.filter((it) => {
-          if (c && safeText(it.category).toLowerCase() !== c) return false;
+          if (t && safeText(it.item_type).toLowerCase() !== t) return false;
           if (!query) return true;
-          return [it.name, it.brand, it.category, it.year, it.description]
+          return [it.name_en, it.name_pt, it.name_jp, it.line, it.item_type, it.manufacturer, it.year, it.era, it.notes, it.jp_search, it.rarity, it.status]
             .some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -1090,7 +1072,13 @@
           el.className = "item";
 
           const img = safeText(it.image_url);
-          const name = safeText(it.name) || "Colecionável";
+          const name = safeText(it.name_pt) || safeText(it.name_en) || safeText(it.name_jp) || "Colecionável";
+          const year = hasValue(it.year) ? String(it.year) : "";
+          const subtitleParts = [
+            safeText(it.line),
+            safeText(it.item_type),
+            safeText(it.manufacturer)
+          ].filter(Boolean);
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1100,29 +1088,36 @@
               <div class="meta">
                 <div class="nameLine">
                   <div class="name">${escapeHtml(name)}</div>
-                  <div class="year">${hasValue(it.year) ? escapeHtml(it.year) : ""}</div>
+                  <div class="year">${escapeHtml(year)}</div>
                 </div>
                 <div class="muted" style="font-size:12px; line-height:1.2;">
-                  ${escapeHtml(safeText(it.category))}${hasValue(it.brand) ? " · " + escapeHtml(it.brand) : ""}
+                  ${escapeHtml(subtitleParts.join(" · "))}
                 </div>
               </div>
             </div>
-            ${hasValue(it.description) ? `<div class="desc">${escapeHtml(it.description)}</div>` : ``}
+            ${hasValue(it.notes) ? `<div class="desc">${escapeHtml(it.notes)}</div>` : ``}
           `;
 
           el.addEventListener("click", () => {
             modalTitle.textContent = name;
             setModalImage(img, name);
-            setModalLink(it.url);
+            setModalLink(""); // collectibles não tem url no schema atual
 
             modalBody.innerHTML = [
-              kvRow("Nome", it.name),
-              kvRow("Categoria", it.category),
-              kvRow("Marca", it.brand),
+              kvRow("Nome (PT)", it.name_pt),
+              kvRow("Nome (EN)", it.name_en),
+              kvRow("Nome (JP)", it.name_jp),
+              kvRow("Linha", it.line),
+              kvRow("Tipo", it.item_type),
+              kvRow("Fabricante", it.manufacturer),
               kvRow("Ano", it.year),
-              kvRow("Franquia", formatFranchise(it.franchise)),
-              kvRow("Descrição", it.description),
-              kvRow("URL", it.url)
+              kvRow("Era", it.era),
+              kvRow("Series code", it.series_code),
+              kvRow("SKU", it.sku_code),
+              kvRow("JP search", it.jp_search),
+              kvRow("Rarity", it.rarity),
+              kvRow("Status", it.status),
+              kvRow("Notas", it.notes)
             ].filter(Boolean).join("");
             openModal();
           });
@@ -1131,8 +1126,8 @@
         }
       }
 
-      inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
-      selectCollectiblesCategory.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
+      inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesType.value)));
+      selectCollectiblesType.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesType.value)));
 
       function init() {
         renderHome();
