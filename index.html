@@ -73,39 +73,27 @@
       .sectionTitle { margin: 6px 2px 10px; font-weight: 700; font-size: 16px; line-height: 1.2; }
       .sectionHint { margin: -4px 2px 12px; color: var(--muted); font-size: 13px; line-height: 1.25; }
 
-      .grid { display: grid; gap: 12px; }
+      /* ✅ CENTRALIZA OS BOTÕES */
+      .grid { display: grid; gap: 12px; justify-items: center; }
 
-      /* ✅ BOTÕES MAIS COMPACTOS (mobile-friendly) */
+      /* ✅ BOTÃO COM CARA DE APP (MENOR + CENTRALIZADO) */
       .btn {
-        width: 100%;
+        width: min(360px, 92vw);
         display: flex;
         align-items: center;
         justify-content: space-between;
-        gap: 8px;
-
-        padding: 10px 12px;          /* era 14px 14px */
-        border-radius: 12px;         /* era 14px */
+        gap: 10px;
+        padding: 12px 14px;
+        border-radius: 14px;
         border: 1px solid var(--border);
         background: var(--panel);
         color: inherit;
-
-        font-size: 14px;             /* era 16px */
+        font-size: 15px;
         cursor: pointer;
         text-align: left;
       }
       .btn:active { transform: translateY(1px); }
-      .btn small { font-size: 11px; color: var(--muted); } /* era 12px */
-
-      /* ainda menor em telas pequenas */
-      @media (max-width: 420px) {
-        .grid { gap: 10px; }
-        .btn {
-          padding: 9px 11px;
-          border-radius: 11px;
-          font-size: 13px;
-        }
-        .btn small { font-size: 10px; }
-      }
+      .btn small { font-size: 12px; color: var(--muted); }
 
       .backRow { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
 
@@ -243,27 +231,57 @@
         font-size: 13px;
       }
 
+      /* ✅ Modal image: SEM CORTAR */
       .modalImage {
         width: 100%;
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 4 / 5;
         border-radius: 16px;
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.05);
         overflow: hidden;
         margin-bottom: 10px;
+
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px;
       }
-      .modalImage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .modalImage img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+        display: block;
+      }
 
-      .kv { display: grid; gap: 8px; margin-top: 10px; }
-
-      .kvRow {
+      /* ✅ FICHA TÉCNICA */
+      .specCard {
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.05);
-        border-radius: 14px;
-        padding: 10px 10px;
+        border-radius: 16px;
+        overflow: hidden;
       }
-      .kvLabel { font-size: 11px; color: var(--muted); margin-bottom: 6px; }
-      .kvValue { font-size: 13px; line-height: 1.35; color: var(--text); word-break: break-word; }
+      .specRow {
+        display: flex;
+        gap: 10px;
+        padding: 10px 12px;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        align-items: flex-start;
+      }
+      .specRow:first-child { border-top: none; }
+      .specKey {
+        flex: 0 0 40%;
+        font-size: 11px;
+        color: var(--muted);
+        line-height: 1.2;
+        padding-top: 2px;
+      }
+      .specVal {
+        flex: 1;
+        font-size: 13px;
+        line-height: 1.35;
+        color: var(--text);
+        word-break: break-word;
+      }
 
       .linkBtn {
         display: inline-flex;
@@ -421,7 +439,7 @@
           <img id="modalImage" alt="" />
         </div>
 
-        <div class="kv" id="modalBody"></div>
+        <div id="modalBody"></div>
 
         <a class="linkBtn" id="modalLinkBtn" href="#" target="_blank" rel="noopener noreferrer" style="display:none;">Abrir link</a>
       </div>
@@ -430,7 +448,6 @@
     <script>
       const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
-
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       const state = { franchise: null };
@@ -486,15 +503,21 @@
           .replaceAll("'", "&#039;");
       }
 
-      function kvRow(label, value) {
+      function specRow(label, value) {
         const v = safeText(value);
         if (!hasValue(v)) return "";
         return `
-          <div class="kvRow">
-            <div class="kvLabel">${label}</div>
-            <div class="kvValue">${escapeHtml(v)}</div>
+          <div class="specRow">
+            <div class="specKey">${escapeHtml(label)}</div>
+            <div class="specVal">${escapeHtml(v)}</div>
           </div>
         `;
+      }
+
+      function renderSpecCard(rowsHtml) {
+        const rows = (rowsHtml || "").trim();
+        if (!rows) return `<div class="muted" style="padding: 8px 2px;">Sem detalhes.</div>`;
+        return `<div class="specCard">${rows}</div>`;
       }
 
       function slugifyName(name) {
@@ -536,7 +559,6 @@
           const btn = document.createElement("button");
           btn.className = "btn";
           btn.type = "button";
-          // sem botão “ABRIR” — o nome é o botão
           btn.innerHTML = `<span>${c.label}</span><small></small>`;
           btn.addEventListener("click", () => {
             state.franchise = c.key;
@@ -682,18 +704,22 @@
             modalTitle.textContent = safeText(c.name_pt) || safeText(c.name_en) || "Detalhes";
             setModalImage(imgUrl, c.name_en);
             setModalLink("");
-            modalBody.innerHTML = [
-              kvRow("Nome (EN)", c.name_en),
-              kvRow("Nome (JP)", c.name_jp),
-              kvRow("Romaji", c.romaji),
-              kvRow("Franquia", formatFranchise(c.franchise)),
-              kvRow("Ano", c.year),
-              kvRow("Nome civil", c.civil_name),
-              kvRow("Ator", c.actor_name),
-              kvRow("Descrição", c.description),
-              kvRow("Poderes", c.powers),
-              kvRow("Equipamentos", c.equipment)
+
+            const rows = [
+              specRow("Nome (PT)", c.name_pt),
+              specRow("Nome (EN)", c.name_en),
+              specRow("Nome (JP)", c.name_jp),
+              specRow("Romaji", c.romaji),
+              specRow("Franquia", formatFranchise(c.franchise)),
+              specRow("Ano", c.year),
+              specRow("Nome civil", c.civil_name),
+              specRow("Ator", c.actor_name),
+              specRow("Descrição", c.description),
+              specRow("Poderes", c.powers),
+              specRow("Equipamentos", c.equipment)
             ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
             openModal();
           });
 
@@ -796,14 +822,17 @@
             modalTitle.textContent = title;
             setModalImage("", "");
             setModalLink("");
-            modalBody.innerHTML = [
-              kvRow("JP", t.jp),
-              kvRow("Romaji", t.romaji),
-              kvRow("EN", t.en),
-              kvRow("PT", t.pt),
-              kvRow("Categoria", t.category),
-              kvRow("Explicação", t.explanation)
+
+            const rows = [
+              specRow("JP", t.jp),
+              specRow("Romaji", t.romaji),
+              specRow("EN", t.en),
+              specRow("PT", t.pt),
+              specRow("Categoria", t.category),
+              specRow("Explicação", t.explanation)
             ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
             openModal();
           });
 
@@ -814,7 +843,7 @@
       inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
       selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
 
-      // PUBLICATIONS
+      // PUBLICATIONS (mantido como estava no seu app)
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -915,14 +944,16 @@
             setModalImage(cover, title);
             setModalLink(p.url);
 
-            modalBody.innerHTML = [
-              kvRow("Título", p.title),
-              kvRow("Tipo", p.type),
-              kvRow("Ano", p.year),
-              kvRow("Franquia", formatFranchise(p.franchise)),
-              kvRow("Descrição", p.description),
-              kvRow("URL", p.url)
+            const rows = [
+              specRow("Título", p.title),
+              specRow("Tipo", p.type),
+              specRow("Ano", p.year),
+              specRow("Franquia", formatFranchise(p.franchise)),
+              specRow("Descrição", p.description),
+              specRow("URL", p.url)
             ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
             openModal();
           });
 
@@ -933,7 +964,7 @@
       inputPublicationsSearch.addEventListener("input", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
       selectPublicationsType.addEventListener("change", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
 
-      // COLLECTIBLES
+      // COLLECTIBLES (mantido como estava no seu app)
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
@@ -1021,15 +1052,17 @@
             setModalImage(img, name);
             setModalLink(it.url);
 
-            modalBody.innerHTML = [
-              kvRow("Nome", it.name),
-              kvRow("Categoria", it.category),
-              kvRow("Marca", it.brand),
-              kvRow("Ano", it.year),
-              kvRow("Franquia", formatFranchise(it.franchise)),
-              kvRow("Descrição", it.description),
-              kvRow("URL", it.url)
+            const rows = [
+              specRow("Nome", it.name),
+              specRow("Categoria", it.category),
+              specRow("Marca", it.brand),
+              specRow("Ano", it.year),
+              specRow("Franquia", formatFranchise(it.franchise)),
+              specRow("Descrição", it.description),
+              specRow("URL", it.url)
             ].filter(Boolean).join("");
+
+            modalBody.innerHTML = renderSpecCard(rows);
             openModal();
           });
 
