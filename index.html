@@ -62,73 +62,36 @@
 
       main {
         flex: 1;
-        position: relative;
-        overflow: hidden;
-        padding: 0;
-      }
-
-      .mobileContainer {
-        max-width: 380px;
-        margin: 0 auto;
-        padding: 14px 14px 90px;
-        height: 100%;
         overflow: auto;
         -webkit-overflow-scrolling: touch;
+        padding: 14px 14px 90px;
       }
 
-      .view {
-        position: absolute;
-        inset: 0;
-        display: block;
-        opacity: 0;
-        transform: translateX(12px);
-        pointer-events: none;
-        transition: transform 260ms ease, opacity 260ms ease;
-        will-change: transform, opacity;
-      }
-
-      .view.active {
-        opacity: 1;
-        transform: translateX(0);
-        pointer-events: auto;
-      }
-
-      .view.enterFromRight { opacity: 0; transform: translateX(24px); }
-      .view.enterFromLeft  { opacity: 0; transform: translateX(-24px); }
-      .view.leaveToLeft    { opacity: 0; transform: translateX(-24px); }
-      .view.leaveToRight   { opacity: 0; transform: translateX(24px); }
-
-      @media (prefers-reduced-motion: reduce) {
-        .view, .view.active {
-          transition: none !important;
-          transform: none !important;
-          opacity: 1 !important;
-        }
-      }
+      .view { display: none; }
+      .view.active { display: block; }
 
       .sectionTitle { margin: 6px 2px 10px; font-weight: 700; font-size: 16px; line-height: 1.2; }
       .sectionHint { margin: -4px 2px 12px; color: var(--muted); font-size: 13px; line-height: 1.25; }
 
-      .grid { display: grid; gap: 10px; justify-items: center; }
+      .grid { display: grid; gap: 12px; }
 
       .btn {
         width: 100%;
-        max-width: 320px;
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 10px;
-        padding: 10px 12px;
-        border-radius: 12px;
+        padding: 14px 14px;
+        border-radius: 14px;
         border: 1px solid var(--border);
         background: var(--panel);
         color: inherit;
-        font-size: 14px;
+        font-size: 16px;
         cursor: pointer;
         text-align: left;
       }
       .btn:active { transform: translateY(1px); }
-      .btn small { font-size: 11px; color: var(--muted); }
+      .btn small { font-size: 12px; color: var(--muted); }
 
       .backRow { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; }
 
@@ -136,9 +99,9 @@
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.04);
         color: inherit;
-        border-radius: 10px;
-        padding: 8px 10px;
-        font-size: 13px;
+        border-radius: 12px;
+        padding: 10px 12px;
+        font-size: 14px;
         cursor: pointer;
       }
       .ghostBtn:active { transform: translateY(1px); }
@@ -150,7 +113,7 @@
         border: 1px solid var(--border);
         background: rgba(0, 0, 0, 0.25);
         color: var(--text);
-        padding: 10px 12px;
+        padding: 12px 12px;
         border-radius: 12px;
         outline: none;
         font-size: 14px;
@@ -168,7 +131,7 @@
       .item:active { transform: translateY(1px); }
 
       .itemTop { display: flex; gap: 12px; align-items: center; }
-      
+
       .thumb {
         width: 54px;
         height: 54px;
@@ -199,6 +162,18 @@
       .year { font-size: 12px; color: var(--muted); flex: 0 0 auto; }
 
       .desc { margin-top: 8px; color: var(--muted); font-size: 13px; line-height: 1.3; }
+
+      .pillRow { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 8px; }
+      .pill {
+        display: inline-flex;
+        align-items: center;
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.05);
+        font-size: 12px;
+        color: var(--muted);
+      }
 
       .muted { color: var(--muted); }
 
@@ -254,16 +229,27 @@
         font-size: 13px;
       }
 
+      /* ✅ AJUSTE AQUI: imagem do MODAL sem cortar */
       .modalImage {
         width: 100%;
-        aspect-ratio: 16 / 10;
+        aspect-ratio: 4 / 5;              /* mais “poster”, melhor p/ imagens verticais */
         border-radius: 16px;
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.05);
         overflow: hidden;
         margin-bottom: 10px;
+
+        display: flex;                    /* centraliza a imagem */
+        align-items: center;
+        justify-content: center;
+        padding: 10px;                    /* dá “respiro” e evita encostar na borda */
       }
-      .modalImage img { width: 100%; height: 100%; object-fit: cover; display: block; }
+      .modalImage img {
+        width: 100%;
+        height: 100%;
+        object-fit: contain;              /* não corta */
+        display: block;
+      }
 
       .kv { display: grid; gap: 8px; margin-top: 10px; }
 
@@ -306,126 +292,121 @@
       </header>
 
       <main>
+        <!-- HOME -->
         <section class="view active" id="viewHome">
-          <div class="mobileContainer">
-            <div class="sectionTitle">Temas</div>
-            <div class="sectionHint">Escolha um tema para navegar.</div>
-            <div class="grid" id="homeCategories"></div>
-          </div>
+          <div class="sectionTitle">Temas</div>
+          <div class="sectionHint">Escolha um tema para navegar.</div>
+          <div class="grid" id="homeCategories"></div>
         </section>
 
+        <!-- FRANCHISE HUB -->
         <section class="view" id="viewFranchise">
-          <div class="mobileContainer">
-            <div class="backRow">
-              <button class="ghostBtn" id="btnBackToHome">Voltar</button>
-            </div>
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToHome">Voltar</button>
+          </div>
 
-            <div class="sectionTitle" id="franchiseTitle">Tema</div>
-            <div class="grid">
-              <button class="btn" id="btnGoCharacters">
-                <span>Personagens</span>
-                <small>Lista completa (A–Z)</small>
-              </button>
+          <div class="sectionTitle" id="franchiseTitle">Tema</div>
+          <div class="grid">
+            <button class="btn" id="btnGoCharacters">
+              <span>Personagens</span>
+              <small>Lista completa (A–Z)</small>
+            </button>
 
-              <button class="btn" id="btnGoGlossary">
-                <span>Glossário</span>
-                <small>Termos JP → PT/EN</small>
-              </button>
+            <button class="btn" id="btnGoGlossary">
+              <span>Glossário</span>
+              <small>Termos JP → PT/EN</small>
+            </button>
 
-              <button class="btn" id="btnGoPublications">
-                <span>Publicações</span>
-                <small>Livros, guias, mooks, etc.</small>
-              </button>
+            <button class="btn" id="btnGoPublications">
+              <span>Publicações</span>
+              <small>Filmes, séries, especiais</small>
+            </button>
 
-              <button class="btn" id="btnGoCollectibles">
-                <span>Colecionáveis</span>
-                <small>DX, SHF, sofubi…</small>
-              </button>
-            </div>
+            <button class="btn" id="btnGoCollectibles">
+              <span>Colecionáveis</span>
+              <small>DX, SHF, sofubi, etc.</small>
+            </button>
           </div>
         </section>
 
+        <!-- CHARACTERS -->
         <section class="view" id="viewCharacters">
-          <div class="mobileContainer">
-            <div class="backRow">
-              <button class="ghostBtn" id="btnBackToFranchiseFromCharacters">Voltar</button>
-            </div>
-
-            <div class="sectionTitle" id="charactersTitle">Personagens</div>
-
-            <div class="searchBox">
-              <input type="search" id="inputCharacterSearch" placeholder="Buscar por nome (EN/PT/JP/romaji)..." />
-            </div>
-
-            <div class="muted" id="charactersStatus"></div>
-            <div class="list" id="charactersList" style="margin-top: 12px;"></div>
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromCharacters">Voltar</button>
           </div>
+
+          <div class="sectionTitle" id="charactersTitle">Personagens</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputCharacterSearch" placeholder="Buscar por nome (EN/PT/JP/romaji)..." />
+          </div>
+
+          <div class="muted" id="charactersStatus"></div>
+          <div class="list" id="charactersList" style="margin-top: 12px;"></div>
         </section>
 
+        <!-- GLOSSARY -->
         <section class="view" id="viewGlossary">
-          <div class="mobileContainer">
-            <div class="backRow">
-              <button class="ghostBtn" id="btnBackToFranchiseFromGlossary">Voltar</button>
-            </div>
-
-            <div class="sectionTitle">Glossário</div>
-
-            <div class="searchBox">
-              <input type="search" id="inputGlossarySearch" placeholder="Buscar por JP/romaji/EN/PT..." />
-              <select id="selectGlossaryCategory">
-                <option value="">Todas</option>
-              </select>
-            </div>
-
-            <div class="muted" id="glossaryStatus"></div>
-            <div class="list" id="glossaryList" style="margin-top: 12px;"></div>
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromGlossary">Voltar</button>
           </div>
+
+          <div class="sectionTitle">Glossário</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputGlossarySearch" placeholder="Buscar por JP/romaji/EN/PT..." />
+            <select id="selectGlossaryCategory">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <div class="muted" id="glossaryStatus"></div>
+          <div class="list" id="glossaryList" style="margin-top: 12px;"></div>
         </section>
 
+        <!-- PUBLICATIONS -->
         <section class="view" id="viewPublications">
-          <div class="mobileContainer">
-            <div class="backRow">
-              <button class="ghostBtn" id="btnBackToFranchiseFromPublications">Voltar</button>
-            </div>
-
-            <div class="sectionTitle" id="publicationsTitle">Publicações</div>
-
-            <div class="searchBox">
-              <input type="search" id="inputPublicationsSearch" placeholder="Buscar por título, tipo, ano..." />
-              <select id="selectPublicationsType">
-                <option value="">Todos</option>
-              </select>
-            </div>
-
-            <div class="muted" id="publicationsStatus"></div>
-            <div class="list" id="publicationsList" style="margin-top: 12px;"></div>
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromPublications">Voltar</button>
           </div>
+
+          <div class="sectionTitle" id="publicationsTitle">Publicações</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputPublicationsSearch" placeholder="Buscar por título, tipo, ano..." />
+            <select id="selectPublicationsType">
+              <option value="">Todos</option>
+            </select>
+          </div>
+
+          <div class="muted" id="publicationsStatus"></div>
+          <div class="list" id="publicationsList" style="margin-top: 12px;"></div>
         </section>
 
+        <!-- COLLECTIBLES -->
         <section class="view" id="viewCollectibles">
-          <div class="mobileContainer">
-            <div class="backRow">
-              <button class="ghostBtn" id="btnBackToFranchiseFromCollectibles">Voltar</button>
-            </div>
-
-            <div class="sectionTitle" id="collectiblesTitle">Colecionáveis</div>
-
-            <div class="searchBox">
-              <input type="search" id="inputCollectiblesSearch" placeholder="Buscar por nome, linha, tipo..." />
-              <select id="selectCollectiblesType">
-                <option value="">Todos</option>
-              </select>
-            </div>
-
-            <div class="muted" id="collectiblesStatus"></div>
-            <div class="list" id="collectiblesList" style="margin-top: 12px;"></div>
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToFranchiseFromCollectibles">Voltar</button>
           </div>
+
+          <div class="sectionTitle" id="collectiblesTitle">Colecionáveis</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputCollectiblesSearch" placeholder="Buscar por nome, marca, categoria..." />
+            <select id="selectCollectiblesCategory">
+              <option value="">Todas</option>
+            </select>
+          </div>
+
+          <div class="muted" id="collectiblesStatus"></div>
+          <div class="list" id="collectiblesList" style="margin-top: 12px;"></div>
         </section>
       </main>
 
       <footer>v0.2 · Henshin DB · Author: Mayara Gouveia</footer>
     </div>
 
+    <!-- MODAL -->
     <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
       <div class="modal">
         <div class="modalHeader">
@@ -446,9 +427,11 @@
     <script>
       const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
+
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
       const state = { franchise: null };
+
       const headerSubtitle = document.getElementById("headerSubtitle");
       const headerChip = document.getElementById("headerChip");
 
@@ -461,9 +444,10 @@
         collectibles: document.getElementById("viewCollectibles")
       };
 
-      let currentView = "home";
+      function showView(name) {
+        for (const k in views) views[k].classList.remove("active");
+        views[name].classList.add("active");
 
-      function setHeaderForView(name) {
         if (name === "home") headerSubtitle.textContent = "Home";
         if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
         if (name === "characters") headerSubtitle.textContent = "Personagens";
@@ -472,52 +456,12 @@
         if (name === "collectibles") headerSubtitle.textContent = "Colecionáveis";
       }
 
-      function showView(name, dir = "forward") {
-        if (name === currentView) return;
-
-        const from = views[currentView];
-        const to = views[name];
-
-        to.classList.remove("enterFromRight","enterFromLeft","leaveToLeft","leaveToRight","active");
-        from.classList.remove("enterFromRight","enterFromLeft","leaveToLeft","leaveToRight");
-
-        if (dir === "forward") to.classList.add("enterFromRight");
-        else to.classList.add("enterFromLeft");
-
-        void to.offsetWidth;
-
-        if (dir === "forward") from.classList.add("leaveToLeft");
-        else from.classList.add("leaveToRight");
-
-        to.classList.add("active");
-        to.classList.remove("enterFromRight","enterFromLeft");
-
-        const done = () => {
-          from.classList.remove("active","leaveToLeft","leaveToRight");
-          from.removeEventListener("transitionend", done);
-        };
-        from.addEventListener("transitionend", done);
-
-        currentView = name;
-        setHeaderForView(name);
-      }
-
       function formatFranchise(key) {
         if (!key) return "Tema";
         if (key === "kamen rider") return "Kamen Rider";
         if (key === "super sentai") return "Super Sentai";
         if (key === "metal hero") return "Metal Hero";
         return key;
-      }
-
-      function normalizeFranchise(v) {
-        return String(v || "")
-          .trim()
-          .toLowerCase()
-          .replace(/[_-]+/g, " ")
-          .replace(/\s+/g, " ")
-          .replace(/[^a-z\s]/g, "")
-          .trim();
       }
 
       function safeText(v) {
@@ -550,39 +494,26 @@
         `;
       }
 
+      function slugifyName(name) {
+        return String(name || "")
+          .trim()
+          .toLowerCase()
+          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/^-+|-+$/g, "");
+      }
+
+      function imageUrlForCharacter(nameEn) {
+        const slug = slugifyName(nameEn);
+        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
+      }
+
       async function pingSupabase() {
         try {
           const { error } = await supabase.from("characters").select("id").limit(1);
           headerChip.textContent = error ? "Conexão com erro" : "Online";
         } catch {
           headerChip.textContent = "Offline";
-        }
-      }
-
-      async function fetchWithFranchiseFallback({ table, select, franchiseKey, statusEl }) {
-        const wanted = normalizeFranchise(franchiseKey);
-
-        try {
-          const { data, error } = await supabase.from(table).select(select).eq("franchise", franchiseKey);
-          if (!error && Array.isArray(data) && data.length > 0) return data;
-          if (error) console.warn(`[${table}] eq(franchise) error:`, error);
-        } catch (e) {
-          console.warn(`[${table}] eq(franchise) exception:`, e);
-        }
-
-        try {
-          const { data, error } = await supabase.from(table).select(select);
-          if (error) {
-            console.warn(`[${table}] fallback select error:`, error);
-            if (statusEl) statusEl.textContent = `Erro ao carregar ${table} (RLS/colunas).`;
-            return [];
-          }
-          const list = Array.isArray(data) ? data : [];
-          return list.filter((row) => normalizeFranchise(row.franchise) === wanted);
-        } catch (e) {
-          console.warn(`[${table}] fallback exception:`, e);
-          if (statusEl) statusEl.textContent = `Erro ao carregar ${table}.`;
-          return [];
         }
       }
 
@@ -606,24 +537,24 @@
           btn.addEventListener("click", () => {
             state.franchise = c.key;
             document.getElementById("franchiseTitle").textContent = c.label;
-            showView("franchise", "forward");
+            showView("franchise");
           });
           homeCategories.appendChild(btn);
         }
       }
 
       // NAV HUB
-      document.getElementById("btnBackToHome").addEventListener("click", () => showView("home", "back"));
+      document.getElementById("btnBackToHome").addEventListener("click", () => showView("home"));
 
       document.getElementById("btnGoCharacters").addEventListener("click", async () => openCharacters());
       document.getElementById("btnGoGlossary").addEventListener("click", async () => openGlossary());
       document.getElementById("btnGoPublications").addEventListener("click", async () => openPublications());
       document.getElementById("btnGoCollectibles").addEventListener("click", async () => openCollectibles());
 
-      document.getElementById("btnBackToFranchiseFromCharacters").addEventListener("click", () => showView("franchise", "back"));
-      document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise", "back"));
-      document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise", "back"));
-      document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise", "back"));
+      document.getElementById("btnBackToFranchiseFromCharacters").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise"));
 
       // MODAL
       const modalOverlay = document.getElementById("modalOverlay");
@@ -665,31 +596,18 @@
         modalImage.onerror = () => { modalImageWrap.style.display = "none"; };
       }
 
-      // CHARACTERS (igual ao teu)
+      // CHARACTERS
       const charactersTitle = document.getElementById("charactersTitle");
       const charactersStatus = document.getElementById("charactersStatus");
       const charactersList = document.getElementById("charactersList");
       const inputCharacterSearch = document.getElementById("inputCharacterSearch");
       let charactersCache = [];
 
-      function slugifyName(name) {
-        return String(name || "")
-          .trim()
-          .toLowerCase()
-          .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-          .replace(/[^a-z0-9]+/g, "-")
-          .replace(/^-+|-+$/g, "");
-      }
-
-      function imageUrlForCharacter(nameEn) {
-        const slug = slugifyName(nameEn);
-        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
-      }
-
       async function openCharacters() {
         charactersTitle.textContent = `${formatFranchise(state.franchise)} · Personagens`;
-        showView("characters", "forward");
+        showView("characters");
         inputCharacterSearch.value = "";
+
         await loadCharacters();
         renderCharactersList(charactersCache);
       }
@@ -781,7 +699,7 @@
 
       inputCharacterSearch.addEventListener("input", () => renderCharactersList(filterCharacters(inputCharacterSearch.value)));
 
-      // GLOSSARY (igual ao teu)
+      // GLOSSARY
       const glossaryStatus = document.getElementById("glossaryStatus");
       const glossaryList = document.getElementById("glossaryList");
       const inputGlossarySearch = document.getElementById("inputGlossarySearch");
@@ -789,7 +707,7 @@
       let glossaryCache = [];
 
       async function openGlossary() {
-        showView("glossary", "forward");
+        showView("glossary");
         inputGlossarySearch.value = "";
         selectGlossaryCategory.value = "";
 
@@ -814,8 +732,7 @@
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) =>
-          (safeText(a.pt) || safeText(a.en) || safeText(a.jp))
-            .localeCompare(safeText(b.pt) || safeText(b.en) || safeText(b.jp), "pt", { sensitivity: "base" })
+          (safeText(a.pt) || safeText(a.en) || safeText(a.jp)).localeCompare(safeText(b.pt) || safeText(b.en) || safeText(b.jp), "pt", { sensitivity: "base" })
         );
         glossaryCache = list;
         glossaryStatus.textContent = `${list.length} termos`;
@@ -863,7 +780,7 @@
             </div>
             <div class="desc">
               <div style="margin-bottom:6px;">
-                <span class="pill" style="border-radius:999px; padding:6px 10px; display:inline-flex; border:1px solid var(--border); background:rgba(255,255,255,0.05); font-size:12px; color:var(--muted);">${escapeHtml(safeText(t.jp) || "-")}</span>
+                <span class="pill">${escapeHtml(safeText(t.jp) || "-")}</span>
                 ${hasValue(t.romaji) ? `<span class="pill">${escapeHtml(t.romaji)}</span>` : ``}
                 ${hasValue(t.en) ? `<span class="pill">${escapeHtml(t.en)}</span>` : ``}
               </div>
@@ -893,7 +810,7 @@
       inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
       selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
 
-      // PUBLICATIONS (AJUSTADO)
+      // PUBLICATIONS
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -903,11 +820,11 @@
 
       async function openPublications() {
         publicationsTitle.textContent = `${formatFranchise(state.franchise)} · Publicações`;
-        showView("publications", "forward");
+        showView("publications");
         inputPublicationsSearch.value = "";
         selectPublicationsType.value = "";
         await loadPublications();
-        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), "Todos");
+        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.type)).filter(Boolean), "Todos");
         renderPublicationsList(filterPublications("", ""));
       }
 
@@ -915,14 +832,19 @@
         publicationsStatus.textContent = "Carregando...";
         publicationsList.innerHTML = "";
 
-        const list = await fetchWithFranchiseFallback({
-          table: "publications",
-          select: "id,title_en,title_pt,title_jp,franchise,year,month,pub_type,publisher,issue,isbn,language,era,cover_url,notes,url",
-          franchiseKey: state.franchise,
-          statusEl: publicationsStatus
-        });
+        const { data, error } = await supabase
+          .from("publications")
+          .select("id,title,franchise,year,type,description,url,cover_url")
+          .eq("franchise", state.franchise);
 
-        list.sort((a, b) => (Number(b.year || 0) - Number(a.year || 0)) || safeText(a.title_en).localeCompare(safeText(b.title_en)));
+        if (error) {
+          publicationsStatus.textContent = "Erro ao carregar publicações (verifique a tabela/colunas).";
+          publicationsCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) => (safeText(b.year)).localeCompare(safeText(a.year)) || safeText(a.title).localeCompare(safeText(b.title)));
         publicationsCache = list;
         publicationsStatus.textContent = `${list.length} itens`;
       }
@@ -943,9 +865,9 @@
         const t = safeText(type).toLowerCase();
 
         return publicationsCache.filter((p) => {
-          if (t && safeText(p.pub_type).toLowerCase() !== t) return false;
+          if (t && safeText(p.type).toLowerCase() !== t) return false;
           if (!query) return true;
-          return [p.title_en, p.title_pt, p.title_jp, p.pub_type, p.publisher, p.issue, p.year, p.month, p.notes, p.isbn]
+          return [p.title, p.type, p.year, p.description]
             .some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -962,9 +884,9 @@
           el.className = "item";
 
           const cover = safeText(p.cover_url);
-          const title = safeText(p.title_pt) || safeText(p.title_en) || safeText(p.title_jp) || "Publicação";
-          const type = safeText(p.pub_type);
-          const year = hasValue(p.year) ? String(p.year) : "";
+          const title = safeText(p.title) || "Publicação";
+          const type = safeText(p.type);
+          const year = safeText(p.year);
 
           el.innerHTML = `
             <div class="itemTop">
@@ -977,11 +899,11 @@
                   <div class="year">${escapeHtml(year)}</div>
                 </div>
                 <div class="muted" style="font-size:12px; line-height:1.2;">
-                  ${escapeHtml(type)}${hasValue(p.publisher) ? " · " + escapeHtml(p.publisher) : ""}
+                  ${escapeHtml(type)}
                 </div>
               </div>
             </div>
-            ${hasValue(p.notes) ? `<div class="desc">${escapeHtml(p.notes)}</div>` : ``}
+            ${hasValue(p.description) ? `<div class="desc">${escapeHtml(p.description)}</div>` : ``}
           `;
 
           el.addEventListener("click", () => {
@@ -990,18 +912,11 @@
             setModalLink(p.url);
 
             modalBody.innerHTML = [
-              kvRow("Título (PT)", p.title_pt),
-              kvRow("Título (EN)", p.title_en),
-              kvRow("Título (JP)", p.title_jp),
-              kvRow("Tipo", p.pub_type),
-              kvRow("Editora", p.publisher),
-              kvRow("Issue", p.issue),
+              kvRow("Título", p.title),
+              kvRow("Tipo", p.type),
               kvRow("Ano", p.year),
-              kvRow("Mês", p.month),
-              kvRow("ISBN", p.isbn),
-              kvRow("Idioma", p.language),
-              kvRow("Era", p.era),
-              kvRow("Notas", p.notes),
+              kvRow("Franquia", formatFranchise(p.franchise)),
+              kvRow("Descrição", p.description),
               kvRow("URL", p.url)
             ].filter(Boolean).join("");
             openModal();
@@ -1014,21 +929,21 @@
       inputPublicationsSearch.addEventListener("input", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
       selectPublicationsType.addEventListener("change", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
 
-      // COLLECTIBLES (AJUSTADO)
+      // COLLECTIBLES
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
       const inputCollectiblesSearch = document.getElementById("inputCollectiblesSearch");
-      const selectCollectiblesType = document.getElementById("selectCollectiblesType");
+      const selectCollectiblesCategory = document.getElementById("selectCollectiblesCategory");
       let collectiblesCache = [];
 
       async function openCollectibles() {
         collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · Colecionáveis`;
-        showView("collectibles", "forward");
+        showView("collectibles");
         inputCollectiblesSearch.value = "";
-        selectCollectiblesType.value = "";
+        selectCollectiblesCategory.value = "";
         await loadCollectibles();
-        populateSelect(selectCollectiblesType, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), "Todos");
+        populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.category)).filter(Boolean), "Todas");
         renderCollectiblesList(filterCollectibles("", ""));
       }
 
@@ -1036,26 +951,31 @@
         collectiblesStatus.textContent = "Carregando...";
         collectiblesList.innerHTML = "";
 
-        const list = await fetchWithFranchiseFallback({
-          table: "collectibles",
-          select: "id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes,rarity,status,created_at",
-          franchiseKey: state.franchise,
-          statusEl: collectiblesStatus
-        });
+        const { data, error } = await supabase
+          .from("collectibles")
+          .select("id,name,franchise,year,category,brand,description,image_url,url")
+          .eq("franchise", state.franchise);
 
-        list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
+        if (error) {
+          collectiblesStatus.textContent = "Erro ao carregar colecionáveis (verifique a tabela/colunas).";
+          collectiblesCache = [];
+          return;
+        }
+
+        const list = Array.isArray(data) ? data : [];
+        list.sort((a, b) => safeText(a.name).localeCompare(safeText(b.name), "pt", { sensitivity: "base" }));
         collectiblesCache = list;
         collectiblesStatus.textContent = `${list.length} itens`;
       }
 
-      function filterCollectibles(q, type) {
+      function filterCollectibles(q, cat) {
         const query = safeText(q).toLowerCase();
-        const t = safeText(type).toLowerCase();
+        const c = safeText(cat).toLowerCase();
 
         return collectiblesCache.filter((it) => {
-          if (t && safeText(it.item_type).toLowerCase() !== t) return false;
+          if (c && safeText(it.category).toLowerCase() !== c) return false;
           if (!query) return true;
-          return [it.name_en, it.name_pt, it.name_jp, it.line, it.item_type, it.manufacturer, it.year, it.era, it.notes, it.jp_search, it.rarity, it.status]
+          return [it.name, it.brand, it.category, it.year, it.description]
             .some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -1072,13 +992,7 @@
           el.className = "item";
 
           const img = safeText(it.image_url);
-          const name = safeText(it.name_pt) || safeText(it.name_en) || safeText(it.name_jp) || "Colecionável";
-          const year = hasValue(it.year) ? String(it.year) : "";
-          const subtitleParts = [
-            safeText(it.line),
-            safeText(it.item_type),
-            safeText(it.manufacturer)
-          ].filter(Boolean);
+          const name = safeText(it.name) || "Colecionável";
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1088,36 +1002,29 @@
               <div class="meta">
                 <div class="nameLine">
                   <div class="name">${escapeHtml(name)}</div>
-                  <div class="year">${escapeHtml(year)}</div>
+                  <div class="year">${hasValue(it.year) ? escapeHtml(it.year) : ""}</div>
                 </div>
                 <div class="muted" style="font-size:12px; line-height:1.2;">
-                  ${escapeHtml(subtitleParts.join(" · "))}
+                  ${escapeHtml(safeText(it.category))}${hasValue(it.brand) ? " · " + escapeHtml(it.brand) : ""}
                 </div>
               </div>
             </div>
-            ${hasValue(it.notes) ? `<div class="desc">${escapeHtml(it.notes)}</div>` : ``}
+            ${hasValue(it.description) ? `<div class="desc">${escapeHtml(it.description)}</div>` : ``}
           `;
 
           el.addEventListener("click", () => {
             modalTitle.textContent = name;
             setModalImage(img, name);
-            setModalLink(""); // collectibles não tem url no schema atual
+            setModalLink(it.url);
 
             modalBody.innerHTML = [
-              kvRow("Nome (PT)", it.name_pt),
-              kvRow("Nome (EN)", it.name_en),
-              kvRow("Nome (JP)", it.name_jp),
-              kvRow("Linha", it.line),
-              kvRow("Tipo", it.item_type),
-              kvRow("Fabricante", it.manufacturer),
+              kvRow("Nome", it.name),
+              kvRow("Categoria", it.category),
+              kvRow("Marca", it.brand),
               kvRow("Ano", it.year),
-              kvRow("Era", it.era),
-              kvRow("Series code", it.series_code),
-              kvRow("SKU", it.sku_code),
-              kvRow("JP search", it.jp_search),
-              kvRow("Rarity", it.rarity),
-              kvRow("Status", it.status),
-              kvRow("Notas", it.notes)
+              kvRow("Franquia", formatFranchise(it.franchise)),
+              kvRow("Descrição", it.description),
+              kvRow("URL", it.url)
             ].filter(Boolean).join("");
             openModal();
           });
@@ -1126,12 +1033,12 @@
         }
       }
 
-      inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesType.value)));
-      selectCollectiblesType.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesType.value)));
+      inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
+      selectCollectiblesCategory.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
 
       function init() {
         renderHome();
-        setHeaderForView("home");
+        showView("home");
         pingSupabase();
       }
 
