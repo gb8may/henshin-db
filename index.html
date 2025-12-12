@@ -1,607 +1,826 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
-<head>
-  <meta charset="UTF-8" />
-  <title>Henshin Database</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-    }
-  </style>
-</head>
-
-<body class="bg-slate-900 text-slate-100">
-  <div class="h-full flex flex-col max-w-md mx-auto bg-slate-900">
-
-    <header class="h-14 flex items-center justify-center border-b border-slate-800 bg-slate-950/70">
-      <h1 class="text-lg font-semibold tracking-wide">Henshin Database</h1>
-    </header>
-
-    <nav class="grid grid-cols-2 gap-2 border-b border-slate-800 px-3 py-2 bg-slate-900">
-      <button id="tab-characters"
-              class="py-2 rounded-full text-sm font-medium bg-slate-100 text-slate-900">
-        Personagens
-      </button>
-      <button id="tab-glossary"
-              class="py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200">
-        Glossário
-      </button>
-      <button id="tab-collectibles"
-              class="py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200">
-        Colecionáveis
-      </button>
-      <button id="tab-publications"
-              class="py-2 rounded-full text-sm font-medium bg-slate-800 text-slate-200">
-        Publicações
-      </button>
-    </nav>
-
-    <div class="px-3 py-2 bg-slate-900">
-      <div class="flex items-center gap-2 bg-slate-800 rounded-full px-3 py-2 w-full">
-        <input
-          id="search-input"
-          type="text"
-          placeholder="Buscar por nome, termo ou linha…"
-          class="bg-transparent outline-none w-full text-sm text-slate-100 placeholder:text-slate-500"
-        />
-      </div>
-    </div>
-
-    <main class="flex-1 overflow-y-auto px-2 pb-16">
-      <ul id="list-characters" class="space-y-1"></ul>
-      <ul id="list-glossary" class="space-y-1 hidden"></ul>
-      <ul id="list-collectibles" class="space-y-1 hidden"></ul>
-      <ul id="list-publications" class="space-y-1 hidden"></ul>
-
-      <div id="empty-state" class="text-center text-slate-500 text-sm mt-6 hidden">
-        Digite algo na busca para começar.
-      </div>
-    </main>
-
-    <div
-      id="detail-overlay"
-      class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 hidden p-4"
-    >
-      <div class="bg-slate-900 w-full max-w-md max-h-[85vh] overflow-y-auto rounded-2xl shadow-2xl border border-slate-800">
-        <div class="flex items-center justify-between px-4 py-3 border-b border-slate-800">
-          <button id="detail-close" class="text-sm text-slate-300 hover:text-white">Fechar</button>
-          <h2 id="detail-title" class="text-sm font-medium text-slate-200 truncate max-w-[60%] text-center"></h2>
-          <span class="w-10"></span>
-        </div>
-        <div id="detail-body" class="px-4 py-4 text-sm text-slate-100 space-y-4"></div>
-      </div>
-    </div>
-
-    <footer class="h-10 flex items-center justify-center text-[11px] text-slate-500">
-      v0.1 · Henshin DB · Author: Mayara Gouveia
-    </footer>
-  </div>
-
-  <script>
-    const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
-    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
-
-    let currentTab = "characters";
-    let charactersData = [];
-    let glossaryData = [];
-    let collectiblesData = [];
-    let publicationsData = [];
-    let currentSearch = "";
-
-    const tabCharactersBtn = document.getElementById("tab-characters");
-    const tabGlossaryBtn = document.getElementById("tab-glossary");
-    const tabCollectiblesBtn = document.getElementById("tab-collectibles");
-    const tabPublicationsBtn = document.getElementById("tab-publications");
-    const searchInput = document.getElementById("search-input");
-
-    const listCharactersEl = document.getElementById("list-characters");
-    const listGlossaryEl = document.getElementById("list-glossary");
-    const listCollectiblesEl = document.getElementById("list-collectibles");
-    const listPublicationsEl = document.getElementById("list-publications");
-    const emptyStateEl = document.getElementById("empty-state");
-
-    const detailOverlay = document.getElementById("detail-overlay");
-    const detailBody = document.getElementById("detail-body");
-    const detailTitle = document.getElementById("detail-title");
-    const detailClose = document.getElementById("detail-close");
-
-    async function fetchCharacters(search = "") {
-      let url = `${SUPABASE_URL}/rest/v1/characters?select=*&order=name_pt.asc,name_en.asc`;
-      if (search.trim() !== "") {
-        const encoded = encodeURIComponent("%" + search + "%");
-        url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},franchise.ilike.${encoded})`;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <title>Henshin DB</title>
+    <style>
+      :root{
+        --bg:#0b0e14;
+        --panel:#111827;
+        --panel2:#0f172a;
+        --text:#e5e7eb;
+        --muted:#94a3b8;
+        --line:rgba(255,255,255,.08);
+        --shadow: 0 16px 50px rgba(0,0,0,.55);
+        --radius:16px;
+        --radius2:22px;
+        --pad:16px;
+        --max:980px;
       }
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      charactersData = await res.json();
-      return charactersData;
-    }
-
-    async function fetchGlossary(search = "") {
-      let url = `${SUPABASE_URL}/rest/v1/glossary?select=*&order=jp.asc`;
-      if (search.trim() !== "") {
-        const encoded = encodeURIComponent(search);
-        url += `&or=(jp.ilike.%${encoded}%,romaji.ilike.%${encoded}%,pt.ilike.%${encoded}%)`;
+      *{box-sizing:border-box}
+      html,body{height:100%}
+      body{
+        margin:0;
+        font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+        background: radial-gradient(1200px 800px at 50% -10%, rgba(99,102,241,.25), transparent 55%),
+                    radial-gradient(1000px 700px at 110% 10%, rgba(34,197,94,.12), transparent 50%),
+                    radial-gradient(900px 700px at -10% 20%, rgba(239,68,68,.10), transparent 50%),
+                    var(--bg);
+        color:var(--text);
+        overflow-x:hidden;
       }
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      glossaryData = await res.json();
-      return glossaryData;
-    }
-
-    async function fetchCollectibles(search = "") {
-      let url = `${SUPABASE_URL}/rest/v1/collectibles?select=*&order=year.asc`;
-      if (search.trim() !== "") {
-        const encoded = encodeURIComponent("%" + search + "%");
-        url += `&or=(name_pt.ilike.${encoded},name_en.ilike.${encoded},line.ilike.${encoded},item_type.ilike.${encoded})`;
+      a{color:inherit;text-decoration:none}
+      .app{
+        min-height:100%;
+        display:flex;
+        flex-direction:column;
       }
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      collectiblesData = await res.json();
-      return collectiblesData;
-    }
-
-    async function fetchPublications(search = "") {
-      let url = `${SUPABASE_URL}/rest/v1/publications?select=*&order=year.asc`;
-      if (search.trim() !== "") {
-        const encoded = encodeURIComponent("%" + search + "%");
-        url += `&or=(title_pt.ilike.${encoded},title_en.ilike.${encoded},publisher.ilike.${encoded})`;
+      header{
+        position:sticky;
+        top:0;
+        z-index:20;
+        backdrop-filter: blur(10px);
+        background: rgba(11,14,20,.72);
+        border-bottom:1px solid var(--line);
       }
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      publicationsData = await res.json();
-      return publicationsData;
-    }
-
-    async function fetchCollectiblesForCharacter(characterId) {
-      if (!characterId) return [];
-      const url =
-        `${SUPABASE_URL}/rest/v1/collectibles` +
-        `?select=*,character_collectibles!inner(character_id)` +
-        `&character_collectibles.character_id=eq.${characterId}`;
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      return await res.json();
-    }
-
-    async function fetchPublicationsForCharacter(characterId) {
-      if (!characterId) return [];
-      const url =
-        `${SUPABASE_URL}/rest/v1/publications` +
-        `?select=*,character_publications!inner(character_id)` +
-        `&character_publications.character_id=eq.${characterId}`;
-      const res = await fetch(url, {
-        headers: { apikey: SUPABASE_ANON_KEY, Authorization: "Bearer " + SUPABASE_ANON_KEY }
-      });
-      return await res.json();
-    }
-
-    function hideAllLists() {
-      listCharactersEl.classList.add("hidden");
-      listGlossaryEl.classList.add("hidden");
-      listCollectiblesEl.classList.add("hidden");
-      listPublicationsEl.classList.add("hidden");
-    }
-
-    function clearAllLists() {
-      listCharactersEl.innerHTML = "";
-      listGlossaryEl.innerHTML = "";
-      listCollectiblesEl.innerHTML = "";
-      listPublicationsEl.innerHTML = "";
-    }
-
-    function showEmptySearchMessage() {
-      clearAllLists();
-      hideAllLists();
-      emptyStateEl.textContent = "Digite algo na busca para começar.";
-      emptyStateEl.classList.remove("hidden");
-    }
-
-    function renderCharactersList() {
-      listCharactersEl.innerHTML = "";
-      if (!charactersData.length) {
-        hideAllLists();
-        emptyStateEl.textContent = "Nenhum personagem encontrado.";
-        emptyStateEl.classList.remove("hidden");
-        return;
+      .bar{
+        max-width:var(--max);
+        margin:0 auto;
+        padding:12px var(--pad);
+        display:flex;
+        align-items:center;
+        gap:12px;
       }
-      emptyStateEl.classList.add("hidden");
-      hideAllLists();
-
-      charactersData.forEach(c => {
-        const name = c.name_pt || c.name_en || "";
-        const civil = c.civil_name || "";
-        const li = document.createElement("li");
-        li.className =
-          "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-        li.innerHTML = `
-          <div class="flex items-center gap-3 w-full">
-            ${
-              c.image_url
-                ? `<img src="${c.image_url}" class="w-12 h-12 flex-shrink-0 rounded-full object-cover border border-slate-700" />`
-                : `<div class="w-12 h-12 flex-shrink-0 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center text-xs text-slate-400">?</div>`
-            }
-            <div class="flex flex-col min-w-0">
-              <span class="text-sm font-semibold truncate">${name}</span>
-              ${
-                civil
-                  ? `<span class="text-[11px] text-slate-300 truncate">${civil}</span>`
-                  : ""
-              }
-              <span class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
-                ${(c.franchise || "")}${c.year ? " · " + c.year : ""}
-              </span>
-            </div>
-          </div>`;
-        li.onclick = () => showCharacterDetail(c);
-        listCharactersEl.appendChild(li);
-      });
-
-      listCharactersEl.classList.remove("hidden");
-    }
-
-    function renderGlossaryList() {
-      listGlossaryEl.innerHTML = "";
-      if (!glossaryData.length) {
-        hideAllLists();
-        emptyStateEl.textContent = "Nenhum termo encontrado.";
-        emptyStateEl.classList.remove("hidden");
-        return;
+      .brand{
+        display:flex;
+        align-items:center;
+        gap:10px;
+        min-width:0;
       }
-      emptyStateEl.classList.add("hidden");
-      hideAllLists();
-
-      glossaryData.forEach(g => {
-        const li = document.createElement("li");
-        li.className =
-          "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-        li.innerHTML = `
-          <div class="flex flex-col min-w-0">
-            <span class="text-sm font-semibold truncate">${g.jp}</span>
-            ${g.romaji ? `<span class="text-[11px] text-slate-300 truncate">${g.romaji}</span>` : ""}
-            ${g.pt ? `<span class="text-xs text-slate-400 mt-1 line-clamp-2">${g.pt}</span>` : ""}
-          </div>`;
-        li.onclick = () => showGlossaryDetail(g);
-        listGlossaryEl.appendChild(li);
-      });
-
-      listGlossaryEl.classList.remove("hidden");
-    }
-
-    function renderCollectiblesList() {
-      listCollectiblesEl.innerHTML = "";
-      if (!collectiblesData.length) {
-        hideAllLists();
-        emptyStateEl.textContent = "Nenhum colecionável encontrado.";
-        emptyStateEl.classList.remove("hidden");
-        return;
+      .dot{
+        width:10px;height:10px;border-radius:999px;
+        background: linear-gradient(135deg, rgba(99,102,241,1), rgba(34,197,94,1));
+        box-shadow:0 0 0 4px rgba(99,102,241,.15);
+        flex:0 0 auto;
       }
-      emptyStateEl.classList.add("hidden");
-      hideAllLists();
-
-      collectiblesData.forEach(col => {
-        const name = col.name_pt || col.name_en || "";
-        const li = document.createElement("li");
-        li.className =
-          "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-        li.innerHTML = `
-          <div class="flex flex-col min-w-0">
-            <span class="text-sm font-semibold truncate">${name}</span>
-            <span class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
-              ${(col.line || "")}${col.item_type ? " · " + col.item_type : ""}${col.year ? " · " + col.year : ""}
-            </span>
-            ${col.manufacturer ? `<span class="text-[11px] text-slate-500 truncate">${col.manufacturer}</span>` : ""}
-          </div>`;
-        listCollectiblesEl.appendChild(li);
-      });
-
-      listCollectiblesEl.classList.remove("hidden");
-    }
-
-    function renderPublicationsList() {
-      listPublicationsEl.innerHTML = "";
-      if (!publicationsData.length) {
-        hideAllLists();
-        emptyStateEl.textContent = "Nenhuma publicação encontrada.";
-        emptyStateEl.classList.remove("hidden");
-        return;
+      .brand h1{
+        font-size:16px;
+        margin:0;
+        letter-spacing:.2px;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
       }
-      emptyStateEl.classList.add("hidden");
-      hideAllLists();
-
-      publicationsData.forEach(pub => {
-        const title = pub.title_pt || pub.title_en || "";
-        const li = document.createElement("li");
-        li.className =
-          "px-3 py-3 border-b border-slate-800 hover:bg-slate-800/60 cursor-pointer";
-        li.innerHTML = `
-          <div class="flex flex-col min-w-0">
-            <span class="text-sm font-semibold truncate">${title}</span>
-            <span class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
-              ${(pub.pub_type || "")}${pub.year ? " · " + pub.year : ""}
-            </span>
-            ${pub.publisher ? `<span class="text-[11px] text-slate-500 truncate">${pub.publisher}</span>` : ""}
-          </div>`;
-        listPublicationsEl.appendChild(li);
-      });
-
-      listPublicationsEl.classList.remove("hidden");
-    }
-
-    async function showCharacterDetail(c) {
-      detailTitle.textContent = c.name_pt || c.name_en || "";
-      detailBody.innerHTML = "";
-
-      const parts = [];
-
-      if (c.image_url) {
-        parts.push(`
-          <img src="${c.image_url}"
-               class="w-full h-48 max-h-56 object-cover rounded-xl border border-slate-800" />
-        `);
+      .crumb{
+        margin-left:auto;
+        color:var(--muted);
+        font-size:12px;
+        white-space:nowrap;
+      }
+      main{
+        flex:1;
+        width:100%;
+      }
+      .container{
+        max-width:var(--max);
+        margin:0 auto;
+        padding:16px var(--pad) 28px;
+      }
+      .title{
+        margin:14px 0 10px;
+        font-size:18px;
+        letter-spacing:.2px;
+      }
+      .subtitle{
+        margin:0 0 18px;
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.45;
       }
 
-      if (c.name_jp) {
-        parts.push(`<div class="text-sm text-slate-200 mt-2">${c.name_jp}</div>`);
+      .grid{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap:12px;
+      }
+      .card{
+        background: linear-gradient(180deg, rgba(17,24,39,.92), rgba(15,23,42,.92));
+        border:1px solid var(--line);
+        border-radius: var(--radius2);
+        padding:14px;
+        box-shadow: 0 10px 28px rgba(0,0,0,.35);
+      }
+      .row{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+      }
+      .chip{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 12px;
+        border-radius:999px;
+        background: rgba(255,255,255,.06);
+        border:1px solid var(--line);
+        color:var(--text);
+        font-weight:600;
+        font-size:13px;
+      }
+      .chip small{font-weight:500;color:var(--muted)}
+      .btn{
+        appearance:none;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.06);
+        color:var(--text);
+        border-radius: 14px;
+        padding:12px 12px;
+        font-weight:700;
+        font-size:14px;
+        width:100%;
+        text-align:left;
+      }
+      .btn:active{transform: translateY(1px)}
+      .btnRow{
+        display:grid;
+        grid-template-columns: 1fr;
+        gap:10px;
+        margin-top:12px;
       }
 
-      if (c.civil_name || c.actor_name) {
-        const civil = c.civil_name
-          ? `<div class="text-xs text-slate-200">Nome civil: ${c.civil_name}</div>`
-          : "";
-        const actor = c.actor_name
-          ? `<div class="text-xs text-slate-200">Ator: ${c.actor_name}</div>`
-          : "";
-        parts.push(`
-          <div class="mt-2 space-y-0.5">
-            ${civil}
-            ${actor}
+      .topActions{
+        display:flex;
+        gap:10px;
+        flex-wrap:wrap;
+        margin:12px 0 8px;
+      }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding:10px 12px;
+        border-radius: 999px;
+        background: rgba(255,255,255,.06);
+        border:1px solid var(--line);
+        font-size:13px;
+        color:var(--text);
+        font-weight:700;
+      }
+      .pill.secondary{
+        color:var(--muted);
+        font-weight:600;
+      }
+      .pill:active{transform: translateY(1px)}
+
+      .input{
+        width:100%;
+        padding:12px 12px;
+        border-radius: 14px;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.04);
+        color:var(--text);
+        outline:none;
+        font-size:14px;
+      }
+      .list{
+        margin-top:10px;
+        display:flex;
+        flex-direction:column;
+        gap:10px;
+      }
+      .item{
+        display:flex;
+        gap:12px;
+        align-items:flex-start;
+        padding:12px;
+        border-radius: var(--radius2);
+        background: rgba(255,255,255,.04);
+        border:1px solid var(--line);
+      }
+      .thumb{
+        width:42px;height:42px;
+        border-radius:12px;
+        background: rgba(255,255,255,.05);
+        border:1px solid var(--line);
+        overflow:hidden;
+        flex:0 0 auto;
+        display:flex;
+        align-items:center;
+        justify-content:center;
+        color:var(--muted);
+        font-weight:800;
+      }
+      .thumb img{width:100%;height:100%;object-fit:cover;display:block}
+      .itemMain{min-width:0;flex:1}
+      .itemTitle{
+        margin:0;
+        font-size:14px;
+        font-weight:800;
+        letter-spacing:.2px;
+        line-height:1.2;
+      }
+      .itemMeta{
+        margin:6px 0 0;
+        font-size:12px;
+        color:var(--muted);
+        line-height:1.35;
+      }
+      .tagRow{
+        margin-top:8px;
+        display:flex;
+        gap:8px;
+        flex-wrap:wrap;
+      }
+      .tag{
+        font-size:11px;
+        color:rgba(229,231,235,.92);
+        background: rgba(99,102,241,.14);
+        border:1px solid rgba(99,102,241,.28);
+        padding:6px 10px;
+        border-radius:999px;
+        white-space:nowrap;
+      }
+
+      .empty{
+        margin-top:14px;
+        padding:14px;
+        border-radius: var(--radius2);
+        border:1px dashed var(--line);
+        color:var(--muted);
+        font-size:13px;
+        line-height:1.45;
+      }
+
+      footer{
+        border-top:1px solid var(--line);
+        color:var(--muted);
+        font-size:12px;
+        padding:14px var(--pad);
+        text-align:center;
+      }
+
+      .overlay{
+        position:fixed;
+        inset:0;
+        background: rgba(0,0,0,.62);
+        display:none;
+        align-items:center;
+        justify-content:center;
+        padding: 18px;
+        z-index:50;
+      }
+      .overlay.open{display:flex}
+      .modal{
+        width:min(560px, 100%);
+        max-height: min(86vh, 720px);
+        overflow:auto;
+        border-radius: 22px;
+        background: linear-gradient(180deg, rgba(17,24,39,.98), rgba(15,23,42,.98));
+        border:1px solid var(--line);
+        box-shadow: var(--shadow);
+      }
+      .modalHeader{
+        position:sticky;
+        top:0;
+        background: rgba(17,24,39,.92);
+        backdrop-filter: blur(10px);
+        border-bottom:1px solid var(--line);
+        padding: 12px 14px;
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap:12px;
+        z-index:1;
+      }
+      .modalHeader h3{
+        margin:0;
+        font-size:14px;
+        font-weight:900;
+        letter-spacing:.2px;
+        overflow:hidden;
+        text-overflow:ellipsis;
+        white-space:nowrap;
+      }
+      .close{
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.06);
+        color:var(--text);
+        border-radius: 12px;
+        padding:10px 12px;
+        font-weight:800;
+        font-size:13px;
+      }
+      .modalBody{padding:14px}
+      .heroImg{
+        width:100%;
+        border-radius: 18px;
+        overflow:hidden;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.04);
+      }
+      .heroImg img{width:100%;height:auto;display:block}
+      .kv{
+        margin-top:12px;
+        display:grid;
+        grid-template-columns: 1fr;
+        gap:10px;
+      }
+      .kvBlock{
+        padding:12px;
+        border-radius: 18px;
+        border:1px solid var(--line);
+        background: rgba(255,255,255,.04);
+      }
+      .kvLabel{
+        font-size:11px;
+        color:var(--muted);
+        letter-spacing:.12em;
+        text-transform:uppercase;
+        margin:0 0 6px;
+      }
+      .kvValue{
+        margin:0;
+        font-size:13px;
+        line-height:1.45;
+        color:var(--text);
+        white-space:pre-wrap;
+      }
+
+      @media (min-width: 640px){
+        .grid{grid-template-columns: 1fr 1fr}
+        .btnRow{grid-template-columns: 1fr}
+      }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  </head>
+
+  <body>
+    <div class="app">
+      <header>
+        <div class="bar">
+          <div class="brand">
+            <div class="dot"></div>
+            <h1 id="headerTitle">Henshin DB</h1>
           </div>
-        `);
-      }
-
-      parts.push(`
-        <div class="text-[11px] text-slate-400 uppercase tracking-wide mt-1">
-          ${(c.franchise || "")}${c.year ? " · " + c.year : ""}
+          <div class="crumb" id="crumb"></div>
         </div>
-      `);
+      </header>
 
-      if (c.description) {
-        parts.push(`
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Descrição</h3>
-            <p class="text-sm mt-1 leading-relaxed">${c.description}</p>
+      <main>
+        <div class="container">
+          <section id="viewHome" style="display:none">
+            <div class="title">Home</div>
+            <p class="subtitle">Escolha uma franquia para navegar.</p>
+
+            <div class="grid">
+              <div class="card">
+                <div class="row">
+                  <div class="chip">Kamen Rider <small>Riders</small></div>
+                </div>
+                <div class="btnRow">
+                  <button class="btn" data-go-franchise="kamen rider">Abrir</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div class="chip">Super Sentai <small>Equipes</small></div>
+                </div>
+                <div class="btnRow">
+                  <button class="btn" data-go-franchise="super sentai">Abrir</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div class="chip">Metal Hero <small>Heróis</small></div>
+                </div>
+                <div class="btnRow">
+                  <button class="btn" data-go-franchise="metal hero">Abrir</button>
+                </div>
+              </div>
+            </div>
           </section>
-        `);
+
+          <section id="viewFranchise" style="display:none">
+            <div class="title" id="frTitle"></div>
+            <p class="subtitle" id="frSubtitle"></p>
+
+            <div class="topActions">
+              <button class="pill secondary" id="btnBackHome">Home</button>
+              <span class="pill secondary" id="frPill"></span>
+            </div>
+
+            <div class="grid">
+              <div class="card">
+                <div class="row">
+                  <div class="chip">Personagens <small>lista completa</small></div>
+                </div>
+                <div class="btnRow">
+                  <button class="btn" id="btnGoCharacters">Abrir lista</button>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="row">
+                  <div class="chip">Glossário <small>termos</small></div>
+                </div>
+                <div class="btnRow">
+                  <button class="btn" id="btnGoGlossary">Abrir glossário</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section id="viewCharacters" style="display:none">
+            <div class="title" id="charsTitle"></div>
+            <p class="subtitle" id="charsSubtitle"></p>
+
+            <div class="topActions">
+              <button class="pill secondary" id="btnBackFranchise">Voltar</button>
+              <button class="pill" id="btnReload">Recarregar</button>
+            </div>
+
+            <input class="input" id="searchInput" placeholder="Buscar pelo nome (EN/PT/JP)..." />
+
+            <div class="list" id="charsList"></div>
+            <div class="empty" id="charsEmpty" style="display:none"></div>
+          </section>
+
+          <section id="viewGlossary" style="display:none">
+            <div class="title">Glossário</div>
+            <p class="subtitle">Tela placeholder. Se você já tiver a tabela do glossário no Supabase, eu conecto aqui igual a de personagens.</p>
+
+            <div class="topActions">
+              <button class="pill secondary" id="btnBackFromGlossary">Voltar</button>
+            </div>
+
+            <div class="empty">Me diga o nome da sua tabela de glossário e as colunas principais (ex: term_en, term_jp, term_pt, definition) que eu ajusto em 1 mensagem.</div>
+          </section>
+        </div>
+      </main>
+
+      <footer>v0.1 · Henshin DB · Author: Mayara Gouveia</footer>
+    </div>
+
+    <div class="overlay" id="overlay">
+      <div class="modal" role="dialog" aria-modal="true">
+        <div class="modalHeader">
+          <h3 id="modalTitle"></h3>
+          <button class="close" id="btnClose">Fechar</button>
+        </div>
+        <div class="modalBody" id="modalBody"></div>
+      </div>
+    </div>
+
+    <script>
+      const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
+      const SUPABASE_ANON_KEY = "https://grvmisyiyxzlqfqgponm.supabase.co";
+
+      const sb = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+      const views = {
+        home: document.getElementById("viewHome"),
+        franchise: document.getElementById("viewFranchise"),
+        characters: document.getElementById("viewCharacters"),
+        glossary: document.getElementById("viewGlossary"),
+      };
+
+      const headerTitle = document.getElementById("headerTitle");
+      const crumb = document.getElementById("crumb");
+
+      const frTitle = document.getElementById("frTitle");
+      const frSubtitle = document.getElementById("frSubtitle");
+      const frPill = document.getElementById("frPill");
+
+      const charsTitle = document.getElementById("charsTitle");
+      const charsSubtitle = document.getElementById("charsSubtitle");
+      const searchInput = document.getElementById("searchInput");
+      const charsList = document.getElementById("charsList");
+      const charsEmpty = document.getElementById("charsEmpty");
+
+      const overlay = document.getElementById("overlay");
+      considerOverlayClickClose();
+
+      const modalTitle = document.getElementById("modalTitle");
+      const modalBody = document.getElementById("modalBody");
+      document.getElementById("btnClose").addEventListener("click", closeModal);
+
+      let state = {
+        view: "home",
+        franchise: null,
+        characters: [],
+      };
+
+      function showView(name) {
+        Object.values(views).forEach(v => v.style.display = "none");
+        views[name].style.display = "block";
+        state.view = name;
+        renderHeader();
       }
 
-      if (c.powers) {
-        parts.push(`
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Poderes</h3>
-            <p class="text-sm mt-1 leading-relaxed">${c.powers}</p>
-          </section>
-        `);
+      function renderHeader() {
+        const fr = state.franchise;
+        if (state.view === "home") {
+          headerTitle.textContent = "Henshin DB";
+          crumb.textContent = "";
+          return;
+        }
+        if (state.view === "franchise") {
+          headerTitle.textContent = "Henshin DB";
+          crumb.textContent = fr ? formatFranchise(fr) : "";
+          return;
+        }
+        if (state.view === "characters") {
+          headerTitle.textContent = "Personagens";
+          crumb.textContent = fr ? formatFranchise(fr) : "";
+          return;
+        }
+        if (state.view === "glossary") {
+          headerTitle.textContent = "Glossário";
+          crumb.textContent = fr ? formatFranchise(fr) : "";
+          return;
+        }
       }
 
-      if (c.equipment) {
-        parts.push(`
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Equipamentos</h3>
-            <p class="text-sm mt-1 leading-relaxed">${c.equipment}</p>
-          </section>
-        `);
+      function formatFranchise(fr) {
+        if (fr === "kamen rider") return "Kamen Rider";
+        if (fr === "super sentai") return "Super Sentai";
+        if (fr === "metal hero") return "Metal Hero";
+        return fr;
       }
 
-      detailBody.innerHTML = parts.join("");
-      detailOverlay.classList.remove("hidden");
+      function openFranchise(fr) {
+        state.franchise = fr;
+        frTitle.textContent = formatFranchise(fr);
+        frSubtitle.textContent = "Escolha o que você quer explorar dentro desta franquia.";
+        frPill.textContent = formatFranchise(fr);
+        showView("franchise");
+      }
 
-      try {
-        const [collectibles, publications] = await Promise.all([
-          fetchCollectiblesForCharacter(c.id),
-          fetchPublicationsForCharacter(c.id)
-        ]);
+      function goCharacters() {
+        const fr = state.franchise;
+        charsTitle.textContent = `Personagens · ${formatFranchise(fr)}`;
+        charsSubtitle.textContent = "Lista completa em ordem alfabética. Toque em um item para ver detalhes.";
+        searchInput.value = "";
+        showView("characters");
+        loadCharacters();
+      }
 
-        let extrasHtml = "";
+      function goGlossary() {
+        showView("glossary");
+      }
 
-        if (collectibles && collectibles.length) {
-          const items = collectibles
-            .map(col => {
-              const line = col.line || "";
-              const type = col.item_type || "";
-              const year = col.year || "";
-              const manufacturer = col.manufacturer || "";
-              return `
-                <li class="flex flex-col gap-0.5 border-b border-slate-800 pb-2 last:border-b-0 last:pb-0">
-                  <div class="text-sm font-medium text-slate-100 truncate">${col.name_pt || col.name_en || ""}</div>
-                  <div class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
-                    ${line}${type ? " · " + type : ""}${year ? " · " + year : ""}
-                  </div>
-                  ${manufacturer ? `<div class="text-[11px] text-slate-500 truncate">${manufacturer}</div>` : ""}
-                </li>`;
-            })
-            .join("");
+      async function loadCharacters() {
+        charsList.innerHTML = "";
+        charsEmpty.style.display = "none";
 
-          extrasHtml += `
-            <section class="mt-6">
-              <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-2">
-                Colecionáveis relacionados
-              </h3>
-              <ul class="space-y-2">${items}</ul>
-            </section>
-          `;
+        const fr = state.franchise;
+        if (!fr) {
+          charsEmpty.textContent = "Selecione uma franquia na Home.";
+          charsEmpty.style.display = "block";
+          return;
         }
 
-        if (publications && publications.length) {
-          const items = publications
-            .map(pub => {
-              const title = pub.title_pt || pub.title_en || "";
-              const year = pub.year || "";
-              const pubType = pub.pub_type || "";
-              const publisher = pub.publisher || "";
-              return `
-                <li class="flex flex-col gap-0.5 border-b border-slate-800 pb-2 last:border-b-0 last:pb-0">
-                  <div class="text-sm font-medium text-slate-100 truncate">${title}</div>
-                  <div class="text-[11px] text-slate-400 uppercase tracking-wide truncate">
-                    ${pubType}${year ? " · " + year : ""}
-                  </div>
-                  ${publisher ? `<div class="text-[11px] text-slate-500 truncate">${publisher}</div>` : ""}
-                </li>
-              `;
-            })
-            .join("");
+        const { data, error } = await sb
+          .from("characters")
+          .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description,powers,equipment,tags,civil_name,actor_name,image_url,image_slug")
+          .eq("franchise", fr)
+          .order("name_en", { ascending: true });
 
-          extrasHtml += `
-            <section class="mt-6">
-              <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide mb-2">
-                Livros e revistas
-              </h3>
-              <ul class="space-y-2">${items}</ul>
-            </section>
-          `;
+        if (error) {
+          charsEmpty.textContent = `Erro ao carregar: ${error.message}`;
+          charsEmpty.style.display = "block";
+          return;
         }
 
-        if (extrasHtml) {
-          detailBody.innerHTML += extrasHtml;
+        state.characters = Array.isArray(data) ? data : [];
+        renderCharacters(state.characters);
+      }
+
+      function renderCharacters(items) {
+        charsList.innerHTML = "";
+
+        if (!items.length) {
+          charsEmpty.textContent = "Nenhum personagem encontrado.";
+          charsEmpty.style.display = "block";
+          return;
         }
-      } catch (e) {
-        console.error("Erro extras personagem:", e);
+
+        charsEmpty.style.display = "none";
+
+        for (const c of items) {
+          const el = document.createElement("div");
+          el.className = "item";
+          el.tabIndex = 0;
+
+          const thumb = document.createElement("div");
+          thumb.className = "thumb";
+
+          const imgUrl = getImageUrl(c);
+          if (imgUrl) {
+            const img = document.createElement("img");
+            img.loading = "lazy";
+            img.alt = c.name_en || "character";
+            img.src = imgUrl;
+            img.onerror = () => {
+              img.remove();
+              thumb.textContent = initials(c.name_en || c.name_pt || "?");
+            };
+            thumb.appendChild(img);
+          } else {
+            thumb.textContent = initials(c.name_en || c.name_pt || "?");
+          }
+
+          const main = document.createElement("div");
+          main.className = "itemMain";
+
+          const title = document.createElement("p");
+          title.className = "itemTitle";
+          title.textContent = c.name_pt || c.name_en || "Sem nome";
+
+          const meta = document.createElement("p");
+          meta.className = "itemMeta";
+          const metaParts = [];
+          if (c.name_en && c.name_pt && c.name_en !== c.name_pt) metaParts.push(c.name_en);
+          if (c.year) metaParts.push(String(c.year));
+          if (c.name_jp) metaParts.push(c.name_jp);
+          meta.textContent = metaParts.join(" · ");
+
+          main.appendChild(title);
+          main.appendChild(meta);
+
+          const tagRow = document.createElement("div");
+          tagRow.className = "tagRow";
+          const tags = safeJsonArray(c.tags);
+          for (const t of tags.slice(0, 3)) {
+            const tg = document.createElement("span");
+            tg.className = "tag";
+            tg.textContent = String(t);
+            tagRow.appendChild(tg);
+          }
+          if (tagRow.childElementCount) main.appendChild(tagRow);
+
+          el.appendChild(thumb);
+          el.appendChild(main);
+
+          el.addEventListener("click", () => openCharacterModal(c));
+          el.addEventListener("keydown", (e) => {
+            if (e.key === "Enter" || e.key === " ") openCharacterModal(c);
+          });
+
+          charsList.appendChild(el);
+        }
       }
-    }
 
-    function showGlossaryDetail(g) {
-      detailTitle.textContent = g.jp || "";
-      let html = "";
+      function openCharacterModal(c) {
+        modalTitle.textContent = c.name_pt || c.name_en || "Detalhes";
+        modalBody.innerHTML = "";
 
-      if (g.romaji) {
-        html += `<div class="text-sm text-slate-200">${g.romaji}</div>`;
+        const imgUrl = getImageUrl(c);
+        if (imgUrl) {
+          const hero = document.createElement("div");
+          hero.className = "heroImg";
+          const img = document.createElement("img");
+          img.alt = c.name_en || "character";
+          img.src = imgUrl;
+          img.loading = "eager";
+          img.onerror = () => hero.remove();
+          hero.appendChild(img);
+          modalBody.appendChild(hero);
+        }
+
+        const kv = document.createElement("div");
+        kv.className = "kv";
+
+        const blocks = [];
+
+        blocks.push(block("Nome (EN)", c.name_en));
+        blocks.push(block("Nome (JP)", c.name_jp));
+        blocks.push(block("Romaji", c.romaji));
+        blocks.push(block("Ano", c.year ? String(c.year) : null));
+        blocks.push(block("Nome civil", c.civil_name));
+        blocks.push(block("Ator", c.actor_name));
+        blocks.push(block("Descrição", c.description));
+        blocks.push(block("Poderes", c.powers));
+        blocks.push(block("Equipamentos", c.equipment));
+
+        for (const b of blocks) if (b) kv.appendChild(b);
+
+        modalBody.appendChild(kv);
+
+        overlay.classList.add("open");
+        document.body.style.overflow = "hidden";
       }
 
-      if (g.category) {
-        html += `
-          <div class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-800 text-[11px] text-slate-200 uppercase tracking-wide mt-1">
-            ${g.category}
-          </div>`;
+      function block(label, value) {
+        if (value === null || value === undefined) return null;
+        const v = String(value).trim();
+        if (!v) return null;
+
+        const w = document.createElement("div");
+        w.className = "kvBlock";
+
+        const l = document.createElement("p");
+        l.className = "kvLabel";
+        l.textContent = label;
+
+        const p = document.createElement("p");
+        p.className = "kvValue";
+        p.textContent = v;
+
+        w.appendChild(l);
+        w.appendChild(p);
+        return w;
       }
 
-      if (g.pt) {
-        html += `
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Português</h3>
-            <p class="text-sm mt-1 leading-relaxed">${g.pt}</p>
-          </section>`;
+      function closeModal() {
+        overlay.classList.remove("open");
+        document.body.style.overflow = "";
       }
 
-      if (g.en) {
-        html += `
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Inglês</h3>
-            <p class="text-sm mt-1 leading-relaxed">${g.en}</p>
-          </section>`;
+      function considerOverlayClickClose() {
+        overlay.addEventListener("click", (e) => {
+          if (e.target === overlay) closeModal();
+        });
+        window.addEventListener("keydown", (e) => {
+          if (e.key === "Escape") closeModal();
+        });
       }
 
-      if (g.explanation) {
-        html += `
-          <section class="mt-4">
-            <h3 class="text-xs font-semibold text-slate-300 uppercase tracking-wide">Explicação</h3>
-            <p class="text-sm mt-1 leading-relaxed">${g.explanation}</p>
-          </section>`;
+      function initials(s) {
+        const t = String(s).trim();
+        if (!t) return "?";
+        const parts = t.split(/\s+/).slice(0,2);
+        return parts.map(x => x[0]?.toUpperCase() || "").join("") || "?";
       }
 
-      detailBody.innerHTML = html;
-      detailOverlay.classList.remove("hidden");
-    }
-
-    function closeDetail() {
-      detailOverlay.classList.add("hidden");
-    }
-
-    async function loadCurrentTab() {
-      const search = currentSearch.trim();
-
-      if (currentTab === "characters") {
-        await fetchCharacters(search);
-        renderCharactersList();
-        return;
+      function safeJsonArray(v) {
+        try {
+          if (Array.isArray(v)) return v;
+          if (typeof v === "string" && v.trim().startsWith("[")) return JSON.parse(v);
+          return [];
+        } catch {
+          return [];
+        }
       }
 
-      if (search === "") {
-        showEmptySearchMessage();
-        return;
+      function getImageUrl(c) {
+        if (c.image_url && String(c.image_url).trim()) return String(c.image_url).trim();
+
+        const slug = (c.image_slug && String(c.image_slug).trim())
+          ? String(c.image_slug).trim()
+          : slugify(c.name_en || c.name_pt || "");
+
+        if (!slug) return null;
+
+        return `${SUPABASE_URL}/storage/v1/object/public/henshin-images/${slug}.png`;
       }
 
-      if (currentTab === "glossary") {
-        await fetchGlossary(search);
-        renderGlossaryList();
-      } else if (currentTab === "collectibles") {
-        await fetchCollectibles(search);
-        renderCollectiblesList();
-      } else if (currentTab === "publications") {
-        await fetchPublications(search);
-        renderPublicationsList();
+      function slugify(s) {
+        return String(s)
+          .normalize("NFKD")
+          .replace(/[\u0300-\u036f]/g, "")
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, "-")
+          .replace(/(^-|-$)/g, "");
       }
-    }
 
-    function setActiveTab(tab) {
-      const activeClasses = ["bg-slate-100", "text-slate-900"];
-      const inactiveClasses = ["bg-slate-800", "text-slate-200"];
+      function applySearchFilter() {
+        const q = searchInput.value.trim().toLowerCase();
+        if (!q) {
+          renderCharacters(state.characters);
+          return;
+        }
+        const filtered = state.characters.filter(c => {
+          const hay = [
+            c.name_en, c.name_pt, c.name_jp, c.romaji,
+            c.description, c.civil_name, c.actor_name
+          ].filter(Boolean).join(" ").toLowerCase();
+          return hay.includes(q);
+        });
+        renderCharacters(filtered);
+      }
 
-      [tabCharactersBtn, tabGlossaryBtn, tabCollectiblesBtn, tabPublicationsBtn].forEach(btn => {
-        btn.classList.remove(...activeClasses);
-        btn.classList.add(...inactiveClasses);
+      document.querySelectorAll("[data-go-franchise]").forEach(btn => {
+        btn.addEventListener("click", () => openFranchise(btn.getAttribute("data-go-franchise")));
       });
 
-      tab.classList.add(...activeClasses);
-      tab.classList.remove(...inactiveClasses);
-    }
+      document.getElementById("btnBackHome").addEventListener("click", () => showView("home"));
+      document.getElementById("btnGoCharacters").addEventListener("click", goCharacters);
+      document.getElementById("btnGoGlossary").addEventListener("click", goGlossary);
 
-    tabCharactersBtn.onclick = () => {
-      currentTab = "characters";
-      setActiveTab(tabCharactersBtn);
-      loadCurrentTab();
-    };
+      document.getElementById("btnBackFranchise").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnReload").addEventListener("click", loadCharacters);
 
-    tabGlossaryBtn.onclick = () => {
-      currentTab = "glossary";
-      setActiveTab(tabGlossaryBtn);
-      loadCurrentTab();
-    };
+      document.getElementById("btnBackFromGlossary").addEventListener("click", () => showView("franchise"));
 
-    tabCollectiblesBtn.onclick = () => {
-      currentTab = "collectibles";
-      setActiveTab(tabCollectiblesBtn);
-      loadCurrentTab();
-    };
+      searchInput.addEventListener("input", () => applySearchFilter());
 
-    tabPublicationsBtn.onclick = () => {
-      currentTab = "publications";
-      setActiveTab(tabPublicationsBtn);
-      loadCurrentTab();
-    };
-
-    searchInput.oninput = () => {
-      currentSearch = searchInput.value;
-      clearTimeout(searchInput._timer);
-      searchInput._timer = setTimeout(() => loadCurrentTab(), 300);
-    };
-
-    detailClose.onclick = closeDetail;
-    detailOverlay.onclick = e => {
-      if (e.target === detailOverlay) closeDetail();
-    };
-
-    setActiveTab(tabCharactersBtn);
-    loadCurrentTab();
-  </script>
-</body>
+      showView("home");
+    </script>
+  </body>
 </html>
