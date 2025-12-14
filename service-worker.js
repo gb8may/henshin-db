@@ -20,12 +20,37 @@ self.addEventListener("install", (event) => {
 // Ativa e limpa caches antigos
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(keys.map(k => (k !== CACHE_NAME ? caches.delete(k) : null)))
+    caches.keys().then((keys) =>
+      Promise.all(keys.map((k) => (k !== CACHE_NAME ? caches.delete(k) : null)))
     )
   );
   self.clients.claim();
 });
+
+// Helper: cache-first (assets)
+async function cacheFirst(req) {
+  const cached = await caches.match(req);
+  if (cached) return cached;
+
+  const res = await fetch(req);
+  const cache = await caches.open(CACHE_NAME);
+  cache.put(req, res.clone());
+  return res;
+}
+
+// Helper: network-first (HTML/navigation)
+async function networkFirst(req) {
+  try {
+    const res = await fetch(req);
+    const cache = await caches.open(CACHE_NAME);
+    // mantém o /index.html sempre atualizado pro fallback offline
+    cache.put("/index.html", res.clone());
+    return res;
+  } catch {
+    const cached = await caches.match("/index.html");
+    return cached || new Response("Offline", { status: 503, statusText: "Offline" });
+  }
+}
 
 // Estratégia: HTML = network-first (com fallback), assets = cache-first
 self.addEventListener("fetch", (event) => {
@@ -37,18 +62,10 @@ self.addEventListener("fetch", (event) => {
 
   // Navegação (documento)
   if (req.mode === "navigate") {
-    event.respondWith(
-      fetch(req).then((res) => {
-        const copy = res.clone();
-        caches.open(CACHE_NAME).then(cache => cache.put("/index.html", copy));
-        return res;
-      }).catch(() => caches.match("/index.html"))
-    );
+    event.respondWith(networkFirst(req));
     return;
   }
 
   // Demais assets
-  event.respondWith(
-    caches.match(req).then((cached) => cached || fetch(req))
-  );
+  event.respondWith(cacheFirst(req));
 });

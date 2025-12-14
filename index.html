@@ -600,6 +600,56 @@
         return `${u}${sep}v=${Date.now()}`;
       }
 
+      // =========================
+      // ✅ LINKS EXTERNOS (Capacitor Browser)
+      // =========================
+      function isNativeCapacitor() {
+        return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
+      }
+
+      async function openExternal(url) {
+        const u = safeText(url);
+        if (!hasValue(u)) return;
+
+        // Capacitor (nativo): abre Safari View Controller / Chrome Custom Tabs
+        if (isNativeCapacitor() && window.Capacitor?.Plugins?.Browser?.open) {
+          try {
+            await window.Capacitor.Plugins.Browser.open({ url: u });
+            return;
+          } catch (e) {
+            console.warn("Capacitor Browser.open falhou, fallback pro window.open:", e);
+          }
+        }
+
+        // Web/PWA (Netlify): abre nova aba/janela
+        window.open(u, "_blank", "noopener,noreferrer");
+      }
+
+      function isExternalUrl(href) {
+        try {
+          const u = new URL(href, window.location.href);
+          const isHttp = u.protocol === "http:" || u.protocol === "https:";
+          const isSameOrigin = u.origin === window.location.origin;
+          return isHttp && !isSameOrigin;
+        } catch {
+          return false;
+        }
+      }
+
+      // Intercepta qualquer <a> externo (inclusive dentro do modalBody etc.)
+      document.addEventListener("click", async (ev) => {
+        const a = ev.target && ev.target.closest ? ev.target.closest("a") : null;
+        if (!a) return;
+
+        const href = a.getAttribute("href");
+        if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
+
+        if (isExternalUrl(href)) {
+          ev.preventDefault();
+          await openExternal(new URL(href, window.location.href).toString());
+        }
+      });
+
       // ===== OFFLINE + CACHE =====
       function setConnectionState(mode, detail) {
         // mode: "online" | "offline" | "error"
@@ -740,10 +790,18 @@
         if (!hasValue(u)) {
           modalLinkBtn.style.display = "none";
           modalLinkBtn.href = "#";
+          modalLinkBtn.onclick = null;
           return;
         }
+
         modalLinkBtn.style.display = "inline-flex";
         modalLinkBtn.href = u;
+
+        // ✅ sempre abre via Browser nativo quando estiver no Capacitor
+        modalLinkBtn.onclick = async (e) => {
+          e.preventDefault();
+          await openExternal(u);
+        };
       }
 
       function setModalImage(url, alt) {
@@ -794,7 +852,6 @@
           return;
         }
 
-        // ✅ ALTERAÇÃO: inclui civil_name_pt/en/jp e REMOVE civil_name antigo do select
         const { data, error } = await supabase
           .from("characters")
           .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description,powers,equipment,civil_name_pt,civil_name_en,civil_name_jp,actor_name,tags,search_terms")
@@ -821,7 +878,6 @@
         charactersCache = list;
         charactersStatus.textContent = `${list.length} itens`;
 
-        // salva cache
         saveCache("characters", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -830,7 +886,6 @@
         const query = safeText(q).toLowerCase();
         if (!query) return charactersCache;
 
-        // ✅ ALTERAÇÃO: busca também pelos 3 nomes civis novos (e não usa mais civil_name antigo)
         return charactersCache.filter((c) =>
           [c.name_en, c.name_pt, c.name_jp, c.romaji, c.civil_name_pt, c.civil_name_en, c.civil_name_jp, c.actor_name]
             .some((v) => safeText(v).toLowerCase().includes(query))
@@ -873,7 +928,6 @@
             setModalImage(imgUrl, c.name_en);
             setModalLink("");
 
-            // ✅ ALTERAÇÃO: remove "Nome civil" antigo e adiciona 3 campos novos
             const rows = [
               specRow("Nome (PT)", c.name_pt),
               specRow("Nome (EN)", c.name_en),
@@ -882,7 +936,6 @@
               specRow("Franquia", formatFranchise(c.franchise)),
               specRow("Ano", c.year),
 
-              // novos campos (só aparecem se tiver valor)
               specRow("Nome civil (PT)", c.civil_name_pt),
               specRow("Nome civil (EN)", c.civil_name_en),
               specRow("Nome civil (JP)", c.civil_name_jp),
@@ -1222,7 +1275,7 @@
         renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
       );
 
-      // ✅ COLLECTIBLES (CORRIGIDO: NÃO PEDE "url" NO SELECT)
+      // ✅ COLLECTIBLES
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
