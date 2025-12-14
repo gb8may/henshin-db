@@ -1,10 +1,10 @@
-# [Henshin DB](https://henshindb.netlify.app/)
+# Henshin DB
 
 ---
 
 ## 🇧🇷 Português
 
-**Henshin DB** é um aplicativo web focado em **tokusatsu japonês**, criado para organizar e explorar informações sobre **personagens**, **publicações**, **colecionáveis** e **termos** relacionados a franquias clássicas e modernas.
+[Henshin DB](https://henshindb.netlify.app/) é um aplicativo web focado em **tokusatsu japonês**, criado para organizar e explorar informações sobre **personagens**, **publicações**, **colecionáveis** e **termos** relacionados a franquias clássicas e modernas.
 
 O projeto nasceu da vontade de tratar tokusatsu com o mesmo cuidado e profundidade de uma *enciclopédia viva*, mas com a experiência fluida de um **app mobile-first**.
 
