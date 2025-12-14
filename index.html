@@ -287,6 +287,17 @@
         word-break: break-word;
       }
 
+      /* ✅ (NOVO) Agrupamento de nomes civis (não quebra nada se não usar) */
+      .spec-group {
+        margin-top: 12px;
+        padding-top: 8px;
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+      .spec-group p {
+        margin: 4px 0;
+        font-size: 0.9rem;
+      }
+
       .linkBtn {
         display: inline-flex;
         align-items: center;
@@ -658,9 +669,10 @@
         charactersStatus.textContent = "Carregando...";
         charactersList.innerHTML = "";
 
+        // ✅ ALTERAÇÃO: inclui civil_name_pt/en/jp e REMOVE civil_name antigo do select
         const { data, error } = await supabase
           .from("characters")
-          .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description,powers,equipment,civil_name,actor_name,tags,search_terms")
+          .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description,powers,equipment,civil_name_pt,civil_name_en,civil_name_jp,actor_name,tags,search_terms")
           .eq("franchise", state.franchise);
 
         if (error) {
@@ -680,8 +692,9 @@
         const query = safeText(q).toLowerCase();
         if (!query) return charactersCache;
 
+        // ✅ ALTERAÇÃO: busca também pelos 3 nomes civis novos (e não usa mais civil_name antigo)
         return charactersCache.filter((c) =>
-          [c.name_en, c.name_pt, c.name_jp, c.romaji, c.civil_name, c.actor_name]
+          [c.name_en, c.name_pt, c.name_jp, c.romaji, c.civil_name_pt, c.civil_name_en, c.civil_name_jp, c.actor_name]
             .some((v) => safeText(v).toLowerCase().includes(query))
         );
       }
@@ -722,6 +735,7 @@
             setModalImage(imgUrl, c.name_en);
             setModalLink("");
 
+            // ✅ ALTERAÇÃO: remove "Nome civil" antigo e adiciona 3 campos novos
             const rows = [
               specRow("Nome (PT)", c.name_pt),
               specRow("Nome (EN)", c.name_en),
@@ -729,7 +743,12 @@
               specRow("Romaji", c.romaji),
               specRow("Franquia", formatFranchise(c.franchise)),
               specRow("Ano", c.year),
-              specRow("Nome civil", c.civil_name),
+
+              // novos campos (só aparecem se tiver valor)
+              specRow("Nome civil (PT)", c.civil_name_pt),
+              specRow("Nome civil (EN)", c.civil_name_en),
+              specRow("Nome civil (JP)", c.civil_name_jp),
+
               specRow("Ator", c.actor_name),
               specRow("Descrição", c.description),
               specRow("Poderes", c.powers),

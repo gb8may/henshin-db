@@ -487,6 +487,7 @@
         if (key === "kamen rider") return "Kamen Rider";
         if (key === "super sentai") return "Super Sentai";
         if (key === "metal hero") return "Metal Hero";
+        if (key === "ultraman") return "Ultraman";
         return key;
       }
 
@@ -543,7 +544,6 @@
       function withCacheBuster(url) {
         const u = safeText(url);
         if (!hasValue(u)) return "";
-        // evita ficar preso na imagem antiga quando você sobrescreve no bucket
         const sep = u.includes("?") ? "&" : "?";
         return `${u}${sep}v=${Date.now()}`;
       }
@@ -564,7 +564,9 @@
         const cats = [
           { key: "kamen rider", label: "Kamen Rider" },
           { key: "super sentai", label: "Super Sentai" },
-          { key: "metal hero", label: "Metal Hero" }
+          { key: "metal hero", label: "Metal Hero" },
+          { key: "ultraman", label: "Ultraman" },
+          { key: "cybercops", label: "Cybercops" }
         ];
 
         homeCategories.innerHTML = "";
@@ -662,7 +664,8 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          charactersStatus.textContent = "Erro ao carregar personagens.";
+          console.error("Characters load error:", error);
+          charactersStatus.textContent = `Erro ao carregar personagens: ${error.message}`;
           charactersCache = [];
           return;
         }
@@ -769,14 +772,19 @@
           .select("id,jp,romaji,en,pt,explanation,category");
 
         if (error) {
-          glossaryStatus.textContent = "Erro ao carregar glossário.";
+          console.error("Glossary load error:", error);
+          glossaryStatus.textContent = `Erro ao carregar glossário: ${error.message}`;
           glossaryCache = [];
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) =>
-          (safeText(a.pt) || safeText(a.en) || safeText(a.jp)).localeCompare(safeText(b.pt) || safeText(b.en) || safeText(b.jp), "pt", { sensitivity: "base" })
+          (safeText(a.pt) || safeText(a.en) || safeText(a.jp)).localeCompare(
+            safeText(b.pt) || safeText(b.en) || safeText(b.jp),
+            "pt",
+            { sensitivity: "base" }
+          )
         );
         glossaryCache = list;
         glossaryStatus.textContent = `${list.length} termos`;
@@ -854,10 +862,14 @@
         }
       }
 
-      inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
-      selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
+      inputGlossarySearch.addEventListener("input", () =>
+        renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value))
+      );
+      selectGlossaryCategory.addEventListener("change", () =>
+        renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value))
+      );
 
-      // ✅ PUBLICATIONS (CORRIGIDO PARA SEU SCHEMA)
+      // ✅ PUBLICATIONS (SEU SCHEMA)
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -889,7 +901,8 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          publicationsStatus.textContent = "Erro ao carregar publicações.";
+          console.error("Publications load error:", error);
+          publicationsStatus.textContent = `Erro ao carregar publicações: ${error.message}`;
           publicationsCache = [];
           return;
         }
@@ -1004,7 +1017,7 @@
         renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
       );
 
-      // ✅ COLLECTIBLES (CORRIGIDO PARA SEU SCHEMA)
+      // ✅ COLLECTIBLES (CORRIGIDO: NÃO PEDE "url" NO SELECT)
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
@@ -1022,8 +1035,13 @@
         inputCollectiblesSearch.value = "";
         selectCollectiblesCategory.value = "";
         await loadCollectibles();
-        // filtro principal por item_type (belt/figure/mecha/weapon etc)
-        populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), "Todos");
+
+        populateSelect(
+          selectCollectiblesCategory,
+          collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean),
+          "Todos"
+        );
+
         renderCollectiblesList(filterCollectibles("", ""));
       }
 
@@ -1037,7 +1055,8 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          collectiblesStatus.textContent = "Erro ao carregar colecionáveis.";
+          console.error("Collectibles load error:", error);
+          collectiblesStatus.textContent = `Erro ao carregar colecionáveis: ${error.message}`;
           collectiblesCache = [];
           return;
         }
@@ -1080,6 +1099,7 @@
           const img = safeText(it.image_url);
           const name = colDisplayName(it);
           const year = safeText(it.year);
+
           const subtitleParts = [];
           if (hasValue(it.line)) subtitleParts.push(safeText(it.line));
           if (hasValue(it.item_type)) subtitleParts.push(safeText(it.item_type));
@@ -1088,7 +1108,7 @@
           el.innerHTML = `
             <div class="itemTop">
               <div class="thumb">
-                ${hasValue(img) ? `<img src="${img}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />` : ``}
+                ${hasValue(img) ? `<img src="${withCacheBuster(img)}" alt="${escapeHtml(name)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />` : ``}
               </div>
               <div class="meta">
                 <div class="nameLine">
@@ -1106,7 +1126,7 @@
           el.addEventListener("click", () => {
             modalTitle.textContent = name;
             setModalImage(img, name);
-            setModalLink(""); // collectibles não tem URL no seu schema atual; se quiser, eu adiciono campo depois
+            setModalLink("");
 
             const rows = [
               specRow("Nome (PT)", it.name_pt),
