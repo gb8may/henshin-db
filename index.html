@@ -5,19 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Henshin DB</title>
 
-    <!-- ===== PWA ===== -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#0b0e14" />
     <meta name="application-name" content="Henshin DB" />
 
-    <!-- iOS: rodar como app (standalone) -->
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-title" content="Henshin DB" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
 
-    <!-- iOS icons -->
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
-    <!-- Fallback icon -->
     <link rel="icon" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="icon" sizes="512x512" href="/icons/icon-512.png" />
 
@@ -76,38 +72,6 @@
         font-size: 12px;
         color: var(--muted);
         user-select: none;
-        white-space: nowrap;
-      }
-
-      /* ===== Language dropdown com cara de chip ===== */
-      .langSelect {
-        appearance: none;
-        -webkit-appearance: none;
-        -moz-appearance: none;
-        border: 1px solid var(--border);
-        background: rgba(255, 255, 255, 0.06);
-        color: var(--text);
-        padding: 8px 30px 8px 10px;
-        border-radius: 999px;
-        font-size: 12px;
-        outline: none;
-        cursor: pointer;
-        line-height: 1;
-      }
-      .langWrap {
-        position: relative;
-        display: inline-flex;
-        align-items: center;
-      }
-      .langWrap::after {
-        content: "▾";
-        position: absolute;
-        right: 10px;
-        top: 50%;
-        transform: translateY(-50%);
-        font-size: 12px;
-        color: var(--muted);
-        pointer-events: none;
       }
 
       main {
@@ -117,7 +81,6 @@
         padding: 14px 14px 90px;
       }
 
-      /* Views + transição */
       .view { display: none; }
       .view.active { display: block; }
       @keyframes viewEnter {
@@ -291,7 +254,6 @@
         background: rgba(255, 255, 255, 0.05);
         overflow: hidden;
         margin-bottom: 10px;
-
         display: flex;
         align-items: center;
         justify-content: center;
@@ -333,16 +295,6 @@
         word-break: break-word;
       }
 
-      .spec-group {
-        margin-top: 12px;
-        padding-top: 8px;
-        border-top: 1px solid rgba(255,255,255,0.1);
-      }
-      .spec-group p {
-        margin: 4px 0;
-        font-size: 0.9rem;
-      }
-
       .linkBtn {
         display: inline-flex;
         align-items: center;
@@ -357,6 +309,43 @@
         text-decoration: none;
         font-weight: 700;
       }
+
+      .langMenu { position: relative; }
+      .langBtn {
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.06);
+        border-radius: 999px;
+        padding: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .langBtn img { width: 22px; height: 14px; display: block; border-radius: 2px; }
+
+      .langDropdown {
+        position: absolute;
+        right: 0;
+        top: 42px;
+        background: rgba(15,18,26,0.95);
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        display: none;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        z-index: 100;
+      }
+      .langDropdown button {
+        background: none;
+        border: none;
+        padding: 6px;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .langDropdown img { width: 22px; height: 14px; display: block; border-radius: 2px; }
     </style>
   </head>
 
@@ -368,31 +357,29 @@
             <div class="title">Henshin DB</div>
             <div class="subtitle" id="headerSubtitle">Home</div>
           </div>
-
           <div class="rightControls">
-            <!-- ✅ Dropdown de idioma -->
-            <div class="langWrap" title="Language">
-              <select class="langSelect" id="langSelect" aria-label="Language selector">
-                <option value="pt">Português</option>
-                <option value="en">English</option>
-                <option value="ja">日本語</option>
-              </select>
+            <div class="langMenu">
+              <button id="langBtn" class="langBtn" type="button" aria-label="Language">
+                <img id="langIcon" src="/icons/flag-ca.svg" alt="" />
+              </button>
+              <div id="langDropdown" class="langDropdown" role="menu">
+                <button type="button" data-lang="pt" role="menuitem"><img src="/icons/flag-br.svg" alt="PT" /></button>
+                <button type="button" data-lang="en" role="menuitem"><img src="/icons/flag-ca.svg" alt="EN" /></button>
+                <button type="button" data-lang="ja" role="menuitem"><img src="/icons/flag-jp.svg" alt="JA" /></button>
+              </div>
             </div>
-
             <div class="chip" id="headerChip">Offline</div>
           </div>
         </div>
       </header>
 
       <main>
-        <!-- HOME -->
         <section class="view active" id="viewHome">
           <div class="sectionTitle" id="homeTitle">Temas</div>
           <div class="sectionHint" id="homeHint">Escolha um tema para navegar.</div>
           <div class="grid" id="homeCategories"></div>
         </section>
 
-        <!-- OFFLINE -->
         <section class="view" id="viewOffline">
           <div class="sectionTitle" id="offlineTitle">Sem conexão</div>
           <div class="sectionHint" id="offlineHint">
@@ -414,40 +401,38 @@
           <div class="muted" id="offlineStatus" style="margin-top:14px;"></div>
         </section>
 
-        <!-- FRANCHISE HUB -->
         <section class="view" id="viewFranchise">
           <div class="backRow">
-            <button class="ghostBtn" id="btnBackToHome">Voltar</button>
+            <button class="ghostBtn" id="btnBackToHome" type="button">Voltar</button>
           </div>
 
           <div class="sectionTitle" id="franchiseTitle">Tema</div>
           <div class="grid">
-            <button class="btn" id="btnGoCharacters">
+            <button class="btn" id="btnGoCharacters" type="button">
               <span id="hubCharactersLabel">Personagens</span>
               <small id="hubCharactersHint">Lista completa (A–Z)</small>
             </button>
 
-            <button class="btn" id="btnGoGlossary">
+            <button class="btn" id="btnGoGlossary" type="button">
               <span id="hubGlossaryLabel">Glossário</span>
               <small id="hubGlossaryHint">Termos JP → PT/EN</small>
             </button>
 
-            <button class="btn" id="btnGoPublications">
+            <button class="btn" id="btnGoPublications" type="button">
               <span id="hubPublicationsLabel">Publicações</span>
               <small id="hubPublicationsHint">Livros, mooks, guias</small>
             </button>
 
-            <button class="btn" id="btnGoCollectibles">
+            <button class="btn" id="btnGoCollectibles" type="button">
               <span id="hubCollectiblesLabel">Colecionáveis</span>
               <small id="hubCollectiblesHint">DX, SHF, sofubi, etc.</small>
             </button>
           </div>
         </section>
 
-        <!-- CHARACTERS -->
         <section class="view" id="viewCharacters">
           <div class="backRow">
-            <button class="ghostBtn" id="btnBackToFranchiseFromCharacters">Voltar</button>
+            <button class="ghostBtn" id="btnBackToFranchiseFromCharacters" type="button">Voltar</button>
           </div>
 
           <div class="sectionTitle" id="charactersTitle">Personagens</div>
@@ -460,10 +445,9 @@
           <div class="list" id="charactersList" style="margin-top: 12px;"></div>
         </section>
 
-        <!-- GLOSSARY -->
         <section class="view" id="viewGlossary">
           <div class="backRow">
-            <button class="ghostBtn" id="btnBackToFranchiseFromGlossary">Voltar</button>
+            <button class="ghostBtn" id="btnBackToFranchiseFromGlossary" type="button">Voltar</button>
           </div>
 
           <div class="sectionTitle" id="glossaryTitle">Glossário</div>
@@ -479,10 +463,9 @@
           <div class="list" id="glossaryList" style="margin-top: 12px;"></div>
         </section>
 
-        <!-- PUBLICATIONS -->
         <section class="view" id="viewPublications">
           <div class="backRow">
-            <button class="ghostBtn" id="btnBackToFranchiseFromPublications">Voltar</button>
+            <button class="ghostBtn" id="btnBackToFranchiseFromPublications" type="button">Voltar</button>
           </div>
 
           <div class="sectionTitle" id="publicationsTitle">Publicações</div>
@@ -498,10 +481,9 @@
           <div class="list" id="publicationsList" style="margin-top: 12px;"></div>
         </section>
 
-        <!-- COLLECTIBLES -->
         <section class="view" id="viewCollectibles">
           <div class="backRow">
-            <button class="ghostBtn" id="btnBackToFranchiseFromCollectibles">Voltar</button>
+            <button class="ghostBtn" id="btnBackToFranchiseFromCollectibles" type="button">Voltar</button>
           </div>
 
           <div class="sectionTitle" id="collectiblesTitle">Colecionáveis</div>
@@ -521,12 +503,11 @@
       <footer>v0.1 · Henshin DB · Author: Mayara Gouveia</footer>
     </div>
 
-    <!-- MODAL -->
     <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
       <div class="modal">
         <div class="modalHeader">
           <div class="modalTitle" id="modalTitle">Detalhes</div>
-          <button class="closeBtn" id="modalClose" aria-label="Close">X</button>
+          <button class="closeBtn" id="modalClose" aria-label="Close" type="button">X</button>
         </div>
 
         <div class="modalImage" id="modalImageWrap" style="display:none;">
@@ -544,16 +525,17 @@
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-      const state = { franchise: null };
+      const state = {
+        franchise: null,
+        view: "home",
+        connMode: "offline",
+        connDetail: ""
+      };
 
       const headerSubtitle = document.getElementById("headerSubtitle");
       const headerChip = document.getElementById("headerChip");
       const offlineStatus = document.getElementById("offlineStatus");
-      const langSelect = document.getElementById("langSelect");
 
-      const LANG_STORAGE_KEY = "henshin_lang_v1";
-
-      // ===== i18n =====
       const I18N = {
         pt: {
           home: "Home",
@@ -592,18 +574,7 @@
           connError: "Conexão com erro",
           loading: "Carregando...",
           noResults: "Nenhum resultado.",
-          noDetails: "Sem detalhes.",
-          noCache: "Sem cache disponível.",
-          items: "itens",
-          terms: "termos",
-          cache: "cache",
-          justNow: "agora há pouco",
-          minAgo: "min atrás",
-          hAgo: "h atrás",
-          daysAgo: "dias atrás",
-          deviceOffline: "Seu dispositivo está sem internet.",
-          testingConn: "Testando conexão...",
-          retryLater: "Ainda sem resposta do Supabase. Tente novamente em instantes."
+          noDetails: "Sem detalhes."
         },
         en: {
           home: "Home",
@@ -642,18 +613,7 @@
           connError: "Connection error",
           loading: "Loading...",
           noResults: "No results.",
-          noDetails: "No details.",
-          noCache: "No cache available.",
-          items: "items",
-          terms: "terms",
-          cache: "cache",
-          justNow: "just now",
-          minAgo: "min ago",
-          hAgo: "h ago",
-          daysAgo: "days ago",
-          deviceOffline: "Your device is offline.",
-          testingConn: "Testing connection...",
-          retryLater: "Still no response from Supabase. Try again in a moment."
+          noDetails: "No details."
         },
         ja: {
           home: "ホーム",
@@ -692,20 +652,30 @@
           connError: "接続エラー",
           loading: "読み込み中…",
           noResults: "結果なし。",
-          noDetails: "詳細なし。",
-          noCache: "キャッシュなし。",
-          items: "件",
-          terms: "件",
-          cache: "キャッシュ",
-          justNow: "たった今",
-          minAgo: "分前",
-          hAgo: "時間前",
-          daysAgo: "日前",
-          deviceOffline: "デバイスはオフラインです。",
-          testingConn: "接続を確認中…",
-          retryLater: "Supabase から応答がありません。少しして再試行してください。"
+          noDetails: "詳細なし。"
         }
       };
+
+      const LANG_STORAGE_KEY = "henshin_lang";
+
+      function safeText(v) {
+        if (v === null || v === undefined) return "";
+        return String(v).trim();
+      }
+
+      function hasValue(v) {
+        const s = safeText(v);
+        return s.length > 0 && s.toLowerCase() !== "null";
+      }
+
+      function escapeHtml(str) {
+        return String(str)
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#039;");
+      }
 
       function pickLangFromDevice() {
         const raw = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
@@ -714,19 +684,21 @@
         return "en";
       }
 
+      function getSavedLang() {
+        try {
+          const v = safeText(localStorage.getItem(LANG_STORAGE_KEY)).toLowerCase();
+          if (v === "pt" || v === "en" || v === "ja") return v;
+        } catch {}
+        return "";
+      }
+
       function t(key) {
         const lang = window.__lang || "en";
         return (I18N[lang] && I18N[lang][key]) || (I18N.en[key]) || key;
       }
 
-      function normalizeLang(v) {
-        const x = String(v || "").toLowerCase().trim();
-        if (x === "pt" || x === "en" || x === "ja") return x;
-        return "en";
-      }
-
-      function setHtmlLang(lang) {
-        const htmlLang = lang === "pt" ? "pt-BR" : (lang === "ja" ? "ja-JP" : "en");
+      function applyHtmlLang() {
+        const htmlLang = window.__lang === "pt" ? "pt-BR" : (window.__lang === "ja" ? "ja-JP" : "en");
         document.documentElement.lang = htmlLang;
       }
 
@@ -774,110 +746,47 @@
         const ico = document.getElementById("inputCollectiblesSearch");
         if (ico) ico.placeholder = t("searchCollectibles");
 
+        const optG = document.querySelector("#selectGlossaryCategory option[value='']");
+        if (optG) optG.textContent = t("allCategories");
+
+        const optP = document.querySelector("#selectPublicationsType option[value='']");
+        if (optP) optP.textContent = t("allTypes");
+
+        const optC = document.querySelector("#selectCollectiblesCategory option[value='']");
+        if (optC) optC.textContent = t("allTypes");
+
         setText("modalTitle", t("modalDetails"));
         const linkBtn = document.getElementById("modalLinkBtn");
         if (linkBtn) linkBtn.textContent = t("modalOpenLink");
+
+        setConnectionState(state.connMode, state.connDetail);
+        showView(state.view, true);
       }
 
-      function setLang(lang, persist = true) {
-        const next = normalizeLang(lang);
-        window.__lang = next;
-        setHtmlLang(next);
-
+      function setLang(lang, persist) {
+        if (lang !== "pt" && lang !== "en" && lang !== "ja") return;
+        window.__lang = lang;
+        applyHtmlLang();
         if (persist) {
-          try { localStorage.setItem(LANG_STORAGE_KEY, next); } catch {}
+          try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch {}
         }
-
-        // Sync UI dropdown
-        if (langSelect && langSelect.value !== next) langSelect.value = next;
-
-        // Apply all static labels
         applyI18nStatic();
-
-        // Update chip text keeping state (online/offline/error) best-effort:
-        // (we keep current chip mode by reading current text is unreliable across langs,
-        // so we just re-ping if online; if offline keep offline)
-        if (!navigator.onLine) setConnectionState("offline", t("deviceOffline"));
-
-        // Update current header subtitle based on active view
-        refreshHeaderSubtitle();
-
-        // Re-render dynamic lists if already loaded
-        rerenderDynamicLists();
+        rerenderCurrentLists();
       }
 
       function initLang() {
-        let initial = null;
-        try { initial = localStorage.getItem(LANG_STORAGE_KEY); } catch {}
-        const lang = normalizeLang(initial || pickLangFromDevice());
-        window.__lang = lang;
-        setHtmlLang(lang);
-        if (langSelect) langSelect.value = lang;
-      }
-
-      // ===== util =====
-      const views = {
-        home: document.getElementById("viewHome"),
-        offline: document.getElementById("viewOffline"),
-        franchise: document.getElementById("viewFranchise"),
-        characters: document.getElementById("viewCharacters"),
-        glossary: document.getElementById("viewGlossary"),
-        publications: document.getElementById("viewPublications"),
-        collectibles: document.getElementById("viewCollectibles")
-      };
-
-      function getActiveViewName() {
-        for (const k in views) {
-          if (views[k].classList.contains("active")) return k;
-        }
-        return "home";
-      }
-
-      function refreshHeaderSubtitle() {
-        const name = getActiveViewName();
-        if (name === "home") headerSubtitle.textContent = t("home");
-        if (name === "offline") headerSubtitle.textContent = t("offline");
-        if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
-        if (name === "characters") headerSubtitle.textContent = t("characters");
-        if (name === "glossary") headerSubtitle.textContent = t("glossary");
-        if (name === "publications") headerSubtitle.textContent = t("publications");
-        if (name === "collectibles") headerSubtitle.textContent = t("collectibles");
-      }
-
-      function showView(name) {
-        for (const k in views) {
-          views[k].classList.remove("active", "animIn");
-        }
-        views[name].classList.add("active", "animIn");
-        refreshHeaderSubtitle();
+        const saved = getSavedLang();
+        window.__lang = saved || pickLangFromDevice();
+        applyHtmlLang();
       }
 
       function formatFranchise(key) {
-        if (!key) return t("themes");
+        if (!key) return "Tema";
         if (key === "kamen rider") return "Kamen Rider";
         if (key === "super sentai") return "Super Sentai";
         if (key === "metal hero") return "Metal Hero";
         if (key === "ultraman") return "Ultraman";
         return key;
-      }
-
-      function safeText(v) {
-        if (v === null || v === undefined) return "";
-        return String(v).trim();
-      }
-
-      function hasValue(v) {
-        const s = safeText(v);
-        return s.length > 0 && s.toLowerCase() !== "null";
-      }
-
-      function escapeHtml(str) {
-        return String(str)
-          .replaceAll("&", "&amp;")
-          .replaceAll("<", "&lt;")
-          .replaceAll(">", "&gt;")
-          .replaceAll('"', "&quot;")
-          .replaceAll("'", "&#039;");
       }
 
       function specRow(label, value) {
@@ -918,7 +827,6 @@
         return `${u}${sep}v=${Date.now()}`;
       }
 
-      // Dado com campos *_pt, *_en, *_jp
       function pickFieldByLang(obj, base) {
         const lang = window.__lang || "en";
         const map = { pt: `${base}_pt`, en: `${base}_en`, ja: `${base}_jp` };
@@ -926,13 +834,13 @@
         return safeText(obj?.[key]) || safeText(obj?.[map.en]) || safeText(obj?.[map.pt]) || safeText(obj?.[map.ja]) || "";
       }
 
-      // ===== OFFLINE + CACHE =====
       function setConnectionState(mode, detail) {
-        // mode: "online" | "offline" | "error"
+        state.connMode = mode;
+        state.connDetail = safeText(detail || "");
         if (mode === "online") headerChip.textContent = t("online");
         if (mode === "offline") headerChip.textContent = t("offlineChip");
         if (mode === "error") headerChip.textContent = t("connError");
-        if (offlineStatus) offlineStatus.textContent = safeText(detail || "");
+        if (offlineStatus) offlineStatus.textContent = state.connDetail;
       }
 
       function cacheKey(kind, franchise) {
@@ -942,13 +850,8 @@
 
       function saveCache(kind, franchise, data) {
         try {
-          localStorage.setItem(cacheKey(kind, franchise), JSON.stringify({
-            ts: Date.now(),
-            data: data
-          }));
-        } catch (e) {
-          console.warn("Cache save failed:", e);
-        }
+          localStorage.setItem(cacheKey(kind, franchise), JSON.stringify({ ts: Date.now(), data }));
+        } catch {}
       }
 
       function loadCache(kind, franchise) {
@@ -957,8 +860,7 @@
           if (!raw) return { ts: 0, data: null };
           const parsed = JSON.parse(raw);
           return { ts: Number(parsed.ts || 0), data: parsed.data ?? null };
-        } catch (e) {
-          console.warn("Cache load failed:", e);
+        } catch {
           return { ts: 0, data: null };
         }
       }
@@ -966,25 +868,45 @@
       function fmtAge(ts) {
         if (!ts) return "";
         const mins = Math.round((Date.now() - ts) / 60000);
-        if (mins < 1) return t("justNow");
-        if (mins < 60) return `${mins} ${t("minAgo")}`;
+        if (mins < 1) return t("loading").includes("...") ? "agora há pouco" : "just now";
+        if (mins < 60) return `${mins} min`;
         const hrs = Math.round(mins / 60);
-        if (hrs < 24) return `${hrs} ${t("hAgo")}`;
+        if (hrs < 24) return `${hrs} h`;
         const days = Math.round(hrs / 24);
-        return `${days} ${t("daysAgo")}`;
+        return `${days} d`;
+      }
+
+      const views = {
+        home: document.getElementById("viewHome"),
+        offline: document.getElementById("viewOffline"),
+        franchise: document.getElementById("viewFranchise"),
+        characters: document.getElementById("viewCharacters"),
+        glossary: document.getElementById("viewGlossary"),
+        publications: document.getElementById("viewPublications"),
+        collectibles: document.getElementById("viewCollectibles")
+      };
+
+      function showView(name, silent) {
+        state.view = name;
+        for (const k in views) views[k].classList.remove("active", "animIn");
+        views[name].classList.add("active", "animIn");
+        if (name === "home") headerSubtitle.textContent = t("home");
+        if (name === "offline") headerSubtitle.textContent = t("offline");
+        if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
+        if (name === "characters") headerSubtitle.textContent = t("characters");
+        if (name === "glossary") headerSubtitle.textContent = t("glossary");
+        if (name === "publications") headerSubtitle.textContent = t("publications");
+        if (name === "collectibles") headerSubtitle.textContent = t("collectibles");
+        if (!silent) applyI18nStatic();
       }
 
       function goOffline(detail) {
         setConnectionState(navigator.onLine ? "error" : "offline", detail || "");
-        showView("offline");
+        showView("offline", true);
       }
 
-      window.addEventListener("online", () => {
-        setConnectionState("online", "");
-      });
-      window.addEventListener("offline", () => {
-        setConnectionState("offline", t("deviceOffline"));
-      });
+      window.addEventListener("online", () => setConnectionState("online", ""));
+      window.addEventListener("offline", () => setConnectionState("offline", "Seu dispositivo está sem internet."));
 
       async function pingSupabase() {
         try {
@@ -992,11 +914,10 @@
           if (error) setConnectionState("error", `Ping: ${error.message}`);
           else setConnectionState("online", "");
         } catch {
-          setConnectionState("offline", t("deviceOffline"));
+          setConnectionState("offline", "Sem conexão com a internet.");
         }
       }
 
-      // HOME
       const homeCategories = document.getElementById("homeCategories");
 
       function renderHome() {
@@ -1009,44 +930,39 @@
         ];
 
         homeCategories.innerHTML = "";
-
         for (const c of cats) {
           const btn = document.createElement("button");
           btn.className = "btn";
           btn.type = "button";
-          btn.innerHTML = `<span>${c.label}</span><small></small>`;
+          btn.innerHTML = `<span>${escapeHtml(c.label)}</span><small></small>`;
           btn.addEventListener("click", () => {
             state.franchise = c.key;
             document.getElementById("franchiseTitle").textContent = c.label;
-            showView("franchise");
+            showView("franchise", true);
           });
           homeCategories.appendChild(btn);
         }
       }
 
-      // NAV HUB
-      document.getElementById("btnBackToHome").addEventListener("click", () => showView("home"));
-
+      document.getElementById("btnBackToHome").addEventListener("click", () => showView("home", true));
       document.getElementById("btnGoCharacters").addEventListener("click", async () => openCharacters());
       document.getElementById("btnGoGlossary").addEventListener("click", async () => openGlossary());
       document.getElementById("btnGoPublications").addEventListener("click", async () => openPublications());
       document.getElementById("btnGoCollectibles").addEventListener("click", async () => openCollectibles());
 
-      document.getElementById("btnBackToFranchiseFromCharacters").addEventListener("click", () => showView("franchise"));
-      document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise"));
-      document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise"));
-      document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise"));
+      document.getElementById("btnBackToFranchiseFromCharacters").addEventListener("click", () => showView("franchise", true));
+      document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise", true));
+      document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise", true));
+      document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise", true));
 
-      // OFFLINE VIEW BUTTONS
-      document.getElementById("btnOfflineGoHome").addEventListener("click", () => showView("home"));
+      document.getElementById("btnOfflineGoHome").addEventListener("click", () => showView("home", true));
       document.getElementById("btnOfflineRetry").addEventListener("click", async () => {
-        setConnectionState("offline", t("testingConn"));
+        setConnectionState("offline", "Testando conexão...");
         await pingSupabase();
-        if (headerChip.textContent === t("online")) showView("home");
-        else goOffline(t("retryLater"));
+        if (headerChip.textContent === t("online")) showView("home", true);
+        else goOffline("Ainda sem resposta do Supabase. Tente novamente em instantes.");
       });
 
-      // MODAL
       const modalOverlay = document.getElementById("modalOverlay");
       const modalClose = document.getElementById("modalClose");
       const modalTitle = document.getElementById("modalTitle");
@@ -1086,7 +1002,6 @@
         modalImage.onerror = () => { modalImageWrap.style.display = "none"; };
       }
 
-      // CHARACTERS
       const charactersTitle = document.getElementById("charactersTitle");
       const charactersStatus = document.getElementById("charactersStatus");
       const charactersList = document.getElementById("charactersList");
@@ -1095,11 +1010,10 @@
 
       async function openCharacters() {
         charactersTitle.textContent = `${formatFranchise(state.franchise)} · ${t("characters")}`;
-        showView("characters");
+        showView("characters", true);
         inputCharacterSearch.value = "";
-
         await loadCharacters();
-        renderCharactersList(charactersCache);
+        renderCharactersList(filterCharacters(""));
       }
 
       async function loadCharacters() {
@@ -1110,12 +1024,8 @@
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           charactersCache = list;
-
-          charactersStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : t("noCache");
-
-          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
+          charactersStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
+          if (!list.length) goOffline("Sem internet e nenhum cache de personagens encontrado para esse tema.");
           return;
         }
 
@@ -1125,25 +1035,18 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          console.error("Characters load error:", error);
-
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           charactersCache = list;
-
-          charactersStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : `Error: ${error.message}`;
-
-          if (!list.length) goOffline(`Supabase error: ${error.message}`);
+          charactersStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de personagens. (${error.message})`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
         charactersCache = list;
-        charactersStatus.textContent = `${list.length} ${t("items")}`;
-
+        charactersStatus.textContent = `${list.length}`;
         saveCache("characters", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -1151,7 +1054,6 @@
       function filterCharacters(q) {
         const query = safeText(q).toLowerCase();
         if (!query) return charactersCache;
-
         return charactersCache.filter((c) =>
           [c.name_en, c.name_pt, c.name_jp, c.romaji, c.civil_name_pt, c.civil_name_en, c.civil_name_jp, c.actor_name]
             .some((v) => safeText(v).toLowerCase().includes(query))
@@ -1200,17 +1102,15 @@
               specRow("Name (EN)", c.name_en),
               specRow("名前 (JP)", c.name_jp),
               specRow("Romaji", c.romaji),
-              specRow("Franchise", formatFranchise(c.franchise)),
-              specRow("Year", c.year),
-
+              specRow("Franquia", formatFranchise(c.franchise)),
+              specRow("Ano", c.year),
               specRow("Nome civil (PT)", c.civil_name_pt),
               specRow("Civil name (EN)", c.civil_name_en),
               specRow("本名 (JP)", c.civil_name_jp),
-
-              specRow("Actor", c.actor_name),
-              specRow("Description", c.description),
-              specRow("Powers", c.powers),
-              specRow("Equipment", c.equipment)
+              specRow("Ator", c.actor_name),
+              specRow("Descrição", c.description),
+              specRow("Poderes", c.powers),
+              specRow("Equipamentos", c.equipment)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1223,7 +1123,6 @@
 
       inputCharacterSearch.addEventListener("input", () => renderCharactersList(filterCharacters(inputCharacterSearch.value)));
 
-      // GLOSSARY
       const glossaryStatus = document.getElementById("glossaryStatus");
       const glossaryList = document.getElementById("glossaryList");
       const inputGlossarySearch = document.getElementById("inputGlossarySearch");
@@ -1232,13 +1131,12 @@
 
       async function openGlossary() {
         setText("glossaryTitle", t("glossary"));
-        showView("glossary");
+        showView("glossary", true);
         inputGlossarySearch.value = "";
         selectGlossaryCategory.value = "";
-
         await loadGlossary();
         populateGlossaryCategories(glossaryCache);
-        renderGlossaryList(glossaryCache);
+        renderGlossaryList(filterGlossary("", ""));
       }
 
       async function loadGlossary() {
@@ -1249,12 +1147,8 @@
           const cached = loadCache("glossary", "global");
           const list = Array.isArray(cached.data) ? cached.data : [];
           glossaryCache = list;
-
-          glossaryStatus.textContent = list.length
-            ? `${list.length} ${t("terms")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : t("noCache");
-
-          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
+          glossaryStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
+          if (!list.length) goOffline("Sem internet e nenhum cache de glossário encontrado.");
           return;
         }
 
@@ -1263,17 +1157,11 @@
           .select("id,jp,romaji,en,pt,explanation,category");
 
         if (error) {
-          console.error("Glossary load error:", error);
-
           const cached = loadCache("glossary", "global");
           const list = Array.isArray(cached.data) ? cached.data : [];
           glossaryCache = list;
-
-          glossaryStatus.textContent = list.length
-            ? `${list.length} ${t("terms")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : `Error: ${error.message}`;
-
-          if (!list.length) goOffline(`Supabase error: ${error.message}`);
+          glossaryStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de glossário. (${error.message})`);
           return;
         }
 
@@ -1286,8 +1174,7 @@
           )
         );
         glossaryCache = list;
-        glossaryStatus.textContent = `${list.length} ${t("terms")}`;
-
+        glossaryStatus.textContent = `${list.length}`;
         saveCache("glossary", "global", list);
         setConnectionState("online", "");
       }
@@ -1326,12 +1213,7 @@
           const el = document.createElement("div");
           el.className = "item";
 
-          // Preferimos mostrar PT/EN/JP conforme o idioma atual
-          let title = safeText(t0.pt);
-          if ((window.__lang || "en") === "en") title = safeText(t0.en) || title;
-          if ((window.__lang || "en") === "ja") title = safeText(t0.jp) || title;
-          title = title || safeText(t0.en) || safeText(t0.jp) || safeText(t0.pt) || "Term";
-
+          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Termo";
           el.innerHTML = `
             <div class="nameLine">
               <div class="name">${escapeHtml(title)}</div>
@@ -1357,8 +1239,8 @@
               specRow("Romaji", t0.romaji),
               specRow("EN", t0.en),
               specRow("PT", t0.pt),
-              specRow("Category", t0.category),
-              specRow("Explanation", t0.explanation)
+              specRow("Categoria", t0.category),
+              specRow("Explicação", t0.explanation)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1369,14 +1251,9 @@
         }
       }
 
-      inputGlossarySearch.addEventListener("input", () =>
-        renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value))
-      );
-      selectGlossaryCategory.addEventListener("change", () =>
-        renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value))
-      );
+      inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
+      selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
 
-      // PUBLICATIONS
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -1385,12 +1262,12 @@
       let publicationsCache = [];
 
       function pubDisplayTitle(p) {
-        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publication";
+        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publicação";
       }
 
       async function openPublications() {
         publicationsTitle.textContent = `${formatFranchise(state.franchise)} · ${t("publications")}`;
-        showView("publications");
+        showView("publications", true);
         inputPublicationsSearch.value = "";
         selectPublicationsType.value = "";
         await loadPublications();
@@ -1406,12 +1283,8 @@
           const cached = loadCache("publications", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           publicationsCache = list;
-
-          publicationsStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : t("noCache");
-
-          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
+          publicationsStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
+          if (!list.length) goOffline("Sem internet e nenhum cache de publicações encontrado para esse tema.");
           return;
         }
 
@@ -1421,17 +1294,11 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          console.error("Publications load error:", error);
-
           const cached = loadCache("publications", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           publicationsCache = list;
-
-          publicationsStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : `Error: ${error.message}`;
-
-          if (!list.length) goOffline(`Supabase error: ${error.message}`);
+          publicationsStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de publicações. (${error.message})`);
           return;
         }
 
@@ -1443,15 +1310,13 @@
         });
 
         publicationsCache = list;
-        publicationsStatus.textContent = `${list.length} ${t("items")}`;
-
+        publicationsStatus.textContent = `${list.length}`;
         saveCache("publications", state.franchise, list);
         setConnectionState("online", "");
       }
 
       function populateSelect(selectEl, values, allLabel) {
-        const uniq = Array.from(new Set(values.map(v => safeText(v)).filter(Boolean)))
-          .sort((a,b) => a.localeCompare(b));
+        const uniq = Array.from(new Set(values.map(v => safeText(v)).filter(Boolean))).sort((a,b) => a.localeCompare(b));
         selectEl.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>`;
         for (const v of uniq) {
           const opt = document.createElement("option");
@@ -1520,16 +1385,16 @@
               specRow("Título (PT)", p.title_pt),
               specRow("Title (EN)", p.title_en),
               specRow("タイトル (JP)", p.title_jp),
-              specRow("Type", p.pub_type),
-              specRow("Publisher", p.publisher),
-              specRow("Issue", p.issue),
-              specRow("Year", p.year),
-              specRow("Month", p.month),
-              specRow("Language", p.language),
+              specRow("Tipo", p.pub_type),
+              specRow("Editora", p.publisher),
+              specRow("Edição", p.issue),
+              specRow("Ano", p.year),
+              specRow("Mês", p.month),
+              specRow("Idioma", p.language),
               specRow("ISBN", p.isbn),
               specRow("Era", p.era),
-              specRow("Franchise", formatFranchise(p.franchise)),
-              specRow("Notes", p.notes),
+              specRow("Franquia", formatFranchise(p.franchise)),
+              specRow("Notas", p.notes),
               specRow("URL", p.url)
             ].filter(Boolean).join("");
 
@@ -1541,14 +1406,9 @@
         }
       }
 
-      inputPublicationsSearch.addEventListener("input", () =>
-        renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
-      );
-      selectPublicationsType.addEventListener("change", () =>
-        renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
-      );
+      inputPublicationsSearch.addEventListener("input", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
+      selectPublicationsType.addEventListener("change", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
 
-      // COLLECTIBLES
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
@@ -1557,22 +1417,16 @@
       let collectiblesCache = [];
 
       function colDisplayName(it) {
-        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Collectible";
+        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Colecionável";
       }
 
       async function openCollectibles() {
         collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · ${t("collectibles")}`;
-        showView("collectibles");
+        showView("collectibles", true);
         inputCollectiblesSearch.value = "";
         selectCollectiblesCategory.value = "";
         await loadCollectibles();
-
-        populateSelect(
-          selectCollectiblesCategory,
-          collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean),
-          t("allTypes")
-        );
-
+        populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), t("allTypes"));
         renderCollectiblesList(filterCollectibles("", ""));
       }
 
@@ -1584,12 +1438,8 @@
           const cached = loadCache("collectibles", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           collectiblesCache = list;
-
-          collectiblesStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : t("noCache");
-
-          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
+          collectiblesStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
+          if (!list.length) goOffline("Sem internet e nenhum cache de colecionáveis encontrado para esse tema.");
           return;
         }
 
@@ -1599,25 +1449,18 @@
           .eq("franchise", state.franchise);
 
         if (error) {
-          console.error("Collectibles load error:", error);
-
           const cached = loadCache("collectibles", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           collectiblesCache = list;
-
-          collectiblesStatus.textContent = list.length
-            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
-            : `Error: ${error.message}`;
-
-          if (!list.length) goOffline(`Supabase error: ${error.message}`);
+          collectiblesStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de colecionáveis. (${error.message})`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
         collectiblesCache = list;
-        collectiblesStatus.textContent = `${list.length} ${t("items")}`;
-
+        collectiblesStatus.textContent = `${list.length}`;
         saveCache("collectibles", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -1629,7 +1472,6 @@
         return collectiblesCache.filter((it) => {
           if (t0 && safeText(it.item_type).toLowerCase() !== t0) return false;
           if (!query) return true;
-
           return [
             it.name_pt, it.name_en, it.name_jp,
             it.line, it.item_type, it.manufacturer,
@@ -1687,18 +1529,18 @@
               specRow("Nome (PT)", it.name_pt),
               specRow("Name (EN)", it.name_en),
               specRow("名前 (JP)", it.name_jp),
-              specRow("Line", it.line),
-              specRow("Type", it.item_type),
-              specRow("Manufacturer", it.manufacturer),
-              specRow("Year", it.year),
+              specRow("Linha", it.line),
+              specRow("Tipo", it.item_type),
+              specRow("Fabricante", it.manufacturer),
+              specRow("Ano", it.year),
               specRow("Era", it.era),
               specRow("Series code", it.series_code),
               specRow("SKU", it.sku_code),
               specRow("Status", it.status),
-              specRow("Rarity", it.rarity),
+              specRow("Raridade", it.rarity),
               specRow("JP search", it.jp_search),
-              specRow("Notes", it.notes),
-              specRow("Franchise", formatFranchise(it.franchise))
+              specRow("Notas", it.notes),
+              specRow("Franquia", formatFranchise(it.franchise))
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1709,70 +1551,61 @@
         }
       }
 
-      inputCollectiblesSearch.addEventListener("input", () =>
-        renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
-      );
-      selectCollectiblesCategory.addEventListener("change", () =>
-        renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
-      );
+      inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
+      selectCollectiblesCategory.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
 
-      // ===== Re-render helpers when language changes =====
-      function rerenderDynamicLists() {
-        const active = getActiveViewName();
-
-        // Titles that include translations
-        if (active === "characters") {
-          charactersTitle.textContent = `${formatFranchise(state.franchise)} · ${t("characters")}`;
-          renderCharactersList(filterCharacters(inputCharacterSearch.value));
-        }
-
-        if (active === "glossary") {
-          setText("glossaryTitle", t("glossary"));
-          populateGlossaryCategories(glossaryCache);
-          renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value));
-        }
-
-        if (active === "publications") {
-          publicationsTitle.textContent = `${formatFranchise(state.franchise)} · ${t("publications")}`;
-          populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), t("allTypes"));
-          renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value));
-        }
-
-        if (active === "collectibles") {
-          collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · ${t("collectibles")}`;
-          populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), t("allTypes"));
-          renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value));
-        }
-
-        if (active === "offline") {
-          // offline screen labels are static already handled by applyI18nStatic()
-        }
+      function rerenderCurrentLists() {
+        if (state.view === "characters") renderCharactersList(filterCharacters(inputCharacterSearch.value));
+        if (state.view === "glossary") renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value));
+        if (state.view === "publications") renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value));
+        if (state.view === "collectibles") renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value));
       }
 
+      const langBtn = document.getElementById("langBtn");
+      const langDropdown = document.getElementById("langDropdown");
+      const langIcon = document.getElementById("langIcon");
+
+      const LANG_ICON = {
+        pt: "/icons/flag-br.svg",
+        en: "/icons/flag-ca.svg",
+        ja: "/icons/flag-jp.svg"
+      };
+
+      function closeLangDropdown() {
+        langDropdown.style.display = "none";
+      }
+
+      langBtn.addEventListener("click", () => {
+        langDropdown.style.display = langDropdown.style.display === "flex" ? "none" : "flex";
+      });
+
+      langDropdown.querySelectorAll("button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const lang = btn.dataset.lang;
+          setLang(lang, true);
+          langIcon.src = LANG_ICON[lang] || LANG_ICON.en;
+          closeLangDropdown();
+        });
+      });
+
+      document.addEventListener("click", (e) => {
+        if (!e.target.closest(".langMenu")) closeLangDropdown();
+      });
+
       function init() {
-        // idioma primeiro
         initLang();
+        langIcon.src = LANG_ICON[window.__lang] || LANG_ICON.en;
+
         applyI18nStatic();
-
-        // Hook do dropdown
-        if (langSelect) {
-          langSelect.addEventListener("change", (e) => setLang(e.target.value, true));
-        }
-
         renderHome();
-        showView("home");
+        showView("home", true);
         pingSupabase();
 
-        if (!navigator.onLine) setConnectionState("offline", t("deviceOffline"));
+        if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
 
-        // PWA: registra o Service Worker
         if ("serviceWorker" in navigator) {
           window.addEventListener("load", async () => {
-            try {
-              await navigator.serviceWorker.register("/service-worker.js");
-            } catch (e) {
-              console.warn("Service Worker register failed:", e);
-            }
+            try { await navigator.serviceWorker.register("/service-worker.js"); } catch {}
           });
         }
       }
