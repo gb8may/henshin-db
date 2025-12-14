@@ -335,6 +335,28 @@
           <div class="grid" id="homeCategories"></div>
         </section>
 
+        <!-- OFFLINE -->
+        <section class="view" id="viewOffline">
+          <div class="sectionTitle">Sem conexão</div>
+          <div class="sectionHint">
+            Você está offline (ou o banco não respondeu). Vou tentar usar o último cache salvo.
+          </div>
+
+          <div class="grid" style="margin-top:12px;">
+            <button class="btn" id="btnOfflineRetry" type="button">
+              <span>Tentar reconectar</span>
+              <small>Testar conexão com o Supabase</small>
+            </button>
+
+            <button class="btn" id="btnOfflineGoHome" type="button">
+              <span>Voltar para Home</span>
+              <small>Navegar pelas categorias</small>
+            </button>
+          </div>
+
+          <div class="muted" id="offlineStatus" style="margin-top:14px;"></div>
+        </section>
+
         <!-- FRANCHISE HUB -->
         <section class="view" id="viewFranchise">
           <div class="backRow">
@@ -469,9 +491,11 @@
 
       const headerSubtitle = document.getElementById("headerSubtitle");
       const headerChip = document.getElementById("headerChip");
+      const offlineStatus = document.getElementById("offlineStatus");
 
       const views = {
         home: document.getElementById("viewHome"),
+        offline: document.getElementById("viewOffline"),
         franchise: document.getElementById("viewFranchise"),
         characters: document.getElementById("viewCharacters"),
         glossary: document.getElementById("viewGlossary"),
@@ -486,6 +510,7 @@
         views[name].classList.add("active", "animIn");
 
         if (name === "home") headerSubtitle.textContent = "Home";
+        if (name === "offline") headerSubtitle.textContent = "Offline";
         if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
         if (name === "characters") headerSubtitle.textContent = "Personagens";
         if (name === "glossary") headerSubtitle.textContent = "Glossário";
@@ -559,12 +584,73 @@
         return `${u}${sep}v=${Date.now()}`;
       }
 
+      // ===== OFFLINE + CACHE =====
+      function setConnectionState(mode, detail) {
+        // mode: "online" | "offline" | "error"
+        if (mode === "online") headerChip.textContent = "Online";
+        if (mode === "offline") headerChip.textContent = "Offline";
+        if (mode === "error") headerChip.textContent = "Conexão com erro";
+        if (offlineStatus) offlineStatus.textContent = safeText(detail || "");
+      }
+
+      function cacheKey(kind, franchise) {
+        const f = safeText(franchise) || "global";
+        return `henshin_cache_v1:${kind}:${f}`;
+      }
+
+      function saveCache(kind, franchise, data) {
+        try {
+          localStorage.setItem(cacheKey(kind, franchise), JSON.stringify({
+            ts: Date.now(),
+            data: data
+          }));
+        } catch (e) {
+          console.warn("Cache save failed:", e);
+        }
+      }
+
+      function loadCache(kind, franchise) {
+        try {
+          const raw = localStorage.getItem(cacheKey(kind, franchise));
+          if (!raw) return { ts: 0, data: null };
+          const parsed = JSON.parse(raw);
+          return { ts: Number(parsed.ts || 0), data: parsed.data ?? null };
+        } catch (e) {
+          console.warn("Cache load failed:", e);
+          return { ts: 0, data: null };
+        }
+      }
+
+      function fmtAge(ts) {
+        if (!ts) return "";
+        const mins = Math.round((Date.now() - ts) / 60000);
+        if (mins < 1) return "agora há pouco";
+        if (mins < 60) return `${mins} min atrás`;
+        const hrs = Math.round(mins / 60);
+        if (hrs < 24) return `${hrs} h atrás`;
+        const days = Math.round(hrs / 24);
+        return `${days} dias atrás`;
+      }
+
+      function goOffline(detail) {
+        setConnectionState(navigator.onLine ? "error" : "offline", detail || "");
+        showView("offline");
+      }
+
+      window.addEventListener("online", () => {
+        setConnectionState("online", "");
+      });
+      window.addEventListener("offline", () => {
+        setConnectionState("offline", "Seu dispositivo está sem internet.");
+      });
+
       async function pingSupabase() {
         try {
           const { error } = await supabase.from("characters").select("id").limit(1);
-          headerChip.textContent = error ? "Conexão com erro" : "Online";
+          if (error) setConnectionState("error", `Ping com erro: ${error.message}`);
+          else setConnectionState("online", "");
         } catch {
-          headerChip.textContent = "Offline";
+          setConnectionState("offline", "Sem conexão com a internet.");
         }
       }
 
@@ -608,6 +694,15 @@
       document.getElementById("btnBackToFranchiseFromGlossary").addEventListener("click", () => showView("franchise"));
       document.getElementById("btnBackToFranchiseFromPublications").addEventListener("click", () => showView("franchise"));
       document.getElementById("btnBackToFranchiseFromCollectibles").addEventListener("click", () => showView("franchise"));
+
+      // OFFLINE VIEW BUTTONS
+      document.getElementById("btnOfflineGoHome").addEventListener("click", () => showView("home"));
+      document.getElementById("btnOfflineRetry").addEventListener("click", async () => {
+        setConnectionState("offline", "Testando conexão...");
+        await pingSupabase();
+        if (headerChip.textContent === "Online") showView("home");
+        else goOffline("Ainda sem resposta do Supabase. Tente novamente em instantes.");
+      });
 
       // MODAL
       const modalOverlay = document.getElementById("modalOverlay");
@@ -669,6 +764,20 @@
         charactersStatus.textContent = "Carregando...";
         charactersList.innerHTML = "";
 
+        // Se o navegador está offline, vai direto pro cache
+        if (!navigator.onLine) {
+          const cached = loadCache("characters", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          charactersCache = list;
+
+          charactersStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : "Sem cache disponível.";
+
+          if (!list.length) goOffline("Sem internet e nenhum cache de personagens encontrado para esse tema.");
+          return;
+        }
+
         // ✅ ALTERAÇÃO: inclui civil_name_pt/en/jp e REMOVE civil_name antigo do select
         const { data, error } = await supabase
           .from("characters")
@@ -677,8 +786,17 @@
 
         if (error) {
           console.error("Characters load error:", error);
-          charactersStatus.textContent = `Erro ao carregar personagens: ${error.message}`;
-          charactersCache = [];
+
+          // fallback cache
+          const cached = loadCache("characters", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          charactersCache = list;
+
+          charactersStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : `Erro ao carregar personagens e sem cache: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de personagens. (${error.message})`);
           return;
         }
 
@@ -686,6 +804,10 @@
         list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
         charactersCache = list;
         charactersStatus.textContent = `${list.length} itens`;
+
+        // salva cache
+        saveCache("characters", state.franchise, list);
+        setConnectionState("online", "");
       }
 
       function filterCharacters(q) {
@@ -786,14 +908,35 @@
         glossaryStatus.textContent = "Carregando...";
         glossaryList.innerHTML = "";
 
+        if (!navigator.onLine) {
+          const cached = loadCache("glossary", "global");
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          glossaryCache = list;
+
+          glossaryStatus.textContent = list.length
+            ? `${list.length} termos (cache · ${fmtAge(cached.ts)})`
+            : "Sem cache disponível.";
+
+          if (!list.length) goOffline("Sem internet e nenhum cache de glossário encontrado.");
+          return;
+        }
+
         const { data, error } = await supabase
           .from("glossary")
           .select("id,jp,romaji,en,pt,explanation,category");
 
         if (error) {
           console.error("Glossary load error:", error);
-          glossaryStatus.textContent = `Erro ao carregar glossário: ${error.message}`;
-          glossaryCache = [];
+
+          const cached = loadCache("glossary", "global");
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          glossaryCache = list;
+
+          glossaryStatus.textContent = list.length
+            ? `${list.length} termos (cache · ${fmtAge(cached.ts)})`
+            : `Erro ao carregar glossário e sem cache: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de glossário. (${error.message})`);
           return;
         }
 
@@ -807,6 +950,9 @@
         );
         glossaryCache = list;
         glossaryStatus.textContent = `${list.length} termos`;
+
+        saveCache("glossary", "global", list);
+        setConnectionState("online", "");
       }
 
       function populateGlossaryCategories(list) {
@@ -914,6 +1060,19 @@
         publicationsStatus.textContent = "Carregando...";
         publicationsList.innerHTML = "";
 
+        if (!navigator.onLine) {
+          const cached = loadCache("publications", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          publicationsCache = list;
+
+          publicationsStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : "Sem cache disponível.";
+
+          if (!list.length) goOffline("Sem internet e nenhum cache de publicações encontrado para esse tema.");
+          return;
+        }
+
         const { data, error } = await supabase
           .from("publications")
           .select("id,title_en,title_pt,title_jp,pub_type,publisher,issue,year,month,isbn,language,franchise,era,cover_url,notes,url,created_at")
@@ -921,8 +1080,16 @@
 
         if (error) {
           console.error("Publications load error:", error);
-          publicationsStatus.textContent = `Erro ao carregar publicações: ${error.message}`;
-          publicationsCache = [];
+
+          const cached = loadCache("publications", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          publicationsCache = list;
+
+          publicationsStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : `Erro ao carregar publicações e sem cache: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de publicações. (${error.message})`);
           return;
         }
 
@@ -935,6 +1102,9 @@
 
         publicationsCache = list;
         publicationsStatus.textContent = `${list.length} itens`;
+
+        saveCache("publications", state.franchise, list);
+        setConnectionState("online", "");
       }
 
       function populateSelect(selectEl, values, allLabel) {
@@ -1068,6 +1238,19 @@
         collectiblesStatus.textContent = "Carregando...";
         collectiblesList.innerHTML = "";
 
+        if (!navigator.onLine) {
+          const cached = loadCache("collectibles", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          collectiblesCache = list;
+
+          collectiblesStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : "Sem cache disponível.";
+
+          if (!list.length) goOffline("Sem internet e nenhum cache de colecionáveis encontrado para esse tema.");
+          return;
+        }
+
         const { data, error } = await supabase
           .from("collectibles")
           .select("id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes,rarity,status,created_at")
@@ -1075,8 +1258,16 @@
 
         if (error) {
           console.error("Collectibles load error:", error);
-          collectiblesStatus.textContent = `Erro ao carregar colecionáveis: ${error.message}`;
-          collectiblesCache = [];
+
+          const cached = loadCache("collectibles", state.franchise);
+          const list = Array.isArray(cached.data) ? cached.data : [];
+          collectiblesCache = list;
+
+          collectiblesStatus.textContent = list.length
+            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
+            : `Erro ao carregar colecionáveis e sem cache: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro no Supabase e sem cache de colecionáveis. (${error.message})`);
           return;
         }
 
@@ -1084,6 +1275,9 @@
         list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
         collectiblesCache = list;
         collectiblesStatus.textContent = `${list.length} itens`;
+
+        saveCache("collectibles", state.franchise, list);
+        setConnectionState("online", "");
       }
 
       function filterCollectibles(q, itemType) {
@@ -1184,6 +1378,9 @@
         renderHome();
         showView("home");
         pingSupabase();
+
+        // Se abrir o app já offline, sinaliza no chip
+        if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
       }
 
       init();
