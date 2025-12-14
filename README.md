@@ -1,4 +1,4 @@
-# Henshin DB
+# [Henshin DB](https://henshindb.netlify.app/)
 
 ---
 
@@ -111,7 +111,7 @@ To provide a clean, reliable and visually pleasant database for fans, collectors
 ## 👩‍💻 Author
 
 **Mayara Gouveia**
-Tokusatsu fan · Developer · Collector
+Tokusatsu fan · [Developer](https://www.linkedin.com/in/gb8may/) · [Collector](https://www.instagram.com/mj3d_printing.ca/)
 
 ---
 
