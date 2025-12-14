@@ -5,6 +5,22 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Henshin DB</title>
 
+    <!-- ===== PWA ===== -->
+    <link rel="manifest" href="/manifest.webmanifest" />
+    <meta name="theme-color" content="#0b0e14" />
+    <meta name="application-name" content="Henshin DB" />
+
+    <!-- iOS: rodar como app (standalone) -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="Henshin DB" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+    <!-- iOS icons -->
+    <link rel="apple-touch-icon" href="/icons/icon-192.png" />
+    <!-- Fallback icon -->
+    <link rel="icon" sizes="192x192" href="/icons/icon-192.png" />
+    <link rel="icon" sizes="512x512" href="/icons/icon-512.png" />
+
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -1381,6 +1397,17 @@
 
         // Se abrir o app já offline, sinaliza no chip
         if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
+
+        // ===== PWA: registra o Service Worker =====
+        if ("serviceWorker" in navigator) {
+          window.addEventListener("load", async () => {
+            try {
+              await navigator.serviceWorker.register("/service-worker.js");
+            } catch (e) {
+              console.warn("Service Worker register failed:", e);
+            }
+          });
+        }
       }
 
       init();
