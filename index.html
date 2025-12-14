@@ -95,10 +95,8 @@
       .sectionTitle { margin: 6px 2px 10px; font-weight: 700; font-size: 16px; line-height: 1.2; }
       .sectionHint { margin: -4px 2px 12px; color: var(--muted); font-size: 13px; line-height: 1.25; }
 
-      /* ✅ CENTRALIZA OS BOTÕES */
       .grid { display: grid; gap: 12px; justify-items: center; }
 
-      /* ✅ BOTÃO COM CARA DE APP (MENOR + CENTRALIZADO) */
       .btn {
         width: min(360px, 92vw);
         display: flex;
@@ -251,7 +249,6 @@
         font-size: 13px;
       }
 
-      /* ✅ Modal image: SEM CORTAR */
       .modalImage {
         width: 100%;
         aspect-ratio: 4 / 5;
@@ -273,7 +270,6 @@
         display: block;
       }
 
-      /* ✅ FICHA TÉCNICA */
       .specCard {
         border: 1px solid var(--border);
         background: rgba(255, 255, 255, 0.05);
@@ -303,7 +299,6 @@
         word-break: break-word;
       }
 
-      /* ✅ (NOVO) Agrupamento de nomes civis (não quebra nada se não usar) */
       .spec-group {
         margin-top: 12px;
         padding-top: 8px;
@@ -346,27 +341,27 @@
       <main>
         <!-- HOME -->
         <section class="view active" id="viewHome">
-          <div class="sectionTitle">Temas</div>
-          <div class="sectionHint">Escolha um tema para navegar.</div>
+          <div class="sectionTitle" id="homeTitle">Temas</div>
+          <div class="sectionHint" id="homeHint">Escolha um tema para navegar.</div>
           <div class="grid" id="homeCategories"></div>
         </section>
 
         <!-- OFFLINE -->
         <section class="view" id="viewOffline">
-          <div class="sectionTitle">Sem conexão</div>
-          <div class="sectionHint">
+          <div class="sectionTitle" id="offlineTitle">Sem conexão</div>
+          <div class="sectionHint" id="offlineHint">
             Você está offline (ou o banco não respondeu). Vou tentar usar o último cache salvo.
           </div>
 
           <div class="grid" style="margin-top:12px;">
             <button class="btn" id="btnOfflineRetry" type="button">
-              <span>Tentar reconectar</span>
-              <small>Testar conexão com o Supabase</small>
+              <span id="offlineRetryLabel">Tentar reconectar</span>
+              <small id="offlineRetryHint">Testar conexão com o Supabase</small>
             </button>
 
             <button class="btn" id="btnOfflineGoHome" type="button">
-              <span>Voltar para Home</span>
-              <small>Navegar pelas categorias</small>
+              <span id="offlineHomeLabel">Voltar para Home</span>
+              <small id="offlineHomeHint">Navegar pelas categorias</small>
             </button>
           </div>
 
@@ -382,23 +377,23 @@
           <div class="sectionTitle" id="franchiseTitle">Tema</div>
           <div class="grid">
             <button class="btn" id="btnGoCharacters">
-              <span>Personagens</span>
-              <small>Lista completa (A–Z)</small>
+              <span id="hubCharactersLabel">Personagens</span>
+              <small id="hubCharactersHint">Lista completa (A–Z)</small>
             </button>
 
             <button class="btn" id="btnGoGlossary">
-              <span>Glossário</span>
-              <small>Termos JP → PT/EN</small>
+              <span id="hubGlossaryLabel">Glossário</span>
+              <small id="hubGlossaryHint">Termos JP → PT/EN</small>
             </button>
 
             <button class="btn" id="btnGoPublications">
-              <span>Publicações</span>
-              <small>Livros, mooks, guias</small>
+              <span id="hubPublicationsLabel">Publicações</span>
+              <small id="hubPublicationsHint">Livros, mooks, guias</small>
             </button>
 
             <button class="btn" id="btnGoCollectibles">
-              <span>Colecionáveis</span>
-              <small>DX, SHF, sofubi, etc.</small>
+              <span id="hubCollectiblesLabel">Colecionáveis</span>
+              <small id="hubCollectiblesHint">DX, SHF, sofubi, etc.</small>
             </button>
           </div>
         </section>
@@ -425,7 +420,7 @@
             <button class="ghostBtn" id="btnBackToFranchiseFromGlossary">Voltar</button>
           </div>
 
-          <div class="sectionTitle">Glossário</div>
+          <div class="sectionTitle" id="glossaryTitle">Glossário</div>
 
           <div class="searchBox">
             <input type="search" id="inputGlossarySearch" placeholder="Buscar por JP/romaji/EN/PT..." />
@@ -485,7 +480,7 @@
       <div class="modal">
         <div class="modalHeader">
           <div class="modalTitle" id="modalTitle">Detalhes</div>
-          <button class="closeBtn" id="modalClose">X</button>
+          <button class="closeBtn" id="modalClose" aria-label="Close">X</button>
         </div>
 
         <div class="modalImage" id="modalImageWrap" style="display:none;">
@@ -509,6 +504,205 @@
       const headerChip = document.getElementById("headerChip");
       const offlineStatus = document.getElementById("offlineStatus");
 
+      // ===== i18n (100% automático) =====
+      const I18N = {
+        pt: {
+          home: "Home",
+          themes: "Temas",
+          chooseTheme: "Escolha um tema para navegar.",
+          offline: "Offline",
+          offlineTitle: "Sem conexão",
+          offlineHint: "Você está offline (ou o banco não respondeu). Vou tentar usar o último cache salvo.",
+          offlineRetryLabel: "Tentar reconectar",
+          offlineRetryHint: "Testar conexão com o Supabase",
+          offlineHomeLabel: "Voltar para Home",
+          offlineHomeHint: "Navegar pelas categorias",
+          back: "Voltar",
+          hubCharactersLabel: "Personagens",
+          hubCharactersHint: "Lista completa (A–Z)",
+          hubGlossaryLabel: "Glossário",
+          hubGlossaryHint: "Termos JP → PT/EN",
+          hubPublicationsLabel: "Publicações",
+          hubPublicationsHint: "Livros, mooks, guias",
+          hubCollectiblesLabel: "Colecionáveis",
+          hubCollectiblesHint: "DX, SHF, sofubi, etc.",
+          characters: "Personagens",
+          glossary: "Glossário",
+          publications: "Publicações",
+          collectibles: "Colecionáveis",
+          searchCharacters: "Buscar por nome (EN/PT/JP/romaji)...",
+          searchGlossary: "Buscar por JP/romaji/EN/PT...",
+          allCategories: "Todas",
+          searchPublications: "Buscar por título, tipo, ano, editora...",
+          allTypes: "Todos",
+          searchCollectibles: "Buscar por nome, linha, fabricante, tipo...",
+          modalOpenLink: "Abrir link",
+          modalDetails: "Detalhes",
+          online: "Online",
+          offlineChip: "Offline",
+          connError: "Conexão com erro",
+          loading: "Carregando...",
+          noResults: "Nenhum resultado.",
+          noDetails: "Sem detalhes."
+        },
+        en: {
+          home: "Home",
+          themes: "Themes",
+          chooseTheme: "Pick a theme to browse.",
+          offline: "Offline",
+          offlineTitle: "No connection",
+          offlineHint: "You're offline (or the database didn't respond). I'll try to use the last saved cache.",
+          offlineRetryLabel: "Retry connection",
+          offlineRetryHint: "Test connection with Supabase",
+          offlineHomeLabel: "Back to Home",
+          offlineHomeHint: "Browse categories",
+          back: "Back",
+          hubCharactersLabel: "Characters",
+          hubCharactersHint: "Full list (A–Z)",
+          hubGlossaryLabel: "Glossary",
+          hubGlossaryHint: "JP → EN/PT terms",
+          hubPublicationsLabel: "Publications",
+          hubPublicationsHint: "Books, mooks, guides",
+          hubCollectiblesLabel: "Collectibles",
+          hubCollectiblesHint: "DX, SHF, sofubi, etc.",
+          characters: "Characters",
+          glossary: "Glossary",
+          publications: "Publications",
+          collectibles: "Collectibles",
+          searchCharacters: "Search by name (EN/PT/JP/romaji)...",
+          searchGlossary: "Search by JP/romaji/EN/PT...",
+          allCategories: "All",
+          searchPublications: "Search by title, type, year, publisher...",
+          allTypes: "All",
+          searchCollectibles: "Search by name, line, maker, type...",
+          modalOpenLink: "Open link",
+          modalDetails: "Details",
+          online: "Online",
+          offlineChip: "Offline",
+          connError: "Connection error",
+          loading: "Loading...",
+          noResults: "No results.",
+          noDetails: "No details."
+        },
+        ja: {
+          home: "ホーム",
+          themes: "テーマ",
+          chooseTheme: "テーマを選んでください。",
+          offline: "オフライン",
+          offlineTitle: "接続なし",
+          offlineHint: "オフライン（またはDBが応答しません）。最後のキャッシュを使います。",
+          offlineRetryLabel: "再接続",
+          offlineRetryHint: "Supabase への接続をテスト",
+          offlineHomeLabel: "ホームへ",
+          offlineHomeHint: "カテゴリを見る",
+          back: "戻る",
+          hubCharactersLabel: "キャラクター",
+          hubCharactersHint: "一覧（A–Z）",
+          hubGlossaryLabel: "用語集",
+          hubGlossaryHint: "JP → EN/PT",
+          hubPublicationsLabel: "出版物",
+          hubPublicationsHint: "書籍・ムック・ガイド",
+          hubCollectiblesLabel: "コレクション",
+          hubCollectiblesHint: "DX、SHF、ソフビなど",
+          characters: "キャラクター",
+          glossary: "用語集",
+          publications: "出版物",
+          collectibles: "コレクション",
+          searchCharacters: "名前で検索（EN/PT/JP/ローマ字）…",
+          searchGlossary: "検索（JP/ローマ字/EN/PT）…",
+          allCategories: "すべて",
+          searchPublications: "検索（タイトル/種類/年/出版社）…",
+          allTypes: "すべて",
+          searchCollectibles: "検索（名前/ライン/メーカー/種類）…",
+          modalOpenLink: "リンクを開く",
+          modalDetails: "詳細",
+          online: "オンライン",
+          offlineChip: "オフライン",
+          connError: "接続エラー",
+          loading: "読み込み中…",
+          noResults: "結果なし。",
+          noDetails: "詳細なし。"
+        }
+      };
+
+      function pickLangFromDevice() {
+        const raw = (navigator.languages?.[0] || navigator.language || "en").toLowerCase();
+        if (raw.startsWith("pt")) return "pt";
+        if (raw.startsWith("ja")) return "ja";
+        return "en";
+      }
+
+      function t(key) {
+        const lang = window.__lang || "en";
+        return (I18N[lang] && I18N[lang][key]) || (I18N.en[key]) || key;
+      }
+
+      function initLang() {
+        window.__lang = pickLangFromDevice();
+        // Ajusta <html lang="">
+        const htmlLang = window.__lang === "pt" ? "pt-BR" : (window.__lang === "ja" ? "ja-JP" : "en");
+        document.documentElement.lang = htmlLang;
+      }
+
+      function setText(id, value) {
+        const el = document.getElementById(id);
+        if (!el) return;
+        el.textContent = value;
+      }
+
+      function applyI18nStatic() {
+        setText("homeTitle", t("themes"));
+        setText("homeHint", t("chooseTheme"));
+
+        setText("offlineTitle", t("offlineTitle"));
+        setText("offlineHint", t("offlineHint"));
+        setText("offlineRetryLabel", t("offlineRetryLabel"));
+        setText("offlineRetryHint", t("offlineRetryHint"));
+        setText("offlineHomeLabel", t("offlineHomeLabel"));
+        setText("offlineHomeHint", t("offlineHomeHint"));
+
+        setText("btnBackToHome", t("back"));
+        setText("btnBackToFranchiseFromCharacters", t("back"));
+        setText("btnBackToFranchiseFromGlossary", t("back"));
+        setText("btnBackToFranchiseFromPublications", t("back"));
+        setText("btnBackToFranchiseFromCollectibles", t("back"));
+
+        setText("hubCharactersLabel", t("hubCharactersLabel"));
+        setText("hubCharactersHint", t("hubCharactersHint"));
+        setText("hubGlossaryLabel", t("hubGlossaryLabel"));
+        setText("hubGlossaryHint", t("hubGlossaryHint"));
+        setText("hubPublicationsLabel", t("hubPublicationsLabel"));
+        setText("hubPublicationsHint", t("hubPublicationsHint"));
+        setText("hubCollectiblesLabel", t("hubCollectiblesLabel"));
+        setText("hubCollectiblesHint", t("hubCollectiblesHint"));
+
+        const ic = document.getElementById("inputCharacterSearch");
+        if (ic) ic.placeholder = t("searchCharacters");
+
+        const ig = document.getElementById("inputGlossarySearch");
+        if (ig) ig.placeholder = t("searchGlossary");
+
+        const ip = document.getElementById("inputPublicationsSearch");
+        if (ip) ip.placeholder = t("searchPublications");
+
+        const ico = document.getElementById("inputCollectiblesSearch");
+        if (ico) ico.placeholder = t("searchCollectibles");
+
+        const optG = document.querySelector("#selectGlossaryCategory option[value='']");
+        if (optG) optG.textContent = t("allCategories");
+
+        const optP = document.querySelector("#selectPublicationsType option[value='']");
+        if (optP) optP.textContent = t("allTypes");
+
+        const optC = document.querySelector("#selectCollectiblesCategory option[value='']");
+        if (optC) optC.textContent = t("allTypes"); // "Todos/All/すべて" serve aqui também
+
+        setText("modalTitle", t("modalDetails"));
+        const linkBtn = document.getElementById("modalLinkBtn");
+        if (linkBtn) linkBtn.textContent = t("modalOpenLink");
+      }
+
+      // ===== util =====
       const views = {
         home: document.getElementById("viewHome"),
         offline: document.getElementById("viewOffline"),
@@ -525,13 +719,13 @@
         }
         views[name].classList.add("active", "animIn");
 
-        if (name === "home") headerSubtitle.textContent = "Home";
-        if (name === "offline") headerSubtitle.textContent = "Offline";
+        if (name === "home") headerSubtitle.textContent = t("home");
+        if (name === "offline") headerSubtitle.textContent = t("offline");
         if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
-        if (name === "characters") headerSubtitle.textContent = "Personagens";
-        if (name === "glossary") headerSubtitle.textContent = "Glossário";
-        if (name === "publications") headerSubtitle.textContent = "Publicações";
-        if (name === "collectibles") headerSubtitle.textContent = "Colecionáveis";
+        if (name === "characters") headerSubtitle.textContent = t("characters");
+        if (name === "glossary") headerSubtitle.textContent = t("glossary");
+        if (name === "publications") headerSubtitle.textContent = t("publications");
+        if (name === "collectibles") headerSubtitle.textContent = t("collectibles");
       }
 
       function formatFranchise(key) {
@@ -575,7 +769,7 @@
 
       function renderSpecCard(rowsHtml) {
         const rows = (rowsHtml || "").trim();
-        if (!rows) return `<div class="muted" style="padding: 8px 2px;">Sem detalhes.</div>`;
+        if (!rows) return `<div class="muted" style="padding: 8px 2px;">${escapeHtml(t("noDetails"))}</div>`;
         return `<div class="specCard">${rows}</div>`;
       }
 
@@ -600,62 +794,20 @@
         return `${u}${sep}v=${Date.now()}`;
       }
 
-      // =========================
-      // ✅ LINKS EXTERNOS (Capacitor Browser)
-      // =========================
-      function isNativeCapacitor() {
-        return !!(window.Capacitor && typeof window.Capacitor.isNativePlatform === "function" && window.Capacitor.isNativePlatform());
+      // Dado com campos *_pt, *_en, *_jp
+      function pickFieldByLang(obj, base) {
+        const lang = window.__lang || "en";
+        const map = { pt: `${base}_pt`, en: `${base}_en`, ja: `${base}_jp` };
+        const key = map[lang] || map.en;
+        return safeText(obj?.[key]) || safeText(obj?.[map.en]) || safeText(obj?.[map.pt]) || safeText(obj?.[map.ja]) || "";
       }
-
-      async function openExternal(url) {
-        const u = safeText(url);
-        if (!hasValue(u)) return;
-
-        // Capacitor (nativo): abre Safari View Controller / Chrome Custom Tabs
-        if (isNativeCapacitor() && window.Capacitor?.Plugins?.Browser?.open) {
-          try {
-            await window.Capacitor.Plugins.Browser.open({ url: u });
-            return;
-          } catch (e) {
-            console.warn("Capacitor Browser.open falhou, fallback pro window.open:", e);
-          }
-        }
-
-        // Web/PWA (Netlify): abre nova aba/janela
-        window.open(u, "_blank", "noopener,noreferrer");
-      }
-
-      function isExternalUrl(href) {
-        try {
-          const u = new URL(href, window.location.href);
-          const isHttp = u.protocol === "http:" || u.protocol === "https:";
-          const isSameOrigin = u.origin === window.location.origin;
-          return isHttp && !isSameOrigin;
-        } catch {
-          return false;
-        }
-      }
-
-      // Intercepta qualquer <a> externo (inclusive dentro do modalBody etc.)
-      document.addEventListener("click", async (ev) => {
-        const a = ev.target && ev.target.closest ? ev.target.closest("a") : null;
-        if (!a) return;
-
-        const href = a.getAttribute("href");
-        if (!href || href.startsWith("#") || href.startsWith("javascript:")) return;
-
-        if (isExternalUrl(href)) {
-          ev.preventDefault();
-          await openExternal(new URL(href, window.location.href).toString());
-        }
-      });
 
       // ===== OFFLINE + CACHE =====
       function setConnectionState(mode, detail) {
         // mode: "online" | "offline" | "error"
-        if (mode === "online") headerChip.textContent = "Online";
-        if (mode === "offline") headerChip.textContent = "Offline";
-        if (mode === "error") headerChip.textContent = "Conexão com erro";
+        if (mode === "online") headerChip.textContent = t("online");
+        if (mode === "offline") headerChip.textContent = t("offlineChip");
+        if (mode === "error") headerChip.textContent = t("connError");
         if (offlineStatus) offlineStatus.textContent = safeText(detail || "");
       }
 
@@ -713,7 +865,7 @@
       async function pingSupabase() {
         try {
           const { error } = await supabase.from("characters").select("id").limit(1);
-          if (error) setConnectionState("error", `Ping com erro: ${error.message}`);
+          if (error) setConnectionState("error", `Ping: ${error.message}`);
           else setConnectionState("online", "");
         } catch {
           setConnectionState("offline", "Sem conexão com a internet.");
@@ -766,7 +918,7 @@
       document.getElementById("btnOfflineRetry").addEventListener("click", async () => {
         setConnectionState("offline", "Testando conexão...");
         await pingSupabase();
-        if (headerChip.textContent === "Online") showView("home");
+        if (headerChip.textContent === t("online")) showView("home");
         else goOffline("Ainda sem resposta do Supabase. Tente novamente em instantes.");
       });
 
@@ -790,18 +942,10 @@
         if (!hasValue(u)) {
           modalLinkBtn.style.display = "none";
           modalLinkBtn.href = "#";
-          modalLinkBtn.onclick = null;
           return;
         }
-
         modalLinkBtn.style.display = "inline-flex";
         modalLinkBtn.href = u;
-
-        // ✅ sempre abre via Browser nativo quando estiver no Capacitor
-        modalLinkBtn.onclick = async (e) => {
-          e.preventDefault();
-          await openExternal(u);
-        };
       }
 
       function setModalImage(url, alt) {
@@ -826,7 +970,7 @@
       let charactersCache = [];
 
       async function openCharacters() {
-        charactersTitle.textContent = `${formatFranchise(state.franchise)} · Personagens`;
+        charactersTitle.textContent = `${formatFranchise(state.franchise)} · ${t("characters")}`;
         showView("characters");
         inputCharacterSearch.value = "";
 
@@ -835,10 +979,9 @@
       }
 
       async function loadCharacters() {
-        charactersStatus.textContent = "Carregando...";
+        charactersStatus.textContent = t("loading");
         charactersList.innerHTML = "";
 
-        // Se o navegador está offline, vai direto pro cache
         if (!navigator.onLine) {
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
@@ -860,7 +1003,6 @@
         if (error) {
           console.error("Characters load error:", error);
 
-          // fallback cache
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           charactersCache = list;
@@ -895,7 +1037,7 @@
       function renderCharactersList(list) {
         charactersList.innerHTML = "";
         if (!list.length) {
-          charactersList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          charactersList.innerHTML = `<div class="muted" style="padding: 10px 2px;">${escapeHtml(t("noResults"))}</div>`;
           return;
         }
 
@@ -904,19 +1046,20 @@
           el.className = "item";
 
           const imgUrl = imageUrlForCharacter(c.name_en);
+          const displayName = pickFieldByLang(c, "name") || safeText(c.name_en);
 
           el.innerHTML = `
             <div class="itemTop">
               <div class="thumb">
-                <img src="${imgUrl}" alt="${safeText(c.name_en)}" onerror="this.style.display='none'; this.parentElement.textContent='';" />
+                <img src="${imgUrl}" alt="${escapeHtml(safeText(c.name_en))}" onerror="this.style.display='none'; this.parentElement.textContent='';" />
               </div>
               <div class="meta">
                 <div class="nameLine">
-                  <div class="name">${safeText(c.name_pt) || safeText(c.name_en)}</div>
-                  <div class="year">${hasValue(c.year) ? c.year : ""}</div>
+                  <div class="name">${escapeHtml(displayName)}</div>
+                  <div class="year">${hasValue(c.year) ? escapeHtml(c.year) : ""}</div>
                 </div>
                 <div class="muted" style="font-size:12px; line-height:1.2;">
-                  ${safeText(c.name_en)}
+                  ${escapeHtml(safeText(c.name_en))}
                 </div>
               </div>
             </div>
@@ -924,21 +1067,21 @@
           `;
 
           el.addEventListener("click", () => {
-            modalTitle.textContent = safeText(c.name_pt) || safeText(c.name_en) || "Detalhes";
+            modalTitle.textContent = displayName || safeText(c.name_en) || t("modalDetails");
             setModalImage(imgUrl, c.name_en);
             setModalLink("");
 
             const rows = [
               specRow("Nome (PT)", c.name_pt),
-              specRow("Nome (EN)", c.name_en),
-              specRow("Nome (JP)", c.name_jp),
+              specRow("Name (EN)", c.name_en),
+              specRow("名前 (JP)", c.name_jp),
               specRow("Romaji", c.romaji),
               specRow("Franquia", formatFranchise(c.franchise)),
               specRow("Ano", c.year),
 
               specRow("Nome civil (PT)", c.civil_name_pt),
-              specRow("Nome civil (EN)", c.civil_name_en),
-              specRow("Nome civil (JP)", c.civil_name_jp),
+              specRow("Civil name (EN)", c.civil_name_en),
+              specRow("本名 (JP)", c.civil_name_jp),
 
               specRow("Ator", c.actor_name),
               specRow("Descrição", c.description),
@@ -964,6 +1107,7 @@
       let glossaryCache = [];
 
       async function openGlossary() {
+        setText("glossaryTitle", t("glossary"));
         showView("glossary");
         inputGlossarySearch.value = "";
         selectGlossaryCategory.value = "";
@@ -974,7 +1118,7 @@
       }
 
       async function loadGlossary() {
-        glossaryStatus.textContent = "Carregando...";
+        glossaryStatus.textContent = t("loading");
         glossaryList.innerHTML = "";
 
         if (!navigator.onLine) {
@@ -1026,7 +1170,7 @@
 
       function populateGlossaryCategories(list) {
         const cats = Array.from(new Set(list.map(x => safeText(x.category)).filter(Boolean))).sort((a,b) => a.localeCompare(b));
-        selectGlossaryCategory.innerHTML = `<option value="">Todas</option>`;
+        selectGlossaryCategory.innerHTML = `<option value="">${escapeHtml(t("allCategories"))}</option>`;
         for (const c of cats) {
           const opt = document.createElement("option");
           opt.value = c;
@@ -1039,10 +1183,10 @@
         const query = safeText(q).toLowerCase();
         const category = safeText(cat).toLowerCase();
 
-        return glossaryCache.filter((t) => {
-          if (category && safeText(t.category).toLowerCase() !== category) return false;
+        return glossaryCache.filter((t0) => {
+          if (category && safeText(t0.category).toLowerCase() !== category) return false;
           if (!query) return true;
-          return [t.jp, t.romaji, t.en, t.pt, t.explanation, t.category]
+          return [t0.jp, t0.romaji, t0.en, t0.pt, t0.explanation, t0.category]
             .some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -1050,27 +1194,27 @@
       function renderGlossaryList(list) {
         glossaryList.innerHTML = "";
         if (!list.length) {
-          glossaryList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          glossaryList.innerHTML = `<div class="muted" style="padding: 10px 2px;">${escapeHtml(t("noResults"))}</div>`;
           return;
         }
 
-        for (const t of list) {
+        for (const t0 of list) {
           const el = document.createElement("div");
           el.className = "item";
 
-          const title = safeText(t.pt) || safeText(t.en) || safeText(t.jp) || "Termo";
+          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Termo";
           el.innerHTML = `
             <div class="nameLine">
               <div class="name">${escapeHtml(title)}</div>
-              <div class="year">${escapeHtml(safeText(t.category))}</div>
+              <div class="year">${escapeHtml(safeText(t0.category))}</div>
             </div>
             <div class="desc">
               <div style="margin-bottom:6px;">
-                <span class="pill">${escapeHtml(safeText(t.jp) || "-")}</span>
-                ${hasValue(t.romaji) ? `<span class="pill">${escapeHtml(t.romaji)}</span>` : ``}
-                ${hasValue(t.en) ? `<span class="pill">${escapeHtml(t.en)}</span>` : ``}
+                <span class="pill">${escapeHtml(safeText(t0.jp) || "-")}</span>
+                ${hasValue(t0.romaji) ? `<span class="pill">${escapeHtml(t0.romaji)}</span>` : ``}
+                ${hasValue(t0.en) ? `<span class="pill">${escapeHtml(t0.en)}</span>` : ``}
               </div>
-              ${hasValue(t.explanation) ? escapeHtml(t.explanation) : ""}
+              ${hasValue(t0.explanation) ? escapeHtml(t0.explanation) : ""}
             </div>
           `;
 
@@ -1080,12 +1224,12 @@
             setModalLink("");
 
             const rows = [
-              specRow("JP", t.jp),
-              specRow("Romaji", t.romaji),
-              specRow("EN", t.en),
-              specRow("PT", t.pt),
-              specRow("Categoria", t.category),
-              specRow("Explicação", t.explanation)
+              specRow("JP", t0.jp),
+              specRow("Romaji", t0.romaji),
+              specRow("EN", t0.en),
+              specRow("PT", t0.pt),
+              specRow("Categoria", t0.category),
+              specRow("Explicação", t0.explanation)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1103,7 +1247,7 @@
         renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value))
       );
 
-      // ✅ PUBLICATIONS (SEU SCHEMA)
+      // PUBLICATIONS
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -1112,21 +1256,22 @@
       let publicationsCache = [];
 
       function pubDisplayTitle(p) {
-        return safeText(p.title_pt) || safeText(p.title_en) || safeText(p.title_jp) || "Publicação";
+        // usa seu schema *_pt/_en/_jp automaticamente
+        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publicação";
       }
 
       async function openPublications() {
-        publicationsTitle.textContent = `${formatFranchise(state.franchise)} · Publicações`;
+        publicationsTitle.textContent = `${formatFranchise(state.franchise)} · ${t("publications")}`;
         showView("publications");
         inputPublicationsSearch.value = "";
         selectPublicationsType.value = "";
         await loadPublications();
-        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), "Todos");
+        populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), t("allTypes"));
         renderPublicationsList(filterPublications("", ""));
       }
 
       async function loadPublications() {
-        publicationsStatus.textContent = "Carregando...";
+        publicationsStatus.textContent = t("loading");
         publicationsList.innerHTML = "";
 
         if (!navigator.onLine) {
@@ -1179,7 +1324,7 @@
       function populateSelect(selectEl, values, allLabel) {
         const uniq = Array.from(new Set(values.map(v => safeText(v)).filter(Boolean)))
           .sort((a,b) => a.localeCompare(b));
-        selectEl.innerHTML = `<option value="">${allLabel}</option>`;
+        selectEl.innerHTML = `<option value="">${escapeHtml(allLabel)}</option>`;
         for (const v of uniq) {
           const opt = document.createElement("option");
           opt.value = v;
@@ -1190,10 +1335,10 @@
 
       function filterPublications(q, pubType) {
         const query = safeText(q).toLowerCase();
-        const t = safeText(pubType).toLowerCase();
+        const t0 = safeText(pubType).toLowerCase();
 
         return publicationsCache.filter((p) => {
-          if (t && safeText(p.pub_type).toLowerCase() !== t) return false;
+          if (t0 && safeText(p.pub_type).toLowerCase() !== t0) return false;
           if (!query) return true;
           return [
             p.title_pt, p.title_en, p.title_jp,
@@ -1207,7 +1352,7 @@
       function renderPublicationsList(list) {
         publicationsList.innerHTML = "";
         if (!list.length) {
-          publicationsList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          publicationsList.innerHTML = `<div class="muted" style="padding: 10px 2px;">${escapeHtml(t("noResults"))}</div>`;
           return;
         }
 
@@ -1245,8 +1390,8 @@
 
             const rows = [
               specRow("Título (PT)", p.title_pt),
-              specRow("Título (EN)", p.title_en),
-              specRow("Título (JP)", p.title_jp),
+              specRow("Title (EN)", p.title_en),
+              specRow("タイトル (JP)", p.title_jp),
               specRow("Tipo", p.pub_type),
               specRow("Editora", p.publisher),
               specRow("Edição", p.issue),
@@ -1275,7 +1420,7 @@
         renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value))
       );
 
-      // ✅ COLLECTIBLES
+      // COLLECTIBLES
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
@@ -1284,11 +1429,11 @@
       let collectiblesCache = [];
 
       function colDisplayName(it) {
-        return safeText(it.name_pt) || safeText(it.name_en) || safeText(it.name_jp) || "Colecionável";
+        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Colecionável";
       }
 
       async function openCollectibles() {
-        collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · Colecionáveis`;
+        collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · ${t("collectibles")}`;
         showView("collectibles");
         inputCollectiblesSearch.value = "";
         selectCollectiblesCategory.value = "";
@@ -1297,14 +1442,14 @@
         populateSelect(
           selectCollectiblesCategory,
           collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean),
-          "Todos"
+          t("allTypes")
         );
 
         renderCollectiblesList(filterCollectibles("", ""));
       }
 
       async function loadCollectibles() {
-        collectiblesStatus.textContent = "Carregando...";
+        collectiblesStatus.textContent = t("loading");
         collectiblesList.innerHTML = "";
 
         if (!navigator.onLine) {
@@ -1351,10 +1496,10 @@
 
       function filterCollectibles(q, itemType) {
         const query = safeText(q).toLowerCase();
-        const t = safeText(itemType).toLowerCase();
+        const t0 = safeText(itemType).toLowerCase();
 
         return collectiblesCache.filter((it) => {
-          if (t && safeText(it.item_type).toLowerCase() !== t) return false;
+          if (t0 && safeText(it.item_type).toLowerCase() !== t0) return false;
           if (!query) return true;
 
           return [
@@ -1370,7 +1515,7 @@
       function renderCollectiblesList(list) {
         collectiblesList.innerHTML = "";
         if (!list.length) {
-          collectiblesList.innerHTML = `<div class="muted" style="padding: 10px 2px;">Nenhum resultado.</div>`;
+          collectiblesList.innerHTML = `<div class="muted" style="padding: 10px 2px;">${escapeHtml(t("noResults"))}</div>`;
           return;
         }
 
@@ -1412,8 +1557,8 @@
 
             const rows = [
               specRow("Nome (PT)", it.name_pt),
-              specRow("Nome (EN)", it.name_en),
-              specRow("Nome (JP)", it.name_jp),
+              specRow("Name (EN)", it.name_en),
+              specRow("名前 (JP)", it.name_jp),
               specRow("Linha", it.line),
               specRow("Tipo", it.item_type),
               specRow("Fabricante", it.manufacturer),
@@ -1444,14 +1589,17 @@
       );
 
       function init() {
+        // idioma primeiro, pra UI já nascer traduzida
+        initLang();
+        applyI18nStatic();
+
         renderHome();
         showView("home");
         pingSupabase();
 
-        // Se abrir o app já offline, sinaliza no chip
         if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
 
-        // ===== PWA: registra o Service Worker =====
+        // PWA: registra o Service Worker
         if ("serviceWorker" in navigator) {
           window.addEventListener("load", async () => {
             try {
