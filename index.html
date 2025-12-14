@@ -63,6 +63,8 @@
       .brand .title { font-weight: 700; letter-spacing: 0.2px; font-size: 16px; line-height: 1.2; }
       .brand .subtitle { font-size: 12px; color: var(--muted); line-height: 1.2; }
 
+      .rightControls { display: inline-flex; align-items: center; gap: 10px; }
+
       .chip {
         display: inline-flex;
         align-items: center;
@@ -74,6 +76,38 @@
         font-size: 12px;
         color: var(--muted);
         user-select: none;
+        white-space: nowrap;
+      }
+
+      /* ===== Language dropdown com cara de chip ===== */
+      .langSelect {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        border: 1px solid var(--border);
+        background: rgba(255, 255, 255, 0.06);
+        color: var(--text);
+        padding: 8px 30px 8px 10px;
+        border-radius: 999px;
+        font-size: 12px;
+        outline: none;
+        cursor: pointer;
+        line-height: 1;
+      }
+      .langWrap {
+        position: relative;
+        display: inline-flex;
+        align-items: center;
+      }
+      .langWrap::after {
+        content: "▾";
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 12px;
+        color: var(--muted);
+        pointer-events: none;
       }
 
       main {
@@ -334,7 +368,19 @@
             <div class="title">Henshin DB</div>
             <div class="subtitle" id="headerSubtitle">Home</div>
           </div>
-          <div class="chip" id="headerChip">Offline</div>
+
+          <div class="rightControls">
+            <!-- ✅ Dropdown de idioma -->
+            <div class="langWrap" title="Language">
+              <select class="langSelect" id="langSelect" aria-label="Language selector">
+                <option value="pt">Português</option>
+                <option value="en">English</option>
+                <option value="ja">日本語</option>
+              </select>
+            </div>
+
+            <div class="chip" id="headerChip">Offline</div>
+          </div>
         </div>
       </header>
 
@@ -503,8 +549,11 @@
       const headerSubtitle = document.getElementById("headerSubtitle");
       const headerChip = document.getElementById("headerChip");
       const offlineStatus = document.getElementById("offlineStatus");
+      const langSelect = document.getElementById("langSelect");
 
-      // ===== i18n (100% automático) =====
+      const LANG_STORAGE_KEY = "henshin_lang_v1";
+
+      // ===== i18n =====
       const I18N = {
         pt: {
           home: "Home",
@@ -543,7 +592,18 @@
           connError: "Conexão com erro",
           loading: "Carregando...",
           noResults: "Nenhum resultado.",
-          noDetails: "Sem detalhes."
+          noDetails: "Sem detalhes.",
+          noCache: "Sem cache disponível.",
+          items: "itens",
+          terms: "termos",
+          cache: "cache",
+          justNow: "agora há pouco",
+          minAgo: "min atrás",
+          hAgo: "h atrás",
+          daysAgo: "dias atrás",
+          deviceOffline: "Seu dispositivo está sem internet.",
+          testingConn: "Testando conexão...",
+          retryLater: "Ainda sem resposta do Supabase. Tente novamente em instantes."
         },
         en: {
           home: "Home",
@@ -582,7 +642,18 @@
           connError: "Connection error",
           loading: "Loading...",
           noResults: "No results.",
-          noDetails: "No details."
+          noDetails: "No details.",
+          noCache: "No cache available.",
+          items: "items",
+          terms: "terms",
+          cache: "cache",
+          justNow: "just now",
+          minAgo: "min ago",
+          hAgo: "h ago",
+          daysAgo: "days ago",
+          deviceOffline: "Your device is offline.",
+          testingConn: "Testing connection...",
+          retryLater: "Still no response from Supabase. Try again in a moment."
         },
         ja: {
           home: "ホーム",
@@ -621,7 +692,18 @@
           connError: "接続エラー",
           loading: "読み込み中…",
           noResults: "結果なし。",
-          noDetails: "詳細なし。"
+          noDetails: "詳細なし。",
+          noCache: "キャッシュなし。",
+          items: "件",
+          terms: "件",
+          cache: "キャッシュ",
+          justNow: "たった今",
+          minAgo: "分前",
+          hAgo: "時間前",
+          daysAgo: "日前",
+          deviceOffline: "デバイスはオフラインです。",
+          testingConn: "接続を確認中…",
+          retryLater: "Supabase から応答がありません。少しして再試行してください。"
         }
       };
 
@@ -637,10 +719,14 @@
         return (I18N[lang] && I18N[lang][key]) || (I18N.en[key]) || key;
       }
 
-      function initLang() {
-        window.__lang = pickLangFromDevice();
-        // Ajusta <html lang="">
-        const htmlLang = window.__lang === "pt" ? "pt-BR" : (window.__lang === "ja" ? "ja-JP" : "en");
+      function normalizeLang(v) {
+        const x = String(v || "").toLowerCase().trim();
+        if (x === "pt" || x === "en" || x === "ja") return x;
+        return "en";
+      }
+
+      function setHtmlLang(lang) {
+        const htmlLang = lang === "pt" ? "pt-BR" : (lang === "ja" ? "ja-JP" : "en");
         document.documentElement.lang = htmlLang;
       }
 
@@ -688,18 +774,45 @@
         const ico = document.getElementById("inputCollectiblesSearch");
         if (ico) ico.placeholder = t("searchCollectibles");
 
-        const optG = document.querySelector("#selectGlossaryCategory option[value='']");
-        if (optG) optG.textContent = t("allCategories");
-
-        const optP = document.querySelector("#selectPublicationsType option[value='']");
-        if (optP) optP.textContent = t("allTypes");
-
-        const optC = document.querySelector("#selectCollectiblesCategory option[value='']");
-        if (optC) optC.textContent = t("allTypes"); // "Todos/All/すべて" serve aqui também
-
         setText("modalTitle", t("modalDetails"));
         const linkBtn = document.getElementById("modalLinkBtn");
         if (linkBtn) linkBtn.textContent = t("modalOpenLink");
+      }
+
+      function setLang(lang, persist = true) {
+        const next = normalizeLang(lang);
+        window.__lang = next;
+        setHtmlLang(next);
+
+        if (persist) {
+          try { localStorage.setItem(LANG_STORAGE_KEY, next); } catch {}
+        }
+
+        // Sync UI dropdown
+        if (langSelect && langSelect.value !== next) langSelect.value = next;
+
+        // Apply all static labels
+        applyI18nStatic();
+
+        // Update chip text keeping state (online/offline/error) best-effort:
+        // (we keep current chip mode by reading current text is unreliable across langs,
+        // so we just re-ping if online; if offline keep offline)
+        if (!navigator.onLine) setConnectionState("offline", t("deviceOffline"));
+
+        // Update current header subtitle based on active view
+        refreshHeaderSubtitle();
+
+        // Re-render dynamic lists if already loaded
+        rerenderDynamicLists();
+      }
+
+      function initLang() {
+        let initial = null;
+        try { initial = localStorage.getItem(LANG_STORAGE_KEY); } catch {}
+        const lang = normalizeLang(initial || pickLangFromDevice());
+        window.__lang = lang;
+        setHtmlLang(lang);
+        if (langSelect) langSelect.value = lang;
       }
 
       // ===== util =====
@@ -713,12 +826,15 @@
         collectibles: document.getElementById("viewCollectibles")
       };
 
-      function showView(name) {
+      function getActiveViewName() {
         for (const k in views) {
-          views[k].classList.remove("active", "animIn");
+          if (views[k].classList.contains("active")) return k;
         }
-        views[name].classList.add("active", "animIn");
+        return "home";
+      }
 
+      function refreshHeaderSubtitle() {
+        const name = getActiveViewName();
         if (name === "home") headerSubtitle.textContent = t("home");
         if (name === "offline") headerSubtitle.textContent = t("offline");
         if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
@@ -728,8 +844,16 @@
         if (name === "collectibles") headerSubtitle.textContent = t("collectibles");
       }
 
+      function showView(name) {
+        for (const k in views) {
+          views[k].classList.remove("active", "animIn");
+        }
+        views[name].classList.add("active", "animIn");
+        refreshHeaderSubtitle();
+      }
+
       function formatFranchise(key) {
-        if (!key) return "Tema";
+        if (!key) return t("themes");
         if (key === "kamen rider") return "Kamen Rider";
         if (key === "super sentai") return "Super Sentai";
         if (key === "metal hero") return "Metal Hero";
@@ -842,12 +966,12 @@
       function fmtAge(ts) {
         if (!ts) return "";
         const mins = Math.round((Date.now() - ts) / 60000);
-        if (mins < 1) return "agora há pouco";
-        if (mins < 60) return `${mins} min atrás`;
+        if (mins < 1) return t("justNow");
+        if (mins < 60) return `${mins} ${t("minAgo")}`;
         const hrs = Math.round(mins / 60);
-        if (hrs < 24) return `${hrs} h atrás`;
+        if (hrs < 24) return `${hrs} ${t("hAgo")}`;
         const days = Math.round(hrs / 24);
-        return `${days} dias atrás`;
+        return `${days} ${t("daysAgo")}`;
       }
 
       function goOffline(detail) {
@@ -859,7 +983,7 @@
         setConnectionState("online", "");
       });
       window.addEventListener("offline", () => {
-        setConnectionState("offline", "Seu dispositivo está sem internet.");
+        setConnectionState("offline", t("deviceOffline"));
       });
 
       async function pingSupabase() {
@@ -868,7 +992,7 @@
           if (error) setConnectionState("error", `Ping: ${error.message}`);
           else setConnectionState("online", "");
         } catch {
-          setConnectionState("offline", "Sem conexão com a internet.");
+          setConnectionState("offline", t("deviceOffline"));
         }
       }
 
@@ -916,10 +1040,10 @@
       // OFFLINE VIEW BUTTONS
       document.getElementById("btnOfflineGoHome").addEventListener("click", () => showView("home"));
       document.getElementById("btnOfflineRetry").addEventListener("click", async () => {
-        setConnectionState("offline", "Testando conexão...");
+        setConnectionState("offline", t("testingConn"));
         await pingSupabase();
         if (headerChip.textContent === t("online")) showView("home");
-        else goOffline("Ainda sem resposta do Supabase. Tente novamente em instantes.");
+        else goOffline(t("retryLater"));
       });
 
       // MODAL
@@ -988,10 +1112,10 @@
           charactersCache = list;
 
           charactersStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : "Sem cache disponível.";
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : t("noCache");
 
-          if (!list.length) goOffline("Sem internet e nenhum cache de personagens encontrado para esse tema.");
+          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
           return;
         }
 
@@ -1008,17 +1132,17 @@
           charactersCache = list;
 
           charactersStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : `Erro ao carregar personagens e sem cache: ${error.message}`;
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : `Error: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de personagens. (${error.message})`);
+          if (!list.length) goOffline(`Supabase error: ${error.message}`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
         charactersCache = list;
-        charactersStatus.textContent = `${list.length} itens`;
+        charactersStatus.textContent = `${list.length} ${t("items")}`;
 
         saveCache("characters", state.franchise, list);
         setConnectionState("online", "");
@@ -1076,17 +1200,17 @@
               specRow("Name (EN)", c.name_en),
               specRow("名前 (JP)", c.name_jp),
               specRow("Romaji", c.romaji),
-              specRow("Franquia", formatFranchise(c.franchise)),
-              specRow("Ano", c.year),
+              specRow("Franchise", formatFranchise(c.franchise)),
+              specRow("Year", c.year),
 
               specRow("Nome civil (PT)", c.civil_name_pt),
               specRow("Civil name (EN)", c.civil_name_en),
               specRow("本名 (JP)", c.civil_name_jp),
 
-              specRow("Ator", c.actor_name),
-              specRow("Descrição", c.description),
-              specRow("Poderes", c.powers),
-              specRow("Equipamentos", c.equipment)
+              specRow("Actor", c.actor_name),
+              specRow("Description", c.description),
+              specRow("Powers", c.powers),
+              specRow("Equipment", c.equipment)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1127,10 +1251,10 @@
           glossaryCache = list;
 
           glossaryStatus.textContent = list.length
-            ? `${list.length} termos (cache · ${fmtAge(cached.ts)})`
-            : "Sem cache disponível.";
+            ? `${list.length} ${t("terms")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : t("noCache");
 
-          if (!list.length) goOffline("Sem internet e nenhum cache de glossário encontrado.");
+          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
           return;
         }
 
@@ -1146,10 +1270,10 @@
           glossaryCache = list;
 
           glossaryStatus.textContent = list.length
-            ? `${list.length} termos (cache · ${fmtAge(cached.ts)})`
-            : `Erro ao carregar glossário e sem cache: ${error.message}`;
+            ? `${list.length} ${t("terms")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : `Error: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de glossário. (${error.message})`);
+          if (!list.length) goOffline(`Supabase error: ${error.message}`);
           return;
         }
 
@@ -1162,7 +1286,7 @@
           )
         );
         glossaryCache = list;
-        glossaryStatus.textContent = `${list.length} termos`;
+        glossaryStatus.textContent = `${list.length} ${t("terms")}`;
 
         saveCache("glossary", "global", list);
         setConnectionState("online", "");
@@ -1202,7 +1326,12 @@
           const el = document.createElement("div");
           el.className = "item";
 
-          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Termo";
+          // Preferimos mostrar PT/EN/JP conforme o idioma atual
+          let title = safeText(t0.pt);
+          if ((window.__lang || "en") === "en") title = safeText(t0.en) || title;
+          if ((window.__lang || "en") === "ja") title = safeText(t0.jp) || title;
+          title = title || safeText(t0.en) || safeText(t0.jp) || safeText(t0.pt) || "Term";
+
           el.innerHTML = `
             <div class="nameLine">
               <div class="name">${escapeHtml(title)}</div>
@@ -1228,8 +1357,8 @@
               specRow("Romaji", t0.romaji),
               specRow("EN", t0.en),
               specRow("PT", t0.pt),
-              specRow("Categoria", t0.category),
-              specRow("Explicação", t0.explanation)
+              specRow("Category", t0.category),
+              specRow("Explanation", t0.explanation)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1256,8 +1385,7 @@
       let publicationsCache = [];
 
       function pubDisplayTitle(p) {
-        // usa seu schema *_pt/_en/_jp automaticamente
-        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publicação";
+        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publication";
       }
 
       async function openPublications() {
@@ -1280,10 +1408,10 @@
           publicationsCache = list;
 
           publicationsStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : "Sem cache disponível.";
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : t("noCache");
 
-          if (!list.length) goOffline("Sem internet e nenhum cache de publicações encontrado para esse tema.");
+          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
           return;
         }
 
@@ -1300,10 +1428,10 @@
           publicationsCache = list;
 
           publicationsStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : `Erro ao carregar publicações e sem cache: ${error.message}`;
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : `Error: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de publicações. (${error.message})`);
+          if (!list.length) goOffline(`Supabase error: ${error.message}`);
           return;
         }
 
@@ -1315,7 +1443,7 @@
         });
 
         publicationsCache = list;
-        publicationsStatus.textContent = `${list.length} itens`;
+        publicationsStatus.textContent = `${list.length} ${t("items")}`;
 
         saveCache("publications", state.franchise, list);
         setConnectionState("online", "");
@@ -1392,16 +1520,16 @@
               specRow("Título (PT)", p.title_pt),
               specRow("Title (EN)", p.title_en),
               specRow("タイトル (JP)", p.title_jp),
-              specRow("Tipo", p.pub_type),
-              specRow("Editora", p.publisher),
-              specRow("Edição", p.issue),
-              specRow("Ano", p.year),
-              specRow("Mês", p.month),
-              specRow("Idioma", p.language),
+              specRow("Type", p.pub_type),
+              specRow("Publisher", p.publisher),
+              specRow("Issue", p.issue),
+              specRow("Year", p.year),
+              specRow("Month", p.month),
+              specRow("Language", p.language),
               specRow("ISBN", p.isbn),
               specRow("Era", p.era),
-              specRow("Franquia", formatFranchise(p.franchise)),
-              specRow("Notas", p.notes),
+              specRow("Franchise", formatFranchise(p.franchise)),
+              specRow("Notes", p.notes),
               specRow("URL", p.url)
             ].filter(Boolean).join("");
 
@@ -1429,7 +1557,7 @@
       let collectiblesCache = [];
 
       function colDisplayName(it) {
-        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Colecionável";
+        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Collectible";
       }
 
       async function openCollectibles() {
@@ -1458,10 +1586,10 @@
           collectiblesCache = list;
 
           collectiblesStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : "Sem cache disponível.";
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : t("noCache");
 
-          if (!list.length) goOffline("Sem internet e nenhum cache de colecionáveis encontrado para esse tema.");
+          if (!list.length) goOffline(`${t("offlineTitle")}: ${t("noCache")}`);
           return;
         }
 
@@ -1478,17 +1606,17 @@
           collectiblesCache = list;
 
           collectiblesStatus.textContent = list.length
-            ? `${list.length} itens (cache · ${fmtAge(cached.ts)})`
-            : `Erro ao carregar colecionáveis e sem cache: ${error.message}`;
+            ? `${list.length} ${t("items")} (${t("cache")} · ${fmtAge(cached.ts)})`
+            : `Error: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de colecionáveis. (${error.message})`);
+          if (!list.length) goOffline(`Supabase error: ${error.message}`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
         collectiblesCache = list;
-        collectiblesStatus.textContent = `${list.length} itens`;
+        collectiblesStatus.textContent = `${list.length} ${t("items")}`;
 
         saveCache("collectibles", state.franchise, list);
         setConnectionState("online", "");
@@ -1559,18 +1687,18 @@
               specRow("Nome (PT)", it.name_pt),
               specRow("Name (EN)", it.name_en),
               specRow("名前 (JP)", it.name_jp),
-              specRow("Linha", it.line),
-              specRow("Tipo", it.item_type),
-              specRow("Fabricante", it.manufacturer),
-              specRow("Ano", it.year),
+              specRow("Line", it.line),
+              specRow("Type", it.item_type),
+              specRow("Manufacturer", it.manufacturer),
+              specRow("Year", it.year),
               specRow("Era", it.era),
               specRow("Series code", it.series_code),
               specRow("SKU", it.sku_code),
               specRow("Status", it.status),
-              specRow("Raridade", it.rarity),
+              specRow("Rarity", it.rarity),
               specRow("JP search", it.jp_search),
-              specRow("Notas", it.notes),
-              specRow("Franquia", formatFranchise(it.franchise))
+              specRow("Notes", it.notes),
+              specRow("Franchise", formatFranchise(it.franchise))
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1588,16 +1716,54 @@
         renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value))
       );
 
+      // ===== Re-render helpers when language changes =====
+      function rerenderDynamicLists() {
+        const active = getActiveViewName();
+
+        // Titles that include translations
+        if (active === "characters") {
+          charactersTitle.textContent = `${formatFranchise(state.franchise)} · ${t("characters")}`;
+          renderCharactersList(filterCharacters(inputCharacterSearch.value));
+        }
+
+        if (active === "glossary") {
+          setText("glossaryTitle", t("glossary"));
+          populateGlossaryCategories(glossaryCache);
+          renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value));
+        }
+
+        if (active === "publications") {
+          publicationsTitle.textContent = `${formatFranchise(state.franchise)} · ${t("publications")}`;
+          populateSelect(selectPublicationsType, publicationsCache.map(x => safeText(x.pub_type)).filter(Boolean), t("allTypes"));
+          renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value));
+        }
+
+        if (active === "collectibles") {
+          collectiblesTitle.textContent = `${formatFranchise(state.franchise)} · ${t("collectibles")}`;
+          populateSelect(selectCollectiblesCategory, collectiblesCache.map(x => safeText(x.item_type)).filter(Boolean), t("allTypes"));
+          renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value));
+        }
+
+        if (active === "offline") {
+          // offline screen labels are static already handled by applyI18nStatic()
+        }
+      }
+
       function init() {
-        // idioma primeiro, pra UI já nascer traduzida
+        // idioma primeiro
         initLang();
         applyI18nStatic();
+
+        // Hook do dropdown
+        if (langSelect) {
+          langSelect.addEventListener("change", (e) => setLang(e.target.value, true));
+        }
 
         renderHome();
         showView("home");
         pingSupabase();
 
-        if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
+        if (!navigator.onLine) setConnectionState("offline", t("deviceOffline"));
 
         // PWA: registra o Service Worker
         if ("serviceWorker" in navigator) {
