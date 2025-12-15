@@ -596,6 +596,13 @@
           footerAuthor: "Autora",
           footerVersion: "v0.1",
 
+          close: "Fechar",
+          errorPrefix: "Erro",
+          pingPrefix: "Ping",
+          term: "Termo",
+          publicationSingular: "Publicação",
+          collectibleSingular: "Colecionável",
+
           spec_name_pt: "Nome (PT)",
           spec_name_en: "Nome (EN)",
           spec_name_jp: "Nome (JP)",
@@ -692,6 +699,13 @@
           footerAuthor: "Author",
           footerVersion: "v0.1",
 
+          close: "Close",
+          errorPrefix: "Error",
+          pingPrefix: "Ping",
+          term: "Term",
+          publicationSingular: "Publication",
+          collectibleSingular: "Collectible",
+
           spec_name_pt: "Name (PT)",
           spec_name_en: "Name (EN)",
           spec_name_jp: "Name (JP)",
@@ -787,6 +801,13 @@
           language: "言語",
           footerAuthor: "作者",
           footerVersion: "v0.1",
+
+          close: "閉じる",
+          errorPrefix: "エラー",
+          pingPrefix: "Ping",
+          term: "用語",
+          publicationSingular: "出版物",
+          collectibleSingular: "コレクション",
 
           spec_name_pt: "名前（PT）",
           spec_name_en: "名前（EN）",
@@ -915,6 +936,12 @@
         setText("hubCollectiblesLabel", t("hubCollectiblesLabel"));
         setText("hubCollectiblesHint", t("hubCollectiblesHint"));
 
+        // ✅ Franchise title agora acompanha o idioma
+        if (state.view === "franchise") {
+          const ft = document.getElementById("franchiseTitle");
+          if (ft) ft.textContent = formatFranchise(state.franchise);
+        }
+
         const ic = document.getElementById("inputCharacterSearch");
         if (ic) ic.placeholder = t("searchCharacters");
 
@@ -942,6 +969,10 @@
 
         const langBtnEl = document.getElementById("langBtn");
         if (langBtnEl) langBtnEl.setAttribute("aria-label", t("language"));
+
+        // ✅ aria-label do close do modal traduzido
+        const closeBtn = document.getElementById("modalClose");
+        if (closeBtn) closeBtn.setAttribute("aria-label", t("close"));
 
         updateFooter();
         setConnectionState(state.connMode, state.connDetail);
@@ -1100,7 +1131,7 @@
       async function pingSupabase() {
         try {
           const { error } = await supabase.from("characters").select("id").limit(1);
-          if (error) setConnectionState("error", `Ping: ${error.message}`);
+          if (error) setConnectionState("error", `${t("pingPrefix")}: ${error.message}`);
           else setConnectionState("online", "");
         } catch {
           setConnectionState("offline", t("noInternet"));
@@ -1126,7 +1157,7 @@
           btn.innerHTML = `<span>${escapeHtml(c.label)}</span><small></small>`;
           btn.addEventListener("click", () => {
             state.franchise = c.key;
-            document.getElementById("franchiseTitle").textContent = c.label;
+            document.getElementById("franchiseTitle").textContent = formatFranchise(c.key);
             showView("franchise", true);
           });
           homeCategories.appendChild(btn);
@@ -1234,9 +1265,9 @@
 
           charactersStatus.textContent = list.length
             ? `${list.length} ${t("charactersItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
-            : `Erro: ${error.message}`;
+            : `${t("errorPrefix")}: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro: ${error.message}`);
+          if (!list.length) goOffline(`${t("errorPrefix")}: ${error.message}`);
           return;
         }
 
@@ -1364,9 +1395,9 @@
 
           glossaryStatus.textContent = list.length
             ? `${list.length} ${t("terms")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
-            : `Erro: ${error.message}`;
+            : `${t("errorPrefix")}: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro: ${error.message}`);
+          if (!list.length) goOffline(`${t("errorPrefix")}: ${error.message}`);
           return;
         }
 
@@ -1418,7 +1449,7 @@
           const el = document.createElement("div");
           el.className = "item";
 
-          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Term";
+          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || t("term");
           el.innerHTML = `
             <div class="nameLine">
               <div class="name">${escapeHtml(title)}</div>
@@ -1467,7 +1498,7 @@
       let publicationsCache = [];
 
       function pubDisplayTitle(p) {
-        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publication";
+        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || t("publicationSingular");
       }
 
       async function openPublications() {
@@ -1509,9 +1540,9 @@
 
           publicationsStatus.textContent = list.length
             ? `${list.length} ${t("publicationsItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
-            : `Erro: ${error.message}`;
+            : `${t("errorPrefix")}: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro: ${error.message}`);
+          if (!list.length) goOffline(`${t("errorPrefix")}: ${error.message}`);
           return;
         }
 
@@ -1630,7 +1661,7 @@
       let collectiblesCache = [];
 
       function colDisplayName(it) {
-        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Collectible";
+        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || t("collectibleSingular");
       }
 
       async function openCollectibles() {
@@ -1672,9 +1703,9 @@
 
           collectiblesStatus.textContent = list.length
             ? `${list.length} ${t("collectiblesItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
-            : `Erro: ${error.message}`;
+            : `${t("errorPrefix")}: ${error.message}`;
 
-          if (!list.length) goOffline(`Erro: ${error.message}`);
+          if (!list.length) goOffline(`${t("errorPrefix")}: ${error.message}`);
           return;
         }
 
