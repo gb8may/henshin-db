@@ -500,7 +500,7 @@
         </section>
       </main>
 
-      <footer>v0.1 · Henshin DB · Author: Mayara Gouveia</footer>
+      <footer><span id="footerText">v0.1 · Henshin DB · Author: Mayara Gouveia</span></footer>
     </div>
 
     <div class="modalOverlay" id="modalOverlay" role="dialog" aria-modal="true">
@@ -535,11 +535,13 @@
       const headerSubtitle = document.getElementById("headerSubtitle");
       const headerChip = document.getElementById("headerChip");
       const offlineStatus = document.getElementById("offlineStatus");
+      const footerText = document.getElementById("footerText");
 
       const I18N = {
         pt: {
           home: "Home",
           themes: "Temas",
+          theme: "Tema",
           chooseTheme: "Escolha um tema para navegar.",
           offline: "Offline",
           offlineTitle: "Sem conexão",
@@ -574,11 +576,68 @@
           connError: "Conexão com erro",
           loading: "Carregando...",
           noResults: "Nenhum resultado.",
-          noDetails: "Sem detalhes."
+          noDetails: "Sem detalhes.",
+          noCacheAvailable: "Sem cache disponível.",
+          deviceNoInternet: "Seu dispositivo está sem internet.",
+          noInternet: "Sem conexão com a internet.",
+          testingConnection: "Testando conexão...",
+          stillNoResponse: "Ainda sem resposta do Supabase. Tente novamente em instantes.",
+          cacheSuffix: "cache",
+          items: "itens",
+          terms: "termos",
+          publicationsItems: "itens",
+          charactersItems: "itens",
+          collectiblesItems: "itens",
+          justNow: "agora há pouco",
+          minutesShort: "min",
+          hoursShort: "h",
+          daysShort: "d",
+          language: "Idioma",
+          footerAuthor: "Autora",
+          footerVersion: "v0.1",
+
+          spec_name_pt: "Nome (PT)",
+          spec_name_en: "Nome (EN)",
+          spec_name_jp: "Nome (JP)",
+          spec_title_pt: "Título (PT)",
+          spec_title_en: "Título (EN)",
+          spec_title_jp: "Título (JP)",
+          spec_romaji: "Romaji",
+          spec_franchise: "Franquia",
+          spec_year: "Ano",
+          spec_month: "Mês",
+          spec_era: "Era",
+          spec_description: "Descrição",
+          spec_powers: "Poderes",
+          spec_equipment: "Equipamentos",
+          spec_actor: "Ator",
+          spec_civil_pt: "Nome civil (PT)",
+          spec_civil_en: "Nome civil (EN)",
+          spec_civil_jp: "Nome civil (JP)",
+          spec_type: "Tipo",
+          spec_publisher: "Editora",
+          spec_issue: "Edição",
+          spec_language: "Idioma",
+          spec_isbn: "ISBN",
+          spec_notes: "Notas",
+          spec_url: "URL",
+          spec_line: "Linha",
+          spec_manufacturer: "Fabricante",
+          spec_series_code: "Series code",
+          spec_sku: "SKU",
+          spec_status: "Status",
+          spec_rarity: "Raridade",
+          spec_jp_search: "JP search",
+          spec_category: "Categoria",
+          spec_explanation: "Explicação",
+          spec_jp: "JP",
+          spec_en: "EN",
+          spec_pt: "PT"
         },
         en: {
           home: "Home",
           themes: "Themes",
+          theme: "Theme",
           chooseTheme: "Pick a theme to browse.",
           offline: "Offline",
           offlineTitle: "No connection",
@@ -613,11 +672,68 @@
           connError: "Connection error",
           loading: "Loading...",
           noResults: "No results.",
-          noDetails: "No details."
+          noDetails: "No details.",
+          noCacheAvailable: "No cache available.",
+          deviceNoInternet: "Your device is offline.",
+          noInternet: "No internet connection.",
+          testingConnection: "Testing connection...",
+          stillNoResponse: "Still no response from Supabase. Try again in a moment.",
+          cacheSuffix: "cache",
+          items: "items",
+          terms: "terms",
+          publicationsItems: "items",
+          charactersItems: "items",
+          collectiblesItems: "items",
+          justNow: "just now",
+          minutesShort: "min",
+          hoursShort: "h",
+          daysShort: "d",
+          language: "Language",
+          footerAuthor: "Author",
+          footerVersion: "v0.1",
+
+          spec_name_pt: "Name (PT)",
+          spec_name_en: "Name (EN)",
+          spec_name_jp: "Name (JP)",
+          spec_title_pt: "Title (PT)",
+          spec_title_en: "Title (EN)",
+          spec_title_jp: "Title (JP)",
+          spec_romaji: "Romaji",
+          spec_franchise: "Franchise",
+          spec_year: "Year",
+          spec_month: "Month",
+          spec_era: "Era",
+          spec_description: "Description",
+          spec_powers: "Powers",
+          spec_equipment: "Equipment",
+          spec_actor: "Actor",
+          spec_civil_pt: "Civil name (PT)",
+          spec_civil_en: "Civil name (EN)",
+          spec_civil_jp: "Civil name (JP)",
+          spec_type: "Type",
+          spec_publisher: "Publisher",
+          spec_issue: "Issue",
+          spec_language: "Language",
+          spec_isbn: "ISBN",
+          spec_notes: "Notes",
+          spec_url: "URL",
+          spec_line: "Line",
+          spec_manufacturer: "Manufacturer",
+          spec_series_code: "Series code",
+          spec_sku: "SKU",
+          spec_status: "Status",
+          spec_rarity: "Rarity",
+          spec_jp_search: "JP search",
+          spec_category: "Category",
+          spec_explanation: "Explanation",
+          spec_jp: "JP",
+          spec_en: "EN",
+          spec_pt: "PT"
         },
         ja: {
           home: "ホーム",
           themes: "テーマ",
+          theme: "テーマ",
           chooseTheme: "テーマを選んでください。",
           offline: "オフライン",
           offlineTitle: "接続なし",
@@ -652,7 +768,63 @@
           connError: "接続エラー",
           loading: "読み込み中…",
           noResults: "結果なし。",
-          noDetails: "詳細なし。"
+          noDetails: "詳細なし。",
+          noCacheAvailable: "キャッシュがありません。",
+          deviceNoInternet: "端末がオフラインです。",
+          noInternet: "インターネット接続なし。",
+          testingConnection: "接続を確認中…",
+          stillNoResponse: "Supabase から応答がありません。しばらくして再試行してください。",
+          cacheSuffix: "キャッシュ",
+          items: "件",
+          terms: "件",
+          publicationsItems: "件",
+          charactersItems: "件",
+          collectiblesItems: "件",
+          justNow: "たった今",
+          minutesShort: "分",
+          hoursShort: "時間",
+          daysShort: "日",
+          language: "言語",
+          footerAuthor: "作者",
+          footerVersion: "v0.1",
+
+          spec_name_pt: "名前（PT）",
+          spec_name_en: "名前（EN）",
+          spec_name_jp: "名前（JP）",
+          spec_title_pt: "タイトル（PT）",
+          spec_title_en: "タイトル（EN）",
+          spec_title_jp: "タイトル（JP）",
+          spec_romaji: "ローマ字",
+          spec_franchise: "シリーズ",
+          spec_year: "年",
+          spec_month: "月",
+          spec_era: "時代",
+          spec_description: "説明",
+          spec_powers: "能力",
+          spec_equipment: "装備",
+          spec_actor: "俳優",
+          spec_civil_pt: "本名（PT）",
+          spec_civil_en: "本名（EN）",
+          spec_civil_jp: "本名（JP）",
+          spec_type: "種類",
+          spec_publisher: "出版社",
+          spec_issue: "号",
+          spec_language: "言語",
+          spec_isbn: "ISBN",
+          spec_notes: "メモ",
+          spec_url: "URL",
+          spec_line: "ライン",
+          spec_manufacturer: "メーカー",
+          spec_series_code: "シリーズコード",
+          spec_sku: "SKU",
+          spec_status: "状態",
+          spec_rarity: "レア度",
+          spec_jp_search: "JP検索",
+          spec_category: "カテゴリ",
+          spec_explanation: "解説",
+          spec_jp: "JP",
+          spec_en: "EN",
+          spec_pt: "PT"
         }
       };
 
@@ -697,6 +869,8 @@
         return (I18N[lang] && I18N[lang][key]) || (I18N.en[key]) || key;
       }
 
+      const L = (key) => t(key);
+
       function applyHtmlLang() {
         const htmlLang = window.__lang === "pt" ? "pt-BR" : (window.__lang === "ja" ? "ja-JP" : "en");
         document.documentElement.lang = htmlLang;
@@ -706,6 +880,13 @@
         const el = document.getElementById(id);
         if (!el) return;
         el.textContent = value;
+      }
+
+      function updateFooter() {
+        if (!footerText) return;
+        const v = t("footerVersion");
+        const authorLabel = t("footerAuthor");
+        footerText.textContent = `${v} · Henshin DB · ${authorLabel}: Mayara Gouveia`;
       }
 
       function applyI18nStatic() {
@@ -759,6 +940,10 @@
         const linkBtn = document.getElementById("modalLinkBtn");
         if (linkBtn) linkBtn.textContent = t("modalOpenLink");
 
+        const langBtnEl = document.getElementById("langBtn");
+        if (langBtnEl) langBtnEl.setAttribute("aria-label", t("language"));
+
+        updateFooter();
         setConnectionState(state.connMode, state.connDetail);
         showView(state.view, true);
       }
@@ -772,6 +957,9 @@
         }
         applyI18nStatic();
         rerenderCurrentLists();
+        if (modalOverlay.classList.contains("show")) {
+          closeModal();
+        }
       }
 
       function initLang() {
@@ -781,11 +969,12 @@
       }
 
       function formatFranchise(key) {
-        if (!key) return "Tema";
+        if (!key) return t("theme");
         if (key === "kamen rider") return "Kamen Rider";
         if (key === "super sentai") return "Super Sentai";
         if (key === "metal hero") return "Metal Hero";
         if (key === "ultraman") return "Ultraman";
+        if (key === "cybercops") return "Cybercops";
         return key;
       }
 
@@ -868,12 +1057,12 @@
       function fmtAge(ts) {
         if (!ts) return "";
         const mins = Math.round((Date.now() - ts) / 60000);
-        if (mins < 1) return t("loading").includes("...") ? "agora há pouco" : "just now";
-        if (mins < 60) return `${mins} min`;
+        if (mins < 1) return t("justNow");
+        if (mins < 60) return `${mins} ${t("minutesShort")}`;
         const hrs = Math.round(mins / 60);
-        if (hrs < 24) return `${hrs} h`;
+        if (hrs < 24) return `${hrs} ${t("hoursShort")}`;
         const days = Math.round(hrs / 24);
-        return `${days} d`;
+        return `${days} ${t("daysShort")}`;
       }
 
       const views = {
@@ -906,7 +1095,7 @@
       }
 
       window.addEventListener("online", () => setConnectionState("online", ""));
-      window.addEventListener("offline", () => setConnectionState("offline", "Seu dispositivo está sem internet."));
+      window.addEventListener("offline", () => setConnectionState("offline", t("deviceNoInternet")));
 
       async function pingSupabase() {
         try {
@@ -914,7 +1103,7 @@
           if (error) setConnectionState("error", `Ping: ${error.message}`);
           else setConnectionState("online", "");
         } catch {
-          setConnectionState("offline", "Sem conexão com a internet.");
+          setConnectionState("offline", t("noInternet"));
         }
       }
 
@@ -957,10 +1146,10 @@
 
       document.getElementById("btnOfflineGoHome").addEventListener("click", () => showView("home", true));
       document.getElementById("btnOfflineRetry").addEventListener("click", async () => {
-        setConnectionState("offline", "Testando conexão...");
+        setConnectionState("offline", t("testingConnection"));
         await pingSupabase();
         if (headerChip.textContent === t("online")) showView("home", true);
-        else goOffline("Ainda sem resposta do Supabase. Tente novamente em instantes.");
+        else goOffline(t("stillNoResponse"));
       });
 
       const modalOverlay = document.getElementById("modalOverlay");
@@ -1024,8 +1213,12 @@
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           charactersCache = list;
-          charactersStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
-          if (!list.length) goOffline("Sem internet e nenhum cache de personagens encontrado para esse tema.");
+
+          charactersStatus.textContent = list.length
+            ? `${list.length} ${t("charactersItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : t("noCacheAvailable");
+
+          if (!list.length) goOffline(t("offlineHint"));
           return;
         }
 
@@ -1038,15 +1231,19 @@
           const cached = loadCache("characters", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           charactersCache = list;
-          charactersStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de personagens. (${error.message})`);
+
+          charactersStatus.textContent = list.length
+            ? `${list.length} ${t("charactersItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : `Erro: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro: ${error.message}`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => safeText(a.name_en).localeCompare(safeText(b.name_en), "en", { sensitivity: "base" }));
         charactersCache = list;
-        charactersStatus.textContent = `${list.length}`;
+        charactersStatus.textContent = `${list.length} ${t("charactersItems")}`;
         saveCache("characters", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -1098,19 +1295,19 @@
             setModalLink("");
 
             const rows = [
-              specRow("Nome (PT)", c.name_pt),
-              specRow("Name (EN)", c.name_en),
-              specRow("名前 (JP)", c.name_jp),
-              specRow("Romaji", c.romaji),
-              specRow("Franquia", formatFranchise(c.franchise)),
-              specRow("Ano", c.year),
-              specRow("Nome civil (PT)", c.civil_name_pt),
-              specRow("Civil name (EN)", c.civil_name_en),
-              specRow("本名 (JP)", c.civil_name_jp),
-              specRow("Ator", c.actor_name),
-              specRow("Descrição", c.description),
-              specRow("Poderes", c.powers),
-              specRow("Equipamentos", c.equipment)
+              specRow(L("spec_name_pt"), c.name_pt),
+              specRow(L("spec_name_en"), c.name_en),
+              specRow(L("spec_name_jp"), c.name_jp),
+              specRow(L("spec_romaji"), c.romaji),
+              specRow(L("spec_franchise"), formatFranchise(c.franchise)),
+              specRow(L("spec_year"), c.year),
+              specRow(L("spec_civil_pt"), c.civil_name_pt),
+              specRow(L("spec_civil_en"), c.civil_name_en),
+              specRow(L("spec_civil_jp"), c.civil_name_jp),
+              specRow(L("spec_actor"), c.actor_name),
+              specRow(L("spec_description"), c.description),
+              specRow(L("spec_powers"), c.powers),
+              specRow(L("spec_equipment"), c.equipment)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1147,8 +1344,12 @@
           const cached = loadCache("glossary", "global");
           const list = Array.isArray(cached.data) ? cached.data : [];
           glossaryCache = list;
-          glossaryStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
-          if (!list.length) goOffline("Sem internet e nenhum cache de glossário encontrado.");
+
+          glossaryStatus.textContent = list.length
+            ? `${list.length} ${t("terms")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : t("noCacheAvailable");
+
+          if (!list.length) goOffline(t("offlineHint"));
           return;
         }
 
@@ -1160,8 +1361,12 @@
           const cached = loadCache("glossary", "global");
           const list = Array.isArray(cached.data) ? cached.data : [];
           glossaryCache = list;
-          glossaryStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de glossário. (${error.message})`);
+
+          glossaryStatus.textContent = list.length
+            ? `${list.length} ${t("terms")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : `Erro: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro: ${error.message}`);
           return;
         }
 
@@ -1174,7 +1379,7 @@
           )
         );
         glossaryCache = list;
-        glossaryStatus.textContent = `${list.length}`;
+        glossaryStatus.textContent = `${list.length} ${t("terms")}`;
         saveCache("glossary", "global", list);
         setConnectionState("online", "");
       }
@@ -1213,7 +1418,7 @@
           const el = document.createElement("div");
           el.className = "item";
 
-          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Termo";
+          const title = safeText(t0.pt) || safeText(t0.en) || safeText(t0.jp) || "Term";
           el.innerHTML = `
             <div class="nameLine">
               <div class="name">${escapeHtml(title)}</div>
@@ -1235,12 +1440,12 @@
             setModalLink("");
 
             const rows = [
-              specRow("JP", t0.jp),
-              specRow("Romaji", t0.romaji),
-              specRow("EN", t0.en),
-              specRow("PT", t0.pt),
-              specRow("Categoria", t0.category),
-              specRow("Explicação", t0.explanation)
+              specRow(L("spec_jp"), t0.jp),
+              specRow(L("spec_romaji"), t0.romaji),
+              specRow(L("spec_en"), t0.en),
+              specRow(L("spec_pt"), t0.pt),
+              specRow(L("spec_category"), t0.category),
+              specRow(L("spec_explanation"), t0.explanation)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1262,7 +1467,7 @@
       let publicationsCache = [];
 
       function pubDisplayTitle(p) {
-        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publicação";
+        return pickFieldByLang(p, "title") || safeText(p.title_en) || safeText(p.title_pt) || safeText(p.title_jp) || "Publication";
       }
 
       async function openPublications() {
@@ -1283,8 +1488,12 @@
           const cached = loadCache("publications", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           publicationsCache = list;
-          publicationsStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
-          if (!list.length) goOffline("Sem internet e nenhum cache de publicações encontrado para esse tema.");
+
+          publicationsStatus.textContent = list.length
+            ? `${list.length} ${t("publicationsItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : t("noCacheAvailable");
+
+          if (!list.length) goOffline(t("offlineHint"));
           return;
         }
 
@@ -1297,8 +1506,12 @@
           const cached = loadCache("publications", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           publicationsCache = list;
-          publicationsStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de publicações. (${error.message})`);
+
+          publicationsStatus.textContent = list.length
+            ? `${list.length} ${t("publicationsItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : `Erro: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro: ${error.message}`);
           return;
         }
 
@@ -1310,7 +1523,7 @@
         });
 
         publicationsCache = list;
-        publicationsStatus.textContent = `${list.length}`;
+        publicationsStatus.textContent = `${list.length} ${t("publicationsItems")}`;
         saveCache("publications", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -1382,20 +1595,20 @@
             setModalLink(p.url);
 
             const rows = [
-              specRow("Título (PT)", p.title_pt),
-              specRow("Title (EN)", p.title_en),
-              specRow("タイトル (JP)", p.title_jp),
-              specRow("Tipo", p.pub_type),
-              specRow("Editora", p.publisher),
-              specRow("Edição", p.issue),
-              specRow("Ano", p.year),
-              specRow("Mês", p.month),
-              specRow("Idioma", p.language),
-              specRow("ISBN", p.isbn),
-              specRow("Era", p.era),
-              specRow("Franquia", formatFranchise(p.franchise)),
-              specRow("Notas", p.notes),
-              specRow("URL", p.url)
+              specRow(L("spec_title_pt"), p.title_pt),
+              specRow(L("spec_title_en"), p.title_en),
+              specRow(L("spec_title_jp"), p.title_jp),
+              specRow(L("spec_type"), p.pub_type),
+              specRow(L("spec_publisher"), p.publisher),
+              specRow(L("spec_issue"), p.issue),
+              specRow(L("spec_year"), p.year),
+              specRow(L("spec_month"), p.month),
+              specRow(L("spec_language"), p.language),
+              specRow(L("spec_isbn"), p.isbn),
+              specRow(L("spec_era"), p.era),
+              specRow(L("spec_franchise"), formatFranchise(p.franchise)),
+              specRow(L("spec_notes"), p.notes),
+              specRow(L("spec_url"), p.url)
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1417,7 +1630,7 @@
       let collectiblesCache = [];
 
       function colDisplayName(it) {
-        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Colecionável";
+        return pickFieldByLang(it, "name") || safeText(it.name_en) || safeText(it.name_pt) || safeText(it.name_jp) || "Collectible";
       }
 
       async function openCollectibles() {
@@ -1438,8 +1651,12 @@
           const cached = loadCache("collectibles", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           collectiblesCache = list;
-          collectiblesStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : "Sem cache disponível.";
-          if (!list.length) goOffline("Sem internet e nenhum cache de colecionáveis encontrado para esse tema.");
+
+          collectiblesStatus.textContent = list.length
+            ? `${list.length} ${t("collectiblesItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : t("noCacheAvailable");
+
+          if (!list.length) goOffline(t("offlineHint"));
           return;
         }
 
@@ -1452,15 +1669,19 @@
           const cached = loadCache("collectibles", state.franchise);
           const list = Array.isArray(cached.data) ? cached.data : [];
           collectiblesCache = list;
-          collectiblesStatus.textContent = list.length ? `${list.length} (cache · ${fmtAge(cached.ts)})` : `Erro: ${error.message}`;
-          if (!list.length) goOffline(`Erro no Supabase e sem cache de colecionáveis. (${error.message})`);
+
+          collectiblesStatus.textContent = list.length
+            ? `${list.length} ${t("collectiblesItems")} (${t("cacheSuffix")} · ${fmtAge(cached.ts)})`
+            : `Erro: ${error.message}`;
+
+          if (!list.length) goOffline(`Erro: ${error.message}`);
           return;
         }
 
         const list = Array.isArray(data) ? data : [];
         list.sort((a, b) => colDisplayName(a).localeCompare(colDisplayName(b), "pt", { sensitivity: "base" }));
         collectiblesCache = list;
-        collectiblesStatus.textContent = `${list.length}`;
+        collectiblesStatus.textContent = `${list.length} ${t("collectiblesItems")}`;
         saveCache("collectibles", state.franchise, list);
         setConnectionState("online", "");
       }
@@ -1526,21 +1747,21 @@
             setModalLink("");
 
             const rows = [
-              specRow("Nome (PT)", it.name_pt),
-              specRow("Name (EN)", it.name_en),
-              specRow("名前 (JP)", it.name_jp),
-              specRow("Linha", it.line),
-              specRow("Tipo", it.item_type),
-              specRow("Fabricante", it.manufacturer),
-              specRow("Ano", it.year),
-              specRow("Era", it.era),
-              specRow("Series code", it.series_code),
-              specRow("SKU", it.sku_code),
-              specRow("Status", it.status),
-              specRow("Raridade", it.rarity),
-              specRow("JP search", it.jp_search),
-              specRow("Notas", it.notes),
-              specRow("Franquia", formatFranchise(it.franchise))
+              specRow(L("spec_name_pt"), it.name_pt),
+              specRow(L("spec_name_en"), it.name_en),
+              specRow(L("spec_name_jp"), it.name_jp),
+              specRow(L("spec_line"), it.line),
+              specRow(L("spec_type"), it.item_type),
+              specRow(L("spec_manufacturer"), it.manufacturer),
+              specRow(L("spec_year"), it.year),
+              specRow(L("spec_era"), it.era),
+              specRow(L("spec_series_code"), it.series_code),
+              specRow(L("spec_sku"), it.sku_code),
+              specRow(L("spec_status"), it.status),
+              specRow(L("spec_rarity"), it.rarity),
+              specRow(L("spec_jp_search"), it.jp_search),
+              specRow(L("spec_notes"), it.notes),
+              specRow(L("spec_franchise"), formatFranchise(it.franchise))
             ].filter(Boolean).join("");
 
             modalBody.innerHTML = renderSpecCard(rows);
@@ -1601,7 +1822,7 @@
         showView("home", true);
         pingSupabase();
 
-        if (!navigator.onLine) setConnectionState("offline", "Seu dispositivo está sem internet.");
+        if (!navigator.onLine) setConnectionState("offline", t("deviceNoInternet"));
 
         if ("serviceWorker" in navigator) {
           window.addEventListener("load", async () => {
