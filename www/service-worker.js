@@ -1,15 +1,15 @@
 const CACHE_NAME = "henshin-db-v3";
 const APP_SHELL = [
-  "www/",
-  "www/index.html",
-  "www/manifest.webmanifest",
-  "www/service-worker.js",
-  "www/icons/icon-192.png",
-  "www/icons/icon-512.png",
-  "www/icons/maskable-512.png",
-  "www/icons/flag-br.svg",
-  "www/icons/flag-ca.svg",
-  "www/icons/flag-jp.svg"
+  "/",
+  "/www/index.html",
+  "/www/manifest.webmanifest",
+  "/www/service-worker.js",
+  "/www/icons/icon-192.png",
+  "/www/icons/icon-512.png",
+  "/www/icons/maskable-512.png",
+  "/www/icons/flag-br.svg",
+  "/www/icons/flag-ca.svg",
+  "/www/icons/flag-jp.svg"
 ];
 
 self.addEventListener("install", (event) => {
