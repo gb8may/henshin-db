@@ -1,15 +1,15 @@
 [[headers]]
-  for = "/service-worker.js"
+  for = "/www/service-worker.js"
   [headers.values]
     Cache-Control = "no-cache"
 
 [[headers]]
-  for = "/manifest.webmanifest"
+  for = "/wwww/manifest.webmanifest"
   [headers.values]
     Content-Type = "application/manifest+json; charset=utf-8"
     Cache-Control = "no-cache"
 
 [[headers]]
-  for = "/icons/*"
+  for = "/www/icons/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
