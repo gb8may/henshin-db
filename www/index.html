@@ -3,31 +3,10 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
     <title>Henshin DB</title>
 
-    <!-- ✅ Open Graph / social preview -->
-    <meta property="og:site_name" content="Henshin DB" />
-    <meta property="og:title" content="Henshin DB" />
-    <meta
-      property="og:description"
-      content="Database de Henshin Heroes: Kamen Rider, Super Sentai, Metal Hero, Ultraman e mais."
-    />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="https://henshindb.netlify.app/" />
-    <meta property="og:image" content="https://henshindb.netlify.app/og/og.png" />
-    <meta property="og:image:width" content="1200" />
-    <meta property="og:image:height" content="630" />
-    <meta property="og:image:alt" content="Henshin DB logo" />
-
-    <!-- ✅ Twitter -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="Henshin DB" />
-    <meta
-      name="twitter:description"
-      content="Database de Henshin Heroes: Kamen Rider, Super Sentai, Metal Hero, Ultraman e mais."
-    />
-    <meta name="twitter:image" content="https://henshindb.netlify.app/og/og.png" />
-
+    <!-- PWA -->
     <link rel="manifest" href="/manifest.webmanifest" />
     <meta name="theme-color" content="#0b0e14" />
     <meta name="application-name" content="Henshin DB" />
@@ -39,6 +18,21 @@
     <link rel="apple-touch-icon" href="/icons/icon-192.png" />
     <link rel="icon" sizes="192x192" href="/icons/icon-192.png" />
     <link rel="icon" sizes="512x512" href="/icons/icon-512.png" />
+
+    <!-- ✅ Social preview (OG / Twitter) -->
+    <meta property="og:site_name" content="Henshin DB" />
+    <meta property="og:title" content="Henshin DB" />
+    <meta property="og:description" content="A Tokusatsu database: characters, glossary, publications, collectibles and more." />
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="https://henshindb.netlify.app/" />
+    <meta property="og:image" content="https://henshindb.netlify.app/og/og.png" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Henshin DB" />
+    <meta name="twitter:description" content="A Tokusatsu database: characters, glossary, publications, collectibles and more." />
+    <meta name="twitter:image" content="https://henshindb.netlify.app/og/og.png" />
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
@@ -369,6 +363,19 @@
         justify-content: center;
       }
       .langDropdown img { width: 22px; height: 14px; display: block; border-radius: 2px; }
+
+      /* Cards com botões de link */
+      .linkActions { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+      .linkActionBtn{
+        border: 1px solid var(--border);
+        background: rgba(255,255,255,0.06);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 8px 10px;
+        font-size: 12px;
+        cursor: pointer;
+      }
+      .linkActionBtn:active { transform: translateY(1px); }
     </style>
   </head>
 
@@ -521,6 +528,54 @@
           <div class="muted" id="collectiblesStatus"></div>
           <div class="list" id="collectiblesList" style="margin-top: 12px;"></div>
         </section>
+
+        <!-- ✅ LINKS ÚTEIS (hub) -->
+        <section class="view" id="viewUsefulLinks">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToHomeFromUseful" type="button">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="usefulTitle">Links Úteis</div>
+          <div class="sectionHint" id="usefulHint">Selecione uma seção.</div>
+
+          <div class="grid">
+            <button class="btn" id="btnGoActors" type="button">
+              <span id="usefulActorsLabel">Atores e Atrizes</span>
+              <small id="usefulActorsHint">Redes oficiais</small>
+            </button>
+
+            <button class="btn" id="btnGoCommunity" type="button">
+              <span id="usefulCommunityLabel">Comunidade</span>
+              <small id="usefulCommunityHint">Perfis de IG</small>
+            </button>
+
+            <button class="btn" id="btnGoLives" type="button">
+              <span id="usefulLivesLabel">Lives</span>
+              <small id="usefulLivesHint">Canais do YouTube</small>
+            </button>
+
+            <button class="btn" id="btnGoCollectiblesLinks" type="button">
+              <span id="usefulCollectiblesLabel">Colecionáveis</span>
+              <small id="usefulCollectiblesHint">Mais perfis de IG</small>
+            </button>
+          </div>
+        </section>
+
+        <!-- ✅ LINKS ÚTEIS (lista) -->
+        <section class="view" id="viewUsefulList">
+          <div class="backRow">
+            <button class="ghostBtn" id="btnBackToUsefulHub" type="button">Voltar</button>
+          </div>
+
+          <div class="sectionTitle" id="usefulListTitle">Links</div>
+
+          <div class="searchBox">
+            <input type="search" id="inputUsefulSearch" placeholder="Buscar..." />
+          </div>
+
+          <div class="muted" id="usefulListStatus"></div>
+          <div class="list" id="usefulList" style="margin-top: 12px;"></div>
+        </section>
       </main>
 
       <footer><span id="footerText">v0.1 · Henshin DB · Author: Mayara Gouveia</span></footer>
@@ -544,6 +599,8 @@
     </div>
 
     <script>
+      const APP_ORIGIN = "https://henshindb.netlify.app";
+
       const SUPABASE_URL = "https://grvmisyiyxzlqfqgponm.supabase.co";
       const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imdydm1pc3lpeXh6bHFmcWdwb25tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyOTgwNTgsImV4cCI6MjA4MDg3NDA1OH0.VPzEEvayTYxVZ7D56h7pWFCVDykciO7OCmGrmD1J0XE";
       const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -618,6 +675,15 @@
           language: "Idioma",
           footerAuthor: "Autora",
           footerVersion: "v0.1",
+
+          usefulLinks: "Links Úteis",
+          usefulHint: "Selecione uma seção.",
+          usefulActors: "Atores e Atrizes",
+          usefulCommunity: "Comunidade",
+          usefulLives: "Lives",
+          usefulCollectibles: "Colecionáveis",
+          usefulSearch: "Buscar...",
+          verifiedHint: "Links oficiais / autorizados",
 
           spec_name_pt: "Nome (PT)",
           spec_name_en: "Nome (EN)",
@@ -715,6 +781,15 @@
           footerAuthor: "Author",
           footerVersion: "v0.1",
 
+          usefulLinks: "Useful Links",
+          usefulHint: "Pick a section.",
+          usefulActors: "Actors & Actresses",
+          usefulCommunity: "Community",
+          usefulLives: "Lives",
+          usefulCollectibles: "Collectibles",
+          usefulSearch: "Search...",
+          verifiedHint: "Official / authorized links",
+
           spec_name_pt: "Name (PT)",
           spec_name_en: "Name (EN)",
           spec_name_jp: "Name (JP)",
@@ -810,6 +885,15 @@
           language: "言語",
           footerAuthor: "作者",
           footerVersion: "v0.1",
+
+          usefulLinks: "便利リンク",
+          usefulHint: "セクションを選んでください。",
+          usefulActors: "俳優・女優",
+          usefulCommunity: "コミュニティ",
+          usefulLives: "ライブ",
+          usefulCollectibles: "コレクション",
+          usefulSearch: "検索…",
+          verifiedHint: "公式 / 許可済みリンク",
 
           spec_name_pt: "名前（PT）",
           spec_name_en: "名前（EN）",
@@ -929,6 +1013,19 @@
         setText("btnBackToFranchiseFromPublications", t("back"));
         setText("btnBackToFranchiseFromCollectibles", t("back"));
 
+        // Links úteis
+        setText("btnBackToHomeFromUseful", t("back"));
+        setText("btnBackToUsefulHub", t("back"));
+        setText("usefulTitle", t("usefulLinks"));
+        setText("usefulHint", t("usefulHint"));
+        setText("usefulActorsLabel", t("usefulActors"));
+        setText("usefulCommunityLabel", t("usefulCommunity"));
+        setText("usefulLivesLabel", t("usefulLives"));
+        setText("usefulCollectiblesLabel", t("usefulCollectibles"));
+
+        const iu = document.getElementById("inputUsefulSearch");
+        if (iu) iu.placeholder = t("usefulSearch");
+
         setText("hubCharactersLabel", t("hubCharactersLabel"));
         setText("hubCharactersHint", t("hubCharactersHint"));
         setText("hubGlossaryLabel", t("hubGlossaryLabel"));
@@ -979,6 +1076,7 @@
           try { localStorage.setItem(LANG_STORAGE_KEY, lang); } catch {}
         }
         applyI18nStatic();
+        renderHome();               // ✅ home re-render pra “Links Úteis” traduzir
         rerenderCurrentLists();
         if (modalOverlay.classList.contains("show")) closeModal();
       }
@@ -1037,18 +1135,12 @@
         return `${u}${sep}v=${Date.now()}`;
       }
 
+      // ✅ pega base_pt/base_en/base_jp (ex: description_pt) e faz fallback
       function pickFieldByLang(obj, base) {
         const lang = window.__lang || "en";
         const map = { pt: `${base}_pt`, en: `${base}_en`, ja: `${base}_jp` };
         const key = map[lang] || map.en;
-        return safeText(obj?.[key]) || safeText(obj?.[map.en]) || safeText(obj?.[map.pt]) || safeText(obj?.[map.ja]) || "";
-      }
-
-      // ✅ pega campo traduzido (base_pt/en/jp) e faz fallback pra legacyBase (ex: "description" / "notes")
-      function pickWithFallback(obj, base, legacyBase) {
-        const v = pickFieldByLang(obj, base);
-        if (hasValue(v)) return v;
-        return safeText(obj?.[legacyBase]) || "";
+        return safeText(obj?.[key]) || safeText(obj?.[map.en]) || safeText(obj?.[map.pt]) || safeText(obj?.[map.ja]) || safeText(obj?.[base]) || "";
       }
 
       function setConnectionState(mode, detail) {
@@ -1100,13 +1192,16 @@
         characters: document.getElementById("viewCharacters"),
         glossary: document.getElementById("viewGlossary"),
         publications: document.getElementById("viewPublications"),
-        collectibles: document.getElementById("viewCollectibles")
+        collectibles: document.getElementById("viewCollectibles"),
+        useful: document.getElementById("viewUsefulLinks"),
+        usefulList: document.getElementById("viewUsefulList")
       };
 
       function showView(name, silent) {
         state.view = name;
         for (const k in views) views[k].classList.remove("active", "animIn");
         views[name].classList.add("active", "animIn");
+
         if (name === "home") headerSubtitle.textContent = t("home");
         if (name === "offline") headerSubtitle.textContent = t("offline");
         if (name === "franchise") headerSubtitle.textContent = formatFranchise(state.franchise);
@@ -1114,6 +1209,8 @@
         if (name === "glossary") headerSubtitle.textContent = t("glossary");
         if (name === "publications") headerSubtitle.textContent = t("publications");
         if (name === "collectibles") headerSubtitle.textContent = t("collectibles");
+        if (name === "useful" || name === "usefulList") headerSubtitle.textContent = t("usefulLinks");
+
         if (!silent) applyI18nStatic();
       }
 
@@ -1143,7 +1240,10 @@
           { key: "super sentai", label: "Super Sentai" },
           { key: "metal hero", label: "Metal Hero" },
           { key: "ultraman", label: "Ultraman" },
-          { key: "cybercops", label: "Cybercops" }
+          { key: "cybercops", label: "Cybercops" },
+
+          // ✅ novo
+          { key: "useful_links", label: t("usefulLinks") }
         ];
 
         homeCategories.innerHTML = "";
@@ -1153,6 +1253,10 @@
           btn.type = "button";
           btn.innerHTML = `<span>${escapeHtml(c.label)}</span><small></small>`;
           btn.addEventListener("click", () => {
+            if (c.key === "useful_links") {
+              showView("useful", true);
+              return;
+            }
             state.franchise = c.key;
             document.getElementById("franchiseTitle").textContent = c.label;
             showView("franchise", true);
@@ -1219,6 +1323,7 @@
         modalImage.onerror = () => { modalImageWrap.style.display = "none"; };
       }
 
+      // -------------------- CHARACTERS --------------------
       const charactersTitle = document.getElementById("charactersTitle");
       const charactersStatus = document.getElementById("charactersStatus");
       const charactersList = document.getElementById("charactersList");
@@ -1252,16 +1357,7 @@
 
         const { data, error } = await supabase
           .from("characters")
-          .select([
-            "id",
-            "name_en","name_pt","name_jp",
-            "romaji","franchise","year",
-            "description_en","description_pt","description_jp",
-            "description",
-            "powers","equipment",
-            "civil_name_pt","civil_name_en","civil_name_jp",
-            "actor_name","tags","search_terms"
-          ].join(","))
+          .select("id,name_en,name_pt,name_jp,romaji,franchise,year,description_pt,description_en,description_jp,powers,equipment,civil_name_pt,civil_name_en,civil_name_jp,actor_name,tags,search_terms")
           .eq("franchise", state.franchise);
 
         if (error) {
@@ -1308,7 +1404,8 @@
           const imgUrl = imageUrlForCharacter(c.name_en);
           const displayName = pickFieldByLang(c, "name") || safeText(c.name_en);
 
-          const desc = pickWithFallback(c, "description", "description");
+          // ✅ description traduzida
+          const desc = pickFieldByLang(c, "description");
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1344,7 +1441,7 @@
               specRow(L("spec_civil_en"), c.civil_name_en),
               specRow(L("spec_civil_jp"), c.civil_name_jp),
               specRow(L("spec_actor"), c.actor_name),
-              specRow(L("spec_description"), desc),
+              specRow(L("spec_description"), pickFieldByLang(c, "description")),
               specRow(L("spec_powers"), c.powers),
               specRow(L("spec_equipment"), c.equipment)
             ].filter(Boolean).join("");
@@ -1359,6 +1456,7 @@
 
       inputCharacterSearch.addEventListener("input", () => renderCharactersList(filterCharacters(inputCharacterSearch.value)));
 
+      // -------------------- GLOSSARY --------------------
       const glossaryStatus = document.getElementById("glossaryStatus");
       const glossaryList = document.getElementById("glossaryList");
       const inputGlossarySearch = document.getElementById("inputGlossarySearch");
@@ -1498,6 +1596,7 @@
       inputGlossarySearch.addEventListener("input", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
       selectGlossaryCategory.addEventListener("change", () => renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value)));
 
+      // -------------------- PUBLICATIONS --------------------
       const publicationsTitle = document.getElementById("publicationsTitle");
       const publicationsStatus = document.getElementById("publicationsStatus");
       const publicationsList = document.getElementById("publicationsList");
@@ -1538,16 +1637,7 @@
 
         const { data, error } = await supabase
           .from("publications")
-          .select([
-            "id",
-            "title_en","title_pt","title_jp",
-            "pub_type","publisher","issue","year","month",
-            "isbn","language","franchise","era",
-            "cover_url",
-            "notes_en","notes_pt","notes_jp",
-            "notes",
-            "url","created_at"
-          ].join(","))
+          .select("id,title_en,title_pt,title_jp,pub_type,publisher,issue,year,month,isbn,language,franchise,era,cover_url,notes_pt,notes_en,notes_jp,url,created_at")
           .eq("franchise", state.franchise);
 
         if (error) {
@@ -1598,7 +1688,7 @@
             p.title_pt, p.title_en, p.title_jp,
             p.pub_type, p.publisher, p.issue,
             p.year, p.month, p.isbn, p.language,
-            p.notes_pt, p.notes_en, p.notes_jp, p.notes,
+            p.notes_pt, p.notes_en, p.notes_jp,
             p.era
           ].some((v) => safeText(v).toLowerCase().includes(query));
         });
@@ -1620,7 +1710,8 @@
           const type = safeText(p.pub_type);
           const year = safeText(p.year);
 
-          const notes = pickWithFallback(p, "notes", "notes");
+          // ✅ notes traduzida
+          const notes = pickFieldByLang(p, "notes");
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1658,7 +1749,7 @@
               specRow(L("spec_isbn"), p.isbn),
               specRow(L("spec_era"), p.era),
               specRow(L("spec_franchise"), formatFranchise(p.franchise)),
-              specRow(L("spec_notes"), notes),
+              specRow(L("spec_notes"), pickFieldByLang(p, "notes")),
               specRow(L("spec_url"), p.url)
             ].filter(Boolean).join("");
 
@@ -1673,6 +1764,7 @@
       inputPublicationsSearch.addEventListener("input", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
       selectPublicationsType.addEventListener("change", () => renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value)));
 
+      // -------------------- COLLECTIBLES --------------------
       const collectiblesTitle = document.getElementById("collectiblesTitle");
       const collectiblesStatus = document.getElementById("collectiblesStatus");
       const collectiblesList = document.getElementById("collectiblesList");
@@ -1713,17 +1805,7 @@
 
         const { data, error } = await supabase
           .from("collectibles")
-          .select([
-            "id",
-            "name_en","name_pt","name_jp",
-            "franchise","era","year",
-            "line","item_type","manufacturer",
-            "series_code","sku_code",
-            "image_url","jp_search",
-            "notes_en","notes_pt","notes_jp",
-            "notes",
-            "rarity","status","created_at"
-          ].join(","))
+          .select("id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes_pt,notes_en,notes_jp,rarity,status,created_at")
           .eq("franchise", state.franchise);
 
         if (error) {
@@ -1758,9 +1840,8 @@
             it.name_pt, it.name_en, it.name_jp,
             it.line, it.item_type, it.manufacturer,
             it.series_code, it.sku_code,
-            it.jp_search, it.notes_pt, it.notes_en, it.notes_jp, it.notes,
-            it.rarity, it.status,
-            it.year, it.era
+            it.jp_search, it.notes_pt, it.notes_en, it.notes_jp,
+            it.rarity, it.status, it.year, it.era
           ].some((v) => safeText(v).toLowerCase().includes(query));
         });
       }
@@ -1785,7 +1866,8 @@
           if (hasValue(it.item_type)) subtitleParts.push(safeText(it.item_type));
           if (hasValue(it.manufacturer)) subtitleParts.push(safeText(it.manufacturer));
 
-          const notes = pickWithFallback(it, "notes", "notes");
+          // ✅ notes traduzida
+          const notes = pickFieldByLang(it, "notes");
 
           el.innerHTML = `
             <div class="itemTop">
@@ -1824,7 +1906,7 @@
               specRow(L("spec_status"), it.status),
               specRow(L("spec_rarity"), it.rarity),
               specRow(L("spec_jp_search"), it.jp_search),
-              specRow(L("spec_notes"), notes),
+              specRow(L("spec_notes"), pickFieldByLang(it, "notes")),
               specRow(L("spec_franchise"), formatFranchise(it.franchise))
             ].filter(Boolean).join("");
 
@@ -1839,11 +1921,152 @@
       inputCollectiblesSearch.addEventListener("input", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
       selectCollectiblesCategory.addEventListener("change", () => renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value)));
 
+      // -------------------- LINKS ÚTEIS --------------------
+      const inputUsefulSearch = document.getElementById("inputUsefulSearch");
+      const usefulListEl = document.getElementById("usefulList");
+      const usefulListStatus = document.getElementById("usefulListStatus");
+      let usefulMode = "actors"; // actors | community | lives | collectibles
+
+      // Você pode (A) alimentar via Supabase (recomendado) ou (B) deixar fallback local
+      // Aqui está um fallback local (não quebra o app se a tabela ainda não existir).
+      const USEFUL_LINKS_FALLBACK = {
+        actors: [
+          { name: "Nome do Ator", note: () => t("verifiedHint"), links: [
+            { label: "Instagram", url: "https://instagram.com/" }
+          ]},
+        ],
+        community: [
+          { name: "Perfil Toku 1", note: () => "Instagram", links: [{ label: "Instagram", url: "https://instagram.com/" }] },
+        ],
+        lives: [
+          { name: "Canal Toku", note: () => "YouTube", links: [{ label: "YouTube", url: "https://youtube.com/" }] },
+        ],
+        collectibles: [
+          { name: "Colecionáveis BR", note: () => "Instagram", links: [{ label: "Instagram", url: "https://instagram.com/" }] },
+        ]
+      };
+
+      let usefulCache = []; // lista do supabase (se existir)
+
+      function normalizeUsefulRow(r) {
+        return {
+          name: safeText(pickFieldByLang(r, "name") || r.name),
+          note: safeText(pickFieldByLang(r, "note") || r.note),
+          links: Array.isArray(r.links) ? r.links : []
+        };
+      }
+
+      async function loadUsefulLinksFromSupabase(category) {
+        // Se você ainda não criou a tabela, isso vai falhar e a gente usa o fallback.
+        try {
+          const { data, error } = await supabase
+            .from("useful_links")
+            .select("id,category,name_pt,name_en,name_jp,note_pt,note_en,note_jp,links,is_active,sort_order")
+            .eq("category", category)
+            .eq("is_active", true)
+            .order("sort_order", { ascending: true });
+
+          if (error) throw error;
+          const list = Array.isArray(data) ? data.map(normalizeUsefulRow) : [];
+          usefulCache = list;
+        } catch {
+          usefulCache = [];
+        }
+      }
+
+      function getUsefulList() {
+        if (usefulCache.length) return usefulCache;
+
+        const raw = USEFUL_LINKS_FALLBACK[usefulMode] || [];
+        return raw.map(x => ({
+          name: safeText(x.name),
+          note: safeText(typeof x.note === "function" ? x.note() : x.note),
+          links: Array.isArray(x.links) ? x.links : []
+        }));
+      }
+
+      function renderUsefulCards(query) {
+        const q = safeText(query).toLowerCase();
+        const list = getUsefulList().filter(item => {
+          if (!q) return true;
+          const hay = [item.name, item.note, ...(item.links || []).map(l => l.label), ...(item.links || []).map(l => l.url)]
+            .map(x => safeText(x).toLowerCase())
+            .join(" ");
+          return hay.includes(q);
+        });
+
+        usefulListEl.innerHTML = "";
+        usefulListStatus.textContent = `${list.length} ${t("items")}`;
+
+        if (!list.length) {
+          usefulListEl.innerHTML = `<div class="muted" style="padding: 10px 2px;">${escapeHtml(t("noResults"))}</div>`;
+          return;
+        }
+
+        for (const item of list) {
+          const card = document.createElement("div");
+          card.className = "item";
+
+          const links = (item.links || []).filter(l => hasValue(l?.url));
+          const actionsHtml = links.map(l => `
+            <button class="linkActionBtn" type="button" data-url="${escapeHtml(l.url)}">${escapeHtml(l.label)}</button>
+          `).join("");
+
+          card.innerHTML = `
+            <div class="nameLine">
+              <div class="name">${escapeHtml(safeText(item.name))}</div>
+              <div class="year">${escapeHtml(safeText(item.note))}</div>
+            </div>
+            ${links.length ? `<div class="linkActions">${actionsHtml}</div>` : `<div class="muted" style="margin-top:8px;">${escapeHtml(t("noDetails"))}</div>`}
+          `;
+
+          card.querySelectorAll("button[data-url]").forEach(btn => {
+            btn.addEventListener("click", (e) => {
+              e.stopPropagation();
+              const url = btn.getAttribute("data-url");
+              if (hasValue(url)) window.open(url, "_blank", "noopener,noreferrer");
+            });
+          });
+
+          usefulListEl.appendChild(card);
+        }
+      }
+
+      async function openUsefulList(mode) {
+        usefulMode = mode;
+        inputUsefulSearch.value = "";
+        setText("usefulListTitle", t(
+          mode === "actors" ? "usefulActors" :
+          mode === "community" ? "usefulCommunity" :
+          mode === "lives" ? "usefulLives" :
+          "usefulCollectibles"
+        ));
+
+        showView("usefulList", true);
+
+        usefulListStatus.textContent = t("loading");
+        usefulListEl.innerHTML = "";
+
+        // carrega do supabase (se existir)
+        await loadUsefulLinksFromSupabase(usefulMode);
+        renderUsefulCards("");
+      }
+
+      document.getElementById("btnBackToHomeFromUseful").addEventListener("click", () => showView("home", true));
+      document.getElementById("btnBackToUsefulHub").addEventListener("click", () => showView("useful", true));
+      document.getElementById("btnGoActors").addEventListener("click", () => openUsefulList("actors"));
+      document.getElementById("btnGoCommunity").addEventListener("click", () => openUsefulList("community"));
+      document.getElementById("btnGoLives").addEventListener("click", () => openUsefulList("lives"));
+      document.getElementById("btnGoCollectiblesLinks").addEventListener("click", () => openUsefulList("collectibles"));
+      inputUsefulSearch.addEventListener("input", () => renderUsefulCards(inputUsefulSearch.value));
+
+      // -------------------- rerender --------------------
       function rerenderCurrentLists() {
         if (state.view === "characters") renderCharactersList(filterCharacters(inputCharacterSearch.value));
         if (state.view === "glossary") renderGlossaryList(filterGlossary(inputGlossarySearch.value, selectGlossaryCategory.value));
         if (state.view === "publications") renderPublicationsList(filterPublications(inputPublicationsSearch.value, selectPublicationsType.value));
         if (state.view === "collectibles") renderCollectiblesList(filterCollectibles(inputCollectiblesSearch.value, selectCollectiblesCategory.value));
+        if (state.view === "usefulList") renderUsefulCards(inputUsefulSearch.value);
       }
 
       const langBtn = document.getElementById("langBtn");
