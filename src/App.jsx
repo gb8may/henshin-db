@@ -28,10 +28,11 @@ function AppContent() {
     } else if (location.pathname.startsWith('/franchise/')) {
       const parts = location.pathname.split('/');
       if (parts.length === 3) {
-        setSubtitle(formatFranchise(parts[2]));
+        const franchise = decodeURIComponent(parts[2]);
+        setSubtitle(formatFranchise(franchise));
       } else if (parts.length === 4) {
-        const franchise = parts[2];
-        const category = parts[3];
+        const franchise = decodeURIComponent(parts[2]);
+        const category = decodeURIComponent(parts[3]);
         setSubtitle(`${formatFranchise(franchise)} · ${t(category)}`);
       }
     } else if (location.pathname === '/useful-links') {

@@ -77,7 +77,7 @@ export function Header({ subtitle, connectionStatus }) {
             </button>
             
             {showLangMenu && (
-              <div className="absolute right-0 top-[42px] bg-[rgba(15,18,26,0.95)] border border-toku-border rounded-xl flex flex-col gap-1.5 p-2 z-50 shadow-toku">
+              <div className="absolute right-0 top-[42px] bg-[rgba(15,18,26,0.95)] border border-toku-border rounded-xl flex flex-col gap-2 p-3 z-50 shadow-toku min-w-[120px]">
                 {(['pt', 'en', 'ja']).map((l) => (
                   <button
                     key={l}
@@ -85,12 +85,12 @@ export function Header({ subtitle, connectionStatus }) {
                       setLang(l);
                       setShowLangMenu(false);
                     }}
-                    className="bg-transparent border-none p-1.5 cursor-pointer inline-flex items-center justify-center hover:bg-[rgba(255,255,255,0.1)] rounded transition-colors"
+                    className="bg-transparent border-none py-2 px-3 cursor-pointer inline-flex items-center justify-center hover:bg-[rgba(255,255,255,0.1)] rounded transition-colors w-full"
                   >
                     <img
                       src={LANG_ICONS[l]}
                       alt={l.toUpperCase()}
-                      className="w-[22px] h-[14px] block rounded-sm"
+                      className="w-8 h-5 block rounded-sm"
                     />
                   </button>
                 ))}
