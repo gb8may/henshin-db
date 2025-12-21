@@ -9,6 +9,8 @@ import { GlossaryPage } from './pages/GlossaryPage';
 import { PublicationsPage } from './pages/PublicationsPage';
 import { CollectiblesPage } from './pages/CollectiblesPage';
 import { UsefulLinksPage } from './pages/UsefulLinksPage';
+import { UsefulLinksListPage } from './pages/UsefulLinksListPage';
+import { AdminPage } from './pages/AdminPage';
 import { OfflinePage } from './pages/OfflinePage';
 import { useLanguage } from './hooks/useLanguage';
 import { supabase } from './lib/supabase';
@@ -43,6 +45,20 @@ function AppContent() {
       }
     } else if (location.pathname === '/useful-links') {
       setSubtitle(t('usefulLinks'));
+    } else if (location.pathname.startsWith('/useful-links/')) {
+      const decodedPath = decodeURIComponent(location.pathname);
+      const parts = decodedPath.split('/').filter(p => p);
+      if (parts.length === 2 && parts[0] === 'useful-links') {
+        const category = parts[1];
+        const categoryLabel = category === 'community' ? t('usefulCommunity') :
+                             category === 'actors' ? t('usefulActors') :
+                             category === 'lives' ? t('usefulLives') :
+                             category === 'collectibles' ? t('usefulCollectibles') :
+                             category;
+        setSubtitle(categoryLabel);
+      } else {
+        setSubtitle(t('usefulLinks'));
+      }
     } else {
       setSubtitle('');
     }
@@ -96,6 +112,8 @@ function AppContent() {
           <Route path="/franchise/:franchise/publications" element={<PublicationsPage />} />
           <Route path="/franchise/:franchise/collectibles" element={<CollectiblesPage />} />
           <Route path="/useful-links" element={<UsefulLinksPage />} />
+          <Route path="/useful-links/:category" element={<UsefulLinksListPage />} />
+          <Route path="/admin" element={<AdminPage />} />
           <Route path="/offline" element={<OfflinePage />} />
         </Routes>
       </main>
