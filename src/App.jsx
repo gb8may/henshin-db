@@ -13,6 +13,7 @@ import { UsefulLinksPage } from './pages/UsefulLinksPage';
 import { UsefulLinksListPage } from './pages/UsefulLinksListPage';
 import { AdminPage } from './pages/AdminPage';
 import { OfflinePage } from './pages/OfflinePage';
+import { StatsPage } from './pages/StatsPage';
 import { useLanguage } from './hooks/useLanguage';
 import { supabase } from './lib/supabase';
 import { formatFranchise } from './lib/i18n';
@@ -115,6 +116,7 @@ function AppContent() {
           <Route path="/useful-links" element={<UsefulLinksPage />} />
           <Route path="/useful-links/:category" element={<UsefulLinksListPage />} />
           <Route path="/admin" element={<AdminPage />} />
+          <Route path="/stats" element={<StatsPage />} />
           <Route path="/offline" element={<OfflinePage />} />
         </Routes>
       </main>
