@@ -4,7 +4,7 @@ import { useLanguage } from '../hooks/useLanguage';
 import { CategoryButton } from '../components/Button';
 
 const SECTIONS = [
-  { key: 'actors', labelKey: 'usefulActors', hintKey: 'verifiedHint' },
+  { key: 'actors', labelKey: 'usefulActors', hintKey: 'usefulSearch' },
   { key: 'community', labelKey: 'usefulCommunity', hintKey: 'usefulSearch' },
   { key: 'lives', labelKey: 'usefulLives', hintKey: 'usefulSearch' },
   { key: 'collectibles', labelKey: 'usefulCollectibles', hintKey: 'usefulSearch' },
