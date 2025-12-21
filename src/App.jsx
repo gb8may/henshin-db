@@ -26,14 +26,20 @@ function AppContent() {
     if (location.pathname === '/') {
       setSubtitle(t('home'));
     } else if (location.pathname.startsWith('/franchise/')) {
-      const parts = location.pathname.split('/');
-      if (parts.length === 3) {
-        const franchise = decodeURIComponent(parts[2]);
-        setSubtitle(formatFranchise(franchise));
-      } else if (parts.length === 4) {
-        const franchise = decodeURIComponent(parts[2]);
-        const category = decodeURIComponent(parts[3]);
-        setSubtitle(`${formatFranchise(franchise)} · ${t(category)}`);
+      // Decode the entire pathname first, then split
+      const decodedPath = decodeURIComponent(location.pathname);
+      const parts = decodedPath.split('/').filter(p => p);
+      
+      if (parts.length >= 2 && parts[0] === 'franchise') {
+        const franchise = parts[1];
+        if (parts.length === 2) {
+          // Franchise hub page
+          setSubtitle(formatFranchise(franchise));
+        } else if (parts.length === 3) {
+          // Category page
+          const category = parts[2];
+          setSubtitle(`${formatFranchise(franchise)} · ${t(category)}`);
+        }
       }
     } else if (location.pathname === '/useful-links') {
       setSubtitle(t('usefulLinks'));
