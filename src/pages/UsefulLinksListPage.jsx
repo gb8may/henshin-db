@@ -2,8 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { Search, Plus, ExternalLink, Instagram, Youtube, Twitter, Globe, X } from 'lucide-react';
-import { supabase } from '../lib/supabase';
+import { supabase, SUPABASE_PERSONALITIES_STORAGE_URL } from '../lib/supabase';
 import { saveCache, loadCache } from '../hooks/useCache';
+import { Modal, SpecCard } from '../components/Modal';
 
 function safeText(v) {
   if (v === null || v === undefined) return "";
@@ -28,6 +29,20 @@ function getSocialIcon(platform) {
   return SOCIAL_ICONS[key] || SOCIAL_ICONS.default;
 }
 
+function slugifyName(name) {
+  return String(name || "")
+    .trim()
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
+
+function imageUrlForPersonality(name) {
+  const slug = slugifyName(name);
+  return `${SUPABASE_PERSONALITIES_STORAGE_URL}/${slug}.png`;
+}
+
 export function UsefulLinksListPage() {
   const { category } = useParams();
   const navigate = useNavigate();
@@ -36,6 +51,8 @@ export function UsefulLinksListPage() {
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
   const [showAddForm, setShowAddForm] = useState(false);
+  const [selected, setSelected] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     description: '',
@@ -163,6 +180,14 @@ export function UsefulLinksListPage() {
     setItems(updated);
     setFiltered(updated);
     saveCache(`useful_links_${category}`, 'global', updated);
+  }
+
+  function openModal(item) {
+    // Only open modal for personalities (actors category)
+    if (category === 'actors') {
+      setSelected(item);
+      setModalOpen(true);
+    }
   }
 
   const categoryLabel = category === 'community' ? t('usefulCommunity') :
@@ -316,7 +341,11 @@ export function UsefulLinksListPage() {
         ) : (
           <div className="grid gap-2.5">
             {filtered.map((item) => (
-              <div key={item.id} className="card">
+              <div 
+                key={item.id} 
+                className={`card ${category === 'actors' ? 'cursor-pointer' : ''}`}
+                onClick={() => category === 'actors' && openModal(item)}
+              >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex-1 min-w-0">
                     <div className="font-bold text-sm leading-tight mb-1">
@@ -329,7 +358,10 @@ export function UsefulLinksListPage() {
                     )}
                   </div>
                   <button
-                    onClick={() => handleDelete(item.id)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(item.id);
+                    }}
                     className="btn-ghost p-1 flex-shrink-0"
                     title={t('remove')}
                   >
@@ -347,6 +379,7 @@ export function UsefulLinksListPage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
+                          onClick={(e) => e.stopPropagation()}
                           className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full border border-toku-border bg-[rgba(255,255,255,0.06)] text-xs text-toku-text hover:bg-[rgba(255,255,255,0.1)] transition-colors"
                         >
                           <Icon className="w-3.5 h-3.5" />
@@ -362,6 +395,25 @@ export function UsefulLinksListPage() {
           </div>
         )}
       </div>
+
+      {category === 'actors' && selected && (
+        <Modal
+          isOpen={modalOpen}
+          onClose={() => setModalOpen(false)}
+          title={selected.name || t('modalDetails')}
+          image={selected.name ? imageUrlForPersonality(selected.name) : ''}
+          imageAlt={selected.name || ''}
+        >
+          <SpecCard rows={[
+            { key: t('itemName'), value: selected.name },
+            { key: t('itemDescription'), value: selected.description },
+            ...(selected.links || []).map((link, idx) => ({
+              key: link.label || link.platform || `Link ${idx + 1}`,
+              value: link.url
+            }))
+          ].filter(r => r.value)} />
+        </Modal>
+      )}
     </div>
   );
 }

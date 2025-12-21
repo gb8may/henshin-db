@@ -6,4 +6,5 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 export const SUPABASE_STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/henshin-images`;
+export const SUPABASE_PERSONALITIES_STORAGE_URL = `${SUPABASE_URL}/storage/v1/object/public/henshin-personalidades`;
 
