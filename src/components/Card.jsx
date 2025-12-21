@@ -115,7 +115,6 @@ export function PublicationCard({ publication, onClick, t }) {
 
 export function CollectibleCard({ collectible, onClick, t }) {
   const name = collectible.name_pt || collectible.name_en || collectible.name_jp || 'Collectible';
-  const notes = collectible.notes_pt || collectible.notes_en || collectible.notes_jp || '';
   const image = collectible.image_url || '';
 
   const subtitleParts = [];
@@ -152,11 +151,6 @@ export function CollectibleCard({ collectible, onClick, t }) {
           </div>
         </div>
       </div>
-      {notes && (
-        <div className="mt-2 text-toku-muted text-[13px] leading-snug line-clamp-2">
-          {notes}
-        </div>
-      )}
     </div>
   );
 }

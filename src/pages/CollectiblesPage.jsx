@@ -70,7 +70,7 @@ export function CollectiblesPage() {
     try {
       const { data, error } = await supabase
         .from('collectibles')
-        .select('id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,notes_pt,notes_en,notes_jp,rarity,status,created_at')
+        .select('id,name_en,name_pt,name_jp,franchise,era,year,line,item_type,manufacturer,series_code,sku_code,image_url,jp_search,rarity,status,created_at')
         .eq('franchise', franchise);
 
       if (error) throw error;
@@ -108,7 +108,7 @@ export function CollectiblesPage() {
         it.name_pt, it.name_en, it.name_jp,
         it.line, it.item_type, it.manufacturer,
         it.series_code, it.sku_code,
-        it.jp_search, it.notes_pt, it.notes_en, it.notes_jp,
+        it.jp_search,
         it.rarity, it.status, it.year, it.era
       ].some((v) => safeText(v).toLowerCase().includes(query));
     });
@@ -135,7 +135,6 @@ export function CollectiblesPage() {
     { key: t('spec_status'), value: selected.status },
     { key: t('spec_rarity'), value: selected.rarity },
     { key: t('spec_jp_search'), value: selected.jp_search },
-    { key: t('spec_notes'), value: pickFieldByLang(selected, 'notes', lang) },
     { key: t('spec_franchise'), value: formatFranchise(selected.franchise) },
   ].filter(r => hasValue(r.value)) : [];
 
