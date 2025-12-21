@@ -1,19 +1,23 @@
 {
   "name": "henshin-db",
   "version": "1.0.0",
-  "description": "---",
-  "main": "index.js",
+  "description": "A Tokusatsu database: characters, glossary, publications, collectibles and more.",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "sync": "cap sync",
+    "android": "cap open android",
+    "ios": "cap open ios"
   },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/gb8may/henshin-db.git"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": ["tokusatsu", "kamen-rider", "super-sentai", "database"],
+  "author": "Mayara Gouveia",
   "license": "ISC",
-  "type": "commonjs",
   "bugs": {
     "url": "https://github.com/gb8may/henshin-db/issues"
   },
@@ -22,6 +26,21 @@
     "@capacitor/android": "^8.0.0",
     "@capacitor/cli": "^8.0.0",
     "@capacitor/core": "^8.0.0",
-    "@capacitor/ios": "^8.0.0"
+    "@capacitor/ios": "^8.0.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-router-dom": "^6.20.0",
+    "@supabase/supabase-js": "^2.39.0",
+    "lucide-react": "^0.294.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.43",
+    "@types/react-dom": "^18.2.17",
+    "@vitejs/plugin-react": "^4.2.1",
+    "autoprefixer": "^10.4.16",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.3.6",
+    "vite": "^5.0.8",
+    "vite-plugin-pwa": "^0.17.4"
   }
 }

@@ -1,0 +1,105 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    @apply box-border;
+  }
+
+  html, body {
+    @apply h-full m-0;
+  }
+
+  body {
+    @apply font-sans bg-toku-dark text-toku-text overflow-hidden;
+    background: radial-gradient(1200px 600px at 20% -10%, rgba(123, 92, 255, 0.25), transparent 60%),
+                radial-gradient(900px 500px at 90% 10%, rgba(0, 192, 255, 0.18), transparent 55%),
+                theme('colors.toku.dark');
+  }
+
+  #root {
+    @apply h-full;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply w-full min-w-0 max-w-[360px] flex items-center justify-between gap-2.5 px-3.5 py-3 
+           rounded-button border border-toku-border bg-toku-panel text-toku-text text-[15px] 
+           cursor-pointer text-left transition-all duration-200;
+  }
+
+  .btn-primary:active {
+    @apply translate-y-px;
+  }
+
+  .btn-ghost {
+    @apply border border-toku-border bg-[rgba(255,255,255,0.04)] text-toku-text 
+           rounded-xl px-3 py-2.5 text-sm cursor-pointer transition-all duration-200;
+  }
+
+  .btn-ghost:active {
+    @apply translate-y-px;
+  }
+
+  .card {
+    @apply border border-toku-border bg-toku-panel rounded-card p-3 cursor-pointer 
+           transition-all duration-200 hover:bg-toku-panel2;
+  }
+
+  .card:active {
+    @apply translate-y-px;
+  }
+
+  .input-search {
+    @apply w-full border border-toku-border bg-[rgba(0,0,0,0.25)] text-toku-text 
+           px-3 py-3 rounded-xl outline-none text-sm;
+  }
+
+  .select-filter {
+    @apply w-full border border-toku-border bg-[rgba(0,0,0,0.25)] text-toku-text 
+           px-3 py-3 rounded-xl outline-none text-sm cursor-pointer;
+  }
+
+  .spec-card {
+    @apply border border-toku-border bg-[rgba(255,255,255,0.05)] rounded-card overflow-hidden;
+  }
+
+  .spec-row {
+    @apply flex gap-2.5 px-3 py-2.5 border-t border-[rgba(255,255,255,0.08)] items-start;
+  }
+
+  .spec-row:first-child {
+    @apply border-t-0;
+  }
+
+  .spec-key {
+    @apply flex-[0_0_40%] text-[11px] text-toku-muted leading-tight pt-0.5;
+  }
+
+  .spec-val {
+    @apply flex-1 text-[13px] leading-[1.35] text-toku-text break-words;
+  }
+
+  .pill {
+    @apply inline-flex items-center px-2.5 py-1.5 rounded-full border border-toku-border 
+           bg-[rgba(255,255,255,0.05)] text-xs text-toku-muted;
+  }
+
+  .thumb {
+    @apply w-[54px] h-[54px] rounded-xl border border-toku-border bg-[rgba(255,255,255,0.05)] 
+           overflow-hidden flex-shrink-0 flex items-center justify-center;
+  }
+
+  .thumb img {
+    @apply w-full h-full object-cover block;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}
+

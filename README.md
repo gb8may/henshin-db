@@ -1,114 +1,132 @@
 # Henshin DB
 
----
-
-## 🇧🇷 Português
+> A modern Tokusatsu database built with React
 
 [Henshin DB](https://henshindb.netlify.app/) é um aplicativo web focado em **tokusatsu japonês**, criado para organizar e explorar informações sobre **personagens**, **publicações**, **colecionáveis** e **termos** relacionados a franquias clássicas e modernas.
 
-O projeto nasceu da vontade de tratar tokusatsu com o mesmo cuidado e profundidade de uma *enciclopédia viva*, mas com a experiência fluida de um **app mobile-first**.
-
-### ✨ Funcionalidades
+## ✨ Funcionalidades
 
 * 📚 Catálogo de **Personagens** com ficha técnica detalhada
 * 🧸 Banco de **Colecionáveis** (DX, SHF, sofubi, mechas, etc.)
 * 📖 **Publicações** (livros, mooks, guias oficiais)
 * 📘 **Glossário** JP → PT / EN
 * 🧭 Navegação por **franquias**:
-
   * Kamen Rider
   * Super Sentai
   * Metal Hero
   * Ultraman
   * Cybercops
 * 📴 **Modo offline** com cache local
-* 📱 Interface pensada para parecer um **app**, não apenas um site
+* 📱 Interface moderna com React e Tailwind CSS
+* 🎨 Design temático com ícones SVG customizados
+* 🌐 Suporte a múltiplos idiomas (PT, EN, JA)
 
-### 🛠️ Stack
+## 🛠️ Stack Tecnológica
 
-* HTML + CSS + JavaScript (vanilla)
-* Supabase (PostgreSQL + Storage)
-* Cache via LocalStorage
-* Deploy com Netlify
+* **React 18** - Framework frontend
+* **Vite** - Build tool e dev server
+* **Tailwind CSS** - Estilização
+* **React Router** - Roteamento
+* **Supabase** - Backend (PostgreSQL + Storage)
+* **Lucide React** - Ícones
+* **Capacitor** - Build mobile (Android/iOS)
+* **PWA** - Progressive Web App
 
-### 🎯 Objetivo
+## 🚀 Como executar
 
-Criar uma base de dados clara, bonita e confiável para fãs, colecionadores e curiosos — sem poluição visual, sem excesso de cliques e com foco em legibilidade.
+### Pré-requisitos
 
----
+- Node.js 18+ e npm
 
-## 🇺🇸 English
+### Instalação
 
-**Henshin DB** is a web application dedicated to **Japanese tokusatsu**, designed to organize and explore information about **characters**, **publications**, **collectibles**, and **terminology** from both classic and modern franchises.
+```bash
+# Instalar dependências
+npm install
 
-The project aims to function as a **living encyclopedia**, while delivering a smooth **mobile-first app-like experience**.
+# Executar em modo desenvolvimento
+npm run dev
 
-### ✨ Features
+# Build para produção
+npm run build
 
-* 📚 **Character database** with detailed technical profiles
-* 🧸 **Collectibles catalog** (DX, SHF, sofubi, mecha, etc.)
-* 📖 **Publications** (books, mooks, official guides)
-* 📘 **Glossary** JP → EN / PT
-* 🧭 Franchise-based navigation:
+# Preview do build
+npm run preview
+```
 
-  * Kamen Rider
-  * Super Sentai
-  * Metal Hero
-  * Ultraman
-  * Cybercops
-* 📴 **Offline mode** with local cache fallback
-* 📱 UI designed to feel like a **real mobile app**, not just a website
+### Mobile (Capacitor)
 
-### 🛠️ Tech Stack
+```bash
+# Sincronizar com Capacitor
+npm run sync
 
-* HTML + CSS + Vanilla JavaScript
-* Supabase (PostgreSQL + Storage)
-* LocalStorage caching
-* Netlify deployment
+# Abrir projeto Android
+npm run android
 
-### 🎯 Goal
+# Abrir projeto iOS
+npm run ios
+```
 
-To provide a clean, reliable and visually pleasant database for fans, collectors, and researchers — focusing on clarity, performance and respect for the source material.
+## 📁 Estrutura do Projeto
 
----
+```
+henshin-db/
+├── src/
+│   ├── components/      # Componentes React reutilizáveis
+│   │   ├── icons/       # Ícones SVG customizados
+│   │   ├── Header.jsx
+│   │   ├── Footer.jsx
+│   │   ├── Modal.jsx
+│   │   ├── Card.jsx
+│   │   └── Button.jsx
+│   ├── pages/           # Páginas/Views
+│   │   ├── Home.jsx
+│   │   ├── CharactersPage.jsx
+│   │   ├── GlossaryPage.jsx
+│   │   ├── PublicationsPage.jsx
+│   │   └── CollectiblesPage.jsx
+│   ├── hooks/           # Custom hooks
+│   │   ├── useLanguage.js
+│   │   └── useCache.js
+│   ├── lib/             # Utilitários
+│   │   ├── supabase.js
+│   │   └── i18n.js
+│   ├── App.jsx          # Componente principal
+│   ├── main.jsx         # Entry point
+│   └── index.css        # Estilos globais
+├── www/                 # Build output (para Capacitor)
+├── index.html
+├── vite.config.js
+├── tailwind.config.js
+└── package.json
+```
 
-## 🇯🇵 日本語
+## 🎨 Design System
 
-**Henshin DB（変身データベース）**は、日本の**特撮作品**をテーマにしたWebアプリです。キャラクター、書籍、コレクターズアイテム、用語などの情報を整理し、分かりやすく閲覧できるように設計されています。
+O projeto usa um design system customizado com tema tokusatsu:
 
-本プロジェクトは、単なるWebサイトではなく、**モバイルアプリのような操作感**を持つ「生きたデータベース」を目指しています。
+- **Cores**: Paleta escura com gradientes temáticos por franquia
+- **Tipografia**: System fonts para performance
+- **Componentes**: Cards, botões, modais com animações suaves
+- **Ícones**: SVG customizados para cada franquia
 
-### ✨ 主な機能
+## 🌐 Internacionalização
 
-* 📚 キャラクターの詳細なプロフィール表示
-* 🧸 コレクターズアイテム（DX、S.H.Figuarts、ソフビ、ロボ等）
-* 📖 書籍・ムック・公式ガイドのデータベース
-* 📘 用語集（日本語 → 英語 / ポルトガル語）
-* 🧭 フランチャイズ別ナビゲーション：
+O app suporta 3 idiomas:
+- Português (PT)
+- Inglês (EN)
+- Japonês (JA)
 
-  * 仮面ライダー
-  * スーパー戦隊
-  * メタルヒーロー
-  * ウルトラマン
-  * サイバーコップ
-* 📴 オフライン対応（ローカルキャッシュ）
-* 📱 Webでありながら**アプリのようなUI/UX**
+O idioma é detectado automaticamente do navegador ou pode ser alterado manualmente.
 
-### 🛠️ 技術構成
+## 📴 Modo Offline
 
-* HTML / CSS / JavaScript（Vanilla）
-* Supabase（PostgreSQL・ストレージ）
-* LocalStorage キャッシュ
-* Netlify デプロイ
+O app funciona offline usando:
+- **LocalStorage** para cache de dados
+- **Service Worker** para cache de assets
+- Fallback automático quando sem conexão
 
-### 🎯 目的
-
-特撮ファン、コレクター、研究者のために、
-**正確で美しく、使いやすいデータベース**を提供すること。
-
----
-
-## 👩‍💻 Author
+## 👩‍💻 Autor
 
 **Mayara Gouveia**
 Tokusatsu fan · [Developer](https://www.linkedin.com/in/gb8may/) · [Collector](https://www.instagram.com/mj3d_printing.ca/)
