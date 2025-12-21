@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
+import { VisitCounter } from './components/VisitCounter';
 import { Home } from './pages/Home';
 import { FranchiseHub } from './pages/FranchiseHub';
 import { CharactersPage } from './pages/CharactersPage';
@@ -118,6 +119,7 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
+      <VisitCounter />
     </div>
   );
 }

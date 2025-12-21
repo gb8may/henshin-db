@@ -3,9 +3,14 @@ import React from 'react';
 export function KamenRiderIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L2 7L12 12L22 7L12 2Z" fill="url(#riderGrad)" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M2 17L12 22L22 17" stroke="currentColor" strokeWidth="1.5" fill="none"/>
-      <path d="M2 12L12 17L22 12" stroke="currentColor" strokeWidth="1.5" fill="none"/>
+      {/* Cinto/Driver do Kamen Rider */}
+      <rect x="4" y="10" width="16" height="4" rx="2" fill="url(#riderGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Centro do cinto */}
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.9"/>
+      <circle cx="12" cy="12" r="1.5" fill="url(#riderGrad)"/>
+      {/* Linhas laterais do cinto */}
+      <rect x="4" y="9" width="2" height="6" rx="1" fill="currentColor" opacity="0.6"/>
+      <rect x="18" y="9" width="2" height="6" rx="1" fill="currentColor" opacity="0.6"/>
       <defs>
         <linearGradient id="riderGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#7b5cff" />
@@ -19,9 +24,11 @@ export function KamenRiderIcon({ className = "w-6 h-6" }) {
 export function SuperSentaiIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="url(#sentaiGrad)" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M12 6L8 10H16L12 6Z" fill="currentColor" opacity="0.9"/>
-      <path d="M12 18L8 14H16L12 18Z" fill="currentColor" opacity="0.9"/>
+      {/* Estrela de 5 pontas representando o time */}
+      <path d="M12 2L14.5 8.5L21.5 9.5L16.5 14L18 21L12 17.5L6 21L7.5 14L2.5 9.5L9.5 8.5L12 2Z" fill="url(#sentaiGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Símbolo de equipe no centro */}
+      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.2"/>
+      <path d="M12 9L10 13H14L12 9Z" fill="currentColor" opacity="0.8"/>
       <defs>
         <linearGradient id="sentaiGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#ff4757" />
@@ -35,8 +42,13 @@ export function SuperSentaiIcon({ className = "w-6 h-6" }) {
 export function MetalHeroIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="16" height="16" rx="2" fill="url(#heroGrad)" stroke="currentColor" strokeWidth="1.5"/>
-      <path d="M8 8H16M8 12H16M8 16H12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+      {/* Capacete/armadura robótica */}
+      <path d="M12 4C8 4 5 6 5 9V11C5 13 7 15 9 15H15C17 15 19 13 19 11V9C19 6 16 4 12 4Z" fill="url(#heroGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Visor */}
+      <rect x="9" y="8" width="6" height="4" rx="1" fill="currentColor" opacity="0.3"/>
+      <path d="M10 10H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
+      {/* Linhas de armadura */}
+      <path d="M8 12H16M8 14H16M10 16H14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round"/>
       <defs>
         <linearGradient id="heroGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#5f27cd" />
@@ -50,7 +62,13 @@ export function MetalHeroIcon({ className = "w-6 h-6" }) {
 export function UltramanIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="url(#ultraGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Estrela de 5 pontas (símbolo do Ultraman) */}
+      <path d="M12 2L14.5 8.5L21.5 9.5L16.5 14L18 21L12 17.5L6 21L7.5 14L2.5 9.5L9.5 8.5L12 2Z" fill="url(#ultraGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Símbolo do Color Timer no centro */}
+      <circle cx="12" cy="12" r="2.5" fill="currentColor" opacity="0.3"/>
+      <circle cx="12" cy="12" r="1.5" fill="url(#ultraGrad)"/>
+      {/* Linhas características do Ultraman */}
+      <path d="M12 6L10 10L12 8L14 10L12 6Z" fill="currentColor" opacity="0.6"/>
       <defs>
         <linearGradient id="ultraGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#00c0ff" />
@@ -64,8 +82,14 @@ export function UltramanIcon({ className = "w-6 h-6" }) {
 export function CybercopsIcon({ className = "w-6 h-6" }) {
   return (
     <svg className={className} viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2L2 7L7 12L2 17L12 22L22 17L17 12L22 7L12 2Z" fill="url(#cyberGrad)" stroke="currentColor" strokeWidth="1.5"/>
-      <circle cx="12" cy="12" r="3" fill="currentColor" opacity="0.3"/>
+      {/* Escudo/emblema tecnológico */}
+      <path d="M12 2L4 6V10L12 14L20 10V6L12 2Z" fill="url(#cyberGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      <path d="M12 14L4 18V22L12 18L20 22V18L12 14Z" fill="url(#cyberGrad)" stroke="currentColor" strokeWidth="1.5"/>
+      {/* Circuito/linhas tecnológicas */}
+      <circle cx="12" cy="8" r="1.5" fill="currentColor" opacity="0.8"/>
+      <circle cx="12" cy="16" r="1.5" fill="currentColor" opacity="0.8"/>
+      <path d="M8 8L12 10L16 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
+      <path d="M8 16L12 18L16 16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" fill="none"/>
       <defs>
         <linearGradient id="cyberGrad" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#00d2d3" />
