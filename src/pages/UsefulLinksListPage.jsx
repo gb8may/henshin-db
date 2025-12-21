@@ -197,7 +197,7 @@ export function UsefulLinksListPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-3.5 py-3.5 pb-[90px] overflow-auto flex-1 -webkit-overflow-scrolling-touch">
+      <div className="px-3.5 py-3.5 pb-[90px] overflow-auto flex-1 -webkit-overflow-scrolling-touch relative">
         <div className="flex gap-2.5 items-center mb-3">
           <button
             onClick={() => navigate('/useful-links')}
@@ -343,8 +343,12 @@ export function UsefulLinksListPage() {
             {filtered.map((item) => (
               <div 
                 key={item.id} 
-                className={`card ${category === 'actors' ? 'cursor-pointer' : ''}`}
-                onClick={() => category === 'actors' && openModal(item)}
+                className={`card ${category === 'actors' ? 'cursor-pointer hover:bg-toku-panel-2' : ''}`}
+                onClick={() => {
+                  if (category === 'actors') {
+                    openModal(item);
+                  }
+                }}
               >
                 <div className="flex items-start justify-between gap-2 mb-2">
                   <div className="flex-1 min-w-0">
@@ -396,22 +400,27 @@ export function UsefulLinksListPage() {
         )}
       </div>
 
-      {category === 'actors' && selected && (
+      {category === 'actors' && (
         <Modal
           isOpen={modalOpen}
-          onClose={() => setModalOpen(false)}
-          title={selected.name || t('modalDetails')}
-          image={selected.name ? imageUrlForPersonality(selected.name) : ''}
-          imageAlt={selected.name || ''}
+          onClose={() => {
+            setModalOpen(false);
+            setSelected(null);
+          }}
+          title={selected?.name || t('modalDetails')}
+          image={selected?.name ? imageUrlForPersonality(selected.name) : ''}
+          imageAlt={selected?.name || ''}
         >
-          <SpecCard rows={[
-            { key: t('itemName'), value: selected.name },
-            { key: t('itemDescription'), value: selected.description },
-            ...(selected.links || []).map((link, idx) => ({
-              key: link.label || link.platform || `Link ${idx + 1}`,
-              value: link.url
-            }))
-          ].filter(r => r.value)} />
+          {selected && (
+            <SpecCard rows={[
+              { key: t('itemName'), value: selected.name },
+              { key: t('itemDescription'), value: selected.description },
+              ...(selected.links || []).map((link, idx) => ({
+                key: link.label || link.platform || `Link ${idx + 1}`,
+                value: link.url
+              }))
+            ].filter(r => r.value)} />
+          )}
         </Modal>
       )}
     </div>
