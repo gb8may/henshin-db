@@ -1,21 +1,15 @@
 import React from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { CategoryButton } from '../components/Button';
-import {
-  KamenRiderIcon,
-  SuperSentaiIcon,
-  MetalHeroIcon,
-  UltramanIcon,
-  CybercopsIcon,
-} from '../components/icons/FranchiseIcons';
+import { Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const FRANCHISES = [
-  { key: 'kamen rider', label: 'Kamen Rider', icon: <KamenRiderIcon className="w-8 h-8" />, color: 'rider' },
-  { key: 'super sentai', label: 'Super Sentai', icon: <SuperSentaiIcon className="w-8 h-8" />, color: 'sentai' },
-  { key: 'metal hero', label: 'Metal Hero', icon: <MetalHeroIcon className="w-8 h-8" />, color: 'hero' },
-  { key: 'ultraman', label: 'Ultraman', icon: <UltramanIcon className="w-8 h-8" />, color: 'ultraman' },
-  { key: 'cybercops', label: 'Cybercops', icon: <CybercopsIcon className="w-8 h-8" />, color: 'cyber' },
+  { key: 'kamen rider', label: 'Kamen Rider', color: 'rider' },
+  { key: 'super sentai', label: 'Super Sentai', color: 'sentai' },
+  { key: 'metal hero', label: 'Metal Hero', color: 'hero' },
+  { key: 'ultraman', label: 'Ultraman', color: 'ultraman' },
+  { key: 'cybercops', label: 'Cybercops', color: 'cyber' },
 ];
 
 export function Home() {
@@ -40,7 +34,6 @@ export function Home() {
             >
               <CategoryButton
                 label={franchise.label}
-                icon={franchise.icon}
                 className="group hover:border-toku-rider-primary/50 transition-all"
               />
             </Link>
@@ -53,6 +46,7 @@ export function Home() {
             <CategoryButton
               label={t('usefulLinks')}
               hint={t('usefulHint')}
+              icon={<Globe className="w-6 h-6" />}
               className="group hover:border-toku-rider-primary/50 transition-all"
             />
           </Link>

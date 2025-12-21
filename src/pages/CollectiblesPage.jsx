@@ -44,11 +44,11 @@ export function CollectiblesPage() {
 
   useEffect(() => {
     loadCollectibles();
-  }, [franchise]);
+  }, [franchise, lang]);
 
   useEffect(() => {
     filterCollectibles();
-  }, [search, itemType, collectibles]);
+  }, [search, itemType, collectibles, lang]);
 
   async function loadCollectibles() {
     setLoading(true);
@@ -193,6 +193,7 @@ export function CollectiblesPage() {
                 collectible={col}
                 onClick={() => openModal(col)}
                 t={t}
+                lang={lang}
               />
             ))}
           </div>

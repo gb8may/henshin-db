@@ -44,11 +44,11 @@ export function PublicationsPage() {
 
   useEffect(() => {
     loadPublications();
-  }, [franchise]);
+  }, [franchise, lang]);
 
   useEffect(() => {
     filterPublications();
-  }, [search, pubType, publications]);
+  }, [search, pubType, publications, lang]);
 
   async function loadPublications() {
     setLoading(true);
@@ -197,6 +197,7 @@ export function PublicationsPage() {
                 publication={pub}
                 onClick={() => openModal(pub)}
                 t={t}
+                lang={lang}
               />
             ))}
           </div>

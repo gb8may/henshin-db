@@ -2,13 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
 import { CategoryButton } from '../components/Button';
-import { Users, Heart, Video, Package } from 'lucide-react';
 
 const SECTIONS = [
-  { key: 'actors', labelKey: 'usefulActors', hintKey: 'verifiedHint', icon: <Users className="w-6 h-6" /> },
-  { key: 'community', labelKey: 'usefulCommunity', hintKey: 'usefulSearch', icon: <Heart className="w-6 h-6" /> },
-  { key: 'lives', labelKey: 'usefulLives', hintKey: 'usefulSearch', icon: <Video className="w-6 h-6" /> },
-  { key: 'collectibles', labelKey: 'usefulCollectibles', hintKey: 'usefulSearch', icon: <Package className="w-6 h-6" /> },
+  { key: 'actors', labelKey: 'usefulActors', hintKey: 'verifiedHint' },
+  { key: 'community', labelKey: 'usefulCommunity', hintKey: 'usefulSearch' },
+  { key: 'lives', labelKey: 'usefulLives', hintKey: 'usefulSearch' },
+  { key: 'collectibles', labelKey: 'usefulCollectibles', hintKey: 'usefulSearch' },
 ];
 
 export function UsefulLinksPage() {
@@ -40,7 +39,6 @@ export function UsefulLinksPage() {
               key={section.key}
               label={t(section.labelKey)}
               hint={t(section.hintKey)}
-              icon={section.icon}
               onClick={() => navigate(`/useful-links/${section.key}`)}
               className="group hover:border-toku-rider-primary/50 transition-all"
             />

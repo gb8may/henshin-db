@@ -52,11 +52,11 @@ export function CharactersPage() {
 
   useEffect(() => {
     loadCharacters();
-  }, [franchise]);
+  }, [franchise, lang]);
 
   useEffect(() => {
     filterCharacters();
-  }, [search, characters]);
+  }, [search, characters, lang]);
 
   async function loadCharacters() {
     setLoading(true);
@@ -179,6 +179,7 @@ export function CharactersPage() {
                 imageUrl={imageUrlForCharacter(char.name_en)}
                 onClick={() => openModal(char)}
                 t={t}
+                lang={lang}
               />
             ))}
           </div>

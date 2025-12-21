@@ -1,22 +1,40 @@
 import React from 'react';
 
-export function CharacterCard({ character, onClick, imageUrl, t }) {
-  const displayName = character.name_pt || character.name_en || character.name_jp || '';
-  const description = character.description_pt || character.description_en || character.description_jp || '';
+export function CharacterCard({ character, onClick, imageUrl, t, lang = 'en' }) {
+  const displayName = character[`name_${lang}`] || character.name_pt || character.name_en || character.name_jp || '';
+  const description = character[`description_${lang}`] || character.description_pt || character.description_en || character.description_jp || '';
+  const [imageError, setImageError] = React.useState(false);
+  const [hasImage, setHasImage] = React.useState(!!imageUrl);
+
+  React.useEffect(() => {
+    if (imageUrl) {
+      const img = new Image();
+      img.onload = () => setHasImage(true);
+      img.onerror = () => {
+        setHasImage(false);
+        setImageError(true);
+      };
+      img.src = imageUrl;
+    } else {
+      setHasImage(false);
+    }
+  }, [imageUrl]);
 
   return (
     <div className="card" onClick={onClick}>
       <div className="flex gap-3 items-center">
-        <div className="thumb">
-          <img
-            src={imageUrl}
-            alt={character.name_en || ''}
-            onError={(e) => {
-              e.target.style.display = 'none';
-              e.target.parentElement.textContent = '';
-            }}
-          />
-        </div>
+        {hasImage && imageUrl && !imageError && (
+          <div className="thumb">
+            <img
+              src={imageUrl}
+              alt={character.name_en || ''}
+              onError={() => {
+                setImageError(true);
+                setHasImage(false);
+              }}
+            />
+          </div>
+        )}
         <div className="flex flex-col gap-1 min-w-0 flex-1">
           <div className="flex gap-2.5 items-baseline min-w-0">
             <div className="font-bold text-sm leading-tight whitespace-nowrap overflow-hidden text-ellipsis">
@@ -69,22 +87,38 @@ export function GlossaryCard({ term, onClick, t }) {
   );
 }
 
-export function PublicationCard({ publication, onClick, t }) {
-  const title = publication.title_pt || publication.title_en || publication.title_jp || 'Publication';
-  const notes = publication.notes_pt || publication.notes_en || publication.notes_jp || '';
+export function PublicationCard({ publication, onClick, t, lang = 'en' }) {
+  const title = publication[`title_${lang}`] || publication.title_pt || publication.title_en || publication.title_jp || 'Publication';
+  const notes = publication[`notes_${lang}`] || publication.notes_pt || publication.notes_en || publication.notes_jp || '';
   const cover = publication.cover_url || '';
+  const [imageError, setImageError] = React.useState(false);
+  const [hasImage, setHasImage] = React.useState(!!cover);
+
+  React.useEffect(() => {
+    if (cover) {
+      const img = new Image();
+      img.onload = () => setHasImage(true);
+      img.onerror = () => {
+        setHasImage(false);
+        setImageError(true);
+      };
+      img.src = cover;
+    } else {
+      setHasImage(false);
+    }
+  }, [cover]);
 
   return (
     <div className="card" onClick={onClick}>
       <div className="flex gap-3 items-center">
-        {cover && (
+        {hasImage && cover && !imageError && (
           <div className="thumb">
             <img
               src={cover}
               alt={title}
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.textContent = '';
+              onError={() => {
+                setImageError(true);
+                setHasImage(false);
               }}
             />
           </div>
@@ -113,9 +147,25 @@ export function PublicationCard({ publication, onClick, t }) {
   );
 }
 
-export function CollectibleCard({ collectible, onClick, t }) {
-  const name = collectible.name_pt || collectible.name_en || collectible.name_jp || 'Collectible';
+export function CollectibleCard({ collectible, onClick, t, lang = 'en' }) {
+  const name = collectible[`name_${lang}`] || collectible.name_pt || collectible.name_en || collectible.name_jp || 'Collectible';
   const image = collectible.image_url || '';
+  const [imageError, setImageError] = React.useState(false);
+  const [hasImage, setHasImage] = React.useState(!!image);
+
+  React.useEffect(() => {
+    if (image) {
+      const img = new Image();
+      img.onload = () => setHasImage(true);
+      img.onerror = () => {
+        setHasImage(false);
+        setImageError(true);
+      };
+      img.src = image;
+    } else {
+      setHasImage(false);
+    }
+  }, [image]);
 
   const subtitleParts = [];
   if (collectible.line) subtitleParts.push(collectible.line);
@@ -125,14 +175,14 @@ export function CollectibleCard({ collectible, onClick, t }) {
   return (
     <div className="card" onClick={onClick}>
       <div className="flex gap-3 items-center">
-        {image && (
+        {hasImage && image && !imageError && (
           <div className="thumb">
             <img
-              src={`${image}?v=${Date.now()}`}
+              src={image}
               alt={name}
-              onError={(e) => {
-                e.target.style.display = 'none';
-                e.target.parentElement.textContent = '';
+              onError={() => {
+                setImageError(true);
+                setHasImage(false);
               }}
             />
           </div>

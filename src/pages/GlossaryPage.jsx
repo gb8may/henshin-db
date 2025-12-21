@@ -33,11 +33,11 @@ export function GlossaryPage() {
 
   useEffect(() => {
     loadGlossary();
-  }, []);
+  }, [lang]);
 
   useEffect(() => {
     filterGlossary();
-  }, [search, category, terms]);
+  }, [search, category, terms, lang]);
 
   async function loadGlossary() {
     setLoading(true);
