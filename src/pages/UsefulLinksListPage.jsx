@@ -31,7 +31,7 @@ function getSocialIcon(platform) {
 export function UsefulLinksListPage() {
   const { category } = useParams();
   const navigate = useNavigate();
-  const { t } = useLanguage();
+  const { lang, t } = useLanguage();
   const [items, setItems] = useState([]);
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
@@ -44,7 +44,7 @@ export function UsefulLinksListPage() {
 
   useEffect(() => {
     loadItems();
-  }, [category]);
+  }, [category, lang]);
 
   useEffect(() => {
     filterItems();
@@ -62,12 +62,17 @@ export function UsefulLinksListPage() {
           .order('sort_order', { ascending: true });
 
         if (!error && data) {
-          const list = data.map(item => ({
-            id: item.id.toString(),
-            name: item.name_pt || item.name_en || item.name_jp || '',
-            description: item.note_pt || item.note_en || item.note_jp || '',
-            links: Array.isArray(item.links) ? item.links : [],
-          }));
+          const list = data.map(item => {
+            // Seleciona o nome e descrição baseado no idioma atual
+            const nameKey = `name_${lang}`;
+            const noteKey = `note_${lang}`;
+            return {
+              id: item.id.toString(),
+              name: item[nameKey] || item.name_pt || item.name_en || item.name_jp || '',
+              description: item[noteKey] || item.note_pt || item.note_en || item.note_jp || '',
+              links: Array.isArray(item.links) ? item.links : [],
+            };
+          });
           setItems(list);
           setFiltered(list);
           saveCache(`useful_links_${category}`, 'global', list);
