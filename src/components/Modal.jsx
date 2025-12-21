@@ -1,9 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { X, ExternalLink } from 'lucide-react';
 import { useLanguage } from '../hooks/useLanguage';
 
 export function Modal({ isOpen, onClose, title, image, imageAlt, children, linkUrl }) {
   const { t } = useLanguage();
+  const [hasImage, setHasImage] = useState(false);
+  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -26,6 +28,26 @@ export function Modal({ isOpen, onClose, title, image, imageAlt, children, linkU
     return () => document.removeEventListener('keydown', handleEscape);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (image) {
+      setImageError(false);
+      setHasImage(false);
+      const img = new Image();
+      img.onload = () => {
+        setHasImage(true);
+        setImageError(false);
+      };
+      img.onerror = () => {
+        setHasImage(false);
+        setImageError(true);
+      };
+      img.src = image;
+    } else {
+      setHasImage(false);
+      setImageError(false);
+    }
+  }, [image]);
+
   if (!isOpen) return null;
 
   return (
@@ -47,14 +69,15 @@ export function Modal({ isOpen, onClose, title, image, imageAlt, children, linkU
           </button>
         </div>
 
-        {image && (
+        {hasImage && image && !imageError && (
           <div className="w-full aspect-[4/5] rounded-card border border-toku-border bg-[rgba(255,255,255,0.05)] overflow-hidden mb-2.5 flex items-center justify-center p-2.5">
             <img
-              src={`${image}?v=${Date.now()}`}
+              src={image}
               alt={imageAlt || ''}
               className="w-full h-full object-contain block"
-              onError={(e) => {
-                e.target.style.display = 'none';
+              onError={() => {
+                setImageError(true);
+                setHasImage(false);
               }}
             />
           </div>

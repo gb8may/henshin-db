@@ -16,7 +16,6 @@
   * Metal Hero
   * Ultraman
   * Cybercops
-* 📴 **Modo offline** com cache local
 * 📱 Interface moderna com React e Tailwind CSS
 * 🎨 Design temático com ícones SVG customizados
 * 🌐 Suporte a múltiplos idiomas (PT, EN, JA)
@@ -29,77 +28,7 @@
 * **React Router** - Roteamento
 * **Supabase** - Backend (PostgreSQL + Storage)
 * **Lucide React** - Ícones
-* **Capacitor** - Build mobile (Android/iOS)
 * **PWA** - Progressive Web App
-
-## 🚀 Como executar
-
-### Pré-requisitos
-
-- Node.js 18+ e npm
-
-### Instalação
-
-```bash
-# Instalar dependências
-npm install
-
-# Executar em modo desenvolvimento
-npm run dev
-
-# Build para produção
-npm run build
-
-# Preview do build
-npm run preview
-```
-
-### Mobile (Capacitor)
-
-```bash
-# Sincronizar com Capacitor
-npm run sync
-
-# Abrir projeto Android
-npm run android
-
-# Abrir projeto iOS
-npm run ios
-```
-
-## 📁 Estrutura do Projeto
-
-```
-henshin-db/
-├── src/
-│   ├── components/      # Componentes React reutilizáveis
-│   │   ├── icons/       # Ícones SVG customizados
-│   │   ├── Header.jsx
-│   │   ├── Footer.jsx
-│   │   ├── Modal.jsx
-│   │   ├── Card.jsx
-│   │   └── Button.jsx
-│   ├── pages/           # Páginas/Views
-│   │   ├── Home.jsx
-│   │   ├── CharactersPage.jsx
-│   │   ├── GlossaryPage.jsx
-│   │   ├── PublicationsPage.jsx
-│   │   └── CollectiblesPage.jsx
-│   ├── hooks/           # Custom hooks
-│   │   ├── useLanguage.js
-│   │   └── useCache.js
-│   ├── lib/             # Utilitários
-│   │   ├── supabase.js
-│   │   └── i18n.js
-│   ├── App.jsx          # Componente principal
-│   ├── main.jsx         # Entry point
-│   └── index.css        # Estilos globais
-├── www/                 # Build output (para Capacitor)
-├── index.html
-├── vite.config.js
-├── tailwind.config.js
-└── package.json
-```
 
 ## 🎨 Design System
 
@@ -118,13 +47,6 @@ O app suporta 3 idiomas:
 - Japonês (JA)
 
 O idioma é detectado automaticamente do navegador ou pode ser alterado manualmente.
-
-## 📴 Modo Offline
-
-O app funciona offline usando:
-- **LocalStorage** para cache de dados
-- **Service Worker** para cache de assets
-- Fallback automático quando sem conexão
 
 ## 👩‍💻 Autor
 
