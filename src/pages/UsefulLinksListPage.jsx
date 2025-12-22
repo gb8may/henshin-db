@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useLanguage } from '../hooks/useLanguage';
-import { Search, Plus, ExternalLink, Instagram, Youtube, Twitter, Globe, X } from 'lucide-react';
+import { Search, ExternalLink, Instagram, Youtube, Twitter, Globe, X } from 'lucide-react';
 import { supabase, SUPABASE_PERSONALITIES_STORAGE_URL } from '../lib/supabase';
 import { saveCache, loadCache } from '../hooks/useCache';
 import { Modal, SpecCard } from '../components/Modal';
@@ -43,25 +43,53 @@ function imageUrlForPersonality(name) {
   return `${SUPABASE_PERSONALITIES_STORAGE_URL}/${slug}.png`;
 }
 
+// Função para mapear dados brutos para um idioma específico
+function mapItemsToLang(rawItems, lang) {
+  return rawItems.map(item => {
+    const nameKey = `name_${lang}`;
+    const noteKey = `note_${lang}`;
+    return {
+      id: item.id.toString(),
+      name: item[nameKey] || item.name_pt || item.name_en || item.name_jp || '',
+      description: item[noteKey] || item.note_pt || item.note_en || item.note_jp || '',
+      links: Array.isArray(item.links) ? item.links : [],
+      // Mantém os dados brutos para remapear quando o idioma mudar
+      _raw: item,
+    };
+  });
+}
+
 export function UsefulLinksListPage() {
   const { category } = useParams();
   const navigate = useNavigate();
   const { lang, t } = useLanguage();
-  const [items, setItems] = useState([]);
+  const [rawItems, setRawItems] = useState([]); // Dados brutos com todos os idiomas
+  const [items, setItems] = useState([]); // Dados mapeados para o idioma atual
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState('');
-  const [showAddForm, setShowAddForm] = useState(false);
   const [selected, setSelected] = useState(null);
   const [modalOpen, setModalOpen] = useState(false);
-  const [formData, setFormData] = useState({
-    name: '',
-    description: '',
-    links: [{ platform: 'instagram', url: '', label: '' }],
-  });
+  const selectedIdRef = useRef(null);
 
   useEffect(() => {
     loadItems();
-  }, [category, lang]);
+  }, [category]);
+
+  // Remapeia os dados quando o idioma muda
+  useEffect(() => {
+    if (rawItems.length > 0) {
+      const mapped = mapItemsToLang(rawItems, lang);
+      setItems(mapped);
+      // Atualiza o item selecionado no modal se houver
+      if (selectedIdRef.current) {
+        const rawItem = rawItems.find(r => r.id.toString() === selectedIdRef.current);
+        if (rawItem) {
+          const updatedSelected = mapItemsToLang([rawItem], lang)[0];
+          setSelected(updatedSelected);
+        }
+      }
+    }
+  }, [lang, rawItems]);
 
   useEffect(() => {
     filterItems();
@@ -79,20 +107,13 @@ export function UsefulLinksListPage() {
           .order('sort_order', { ascending: true });
 
         if (!error && data) {
-          const list = data.map(item => {
-            // Seleciona o nome e descrição baseado no idioma atual
-            const nameKey = `name_${lang}`;
-            const noteKey = `note_${lang}`;
-            return {
-              id: item.id.toString(),
-              name: item[nameKey] || item.name_pt || item.name_en || item.name_jp || '',
-              description: item[noteKey] || item.note_pt || item.note_en || item.note_jp || '',
-              links: Array.isArray(item.links) ? item.links : [],
-            };
-          });
-          setItems(list);
-          setFiltered(list);
-          saveCache(`useful_links_${category}`, 'global', list);
+          // Salva os dados brutos (com todos os idiomas) no cache
+          setRawItems(data);
+          const mapped = mapItemsToLang(data, lang);
+          setItems(mapped);
+          setFiltered(mapped);
+          // Salva dados brutos no cache para poder remapear depois
+          saveCache(`useful_links_raw_${category}`, 'global', data);
           return;
         }
       } catch (err) {
@@ -100,11 +121,35 @@ export function UsefulLinksListPage() {
       }
     }
 
-    // Fallback para cache local
-    const cached = loadCache(`useful_links_${category}`, 'global');
-    const list = Array.isArray(cached.data) ? cached.data : [];
-    setItems(list);
-    setFiltered(list);
+    // Fallback para cache local - tenta buscar dados brutos primeiro
+    const cachedRaw = loadCache(`useful_links_raw_${category}`, 'global');
+    if (cachedRaw.data && Array.isArray(cachedRaw.data) && cachedRaw.data.length > 0) {
+      // Se tem dados brutos no cache, usa eles
+      setRawItems(cachedRaw.data);
+      const mapped = mapItemsToLang(cachedRaw.data, lang);
+      setItems(mapped);
+      setFiltered(mapped);
+    } else {
+      // Fallback para cache antigo (dados já mapeados)
+      const cached = loadCache(`useful_links_${category}`, 'global');
+      const list = Array.isArray(cached.data) ? cached.data : [];
+      setItems(list);
+      setFiltered(list);
+      // Tenta reconstruir dados brutos a partir dos dados mapeados (limitado)
+      if (list.length > 0) {
+        const reconstructed = list.map(item => ({
+          id: item.id,
+          name_pt: item.name,
+          name_en: item.name,
+          name_jp: item.name,
+          note_pt: item.description,
+          note_en: item.description,
+          note_jp: item.description,
+          links: item.links || [],
+        }));
+        setRawItems(reconstructed);
+      }
+    }
   }
 
   function filterItems() {
@@ -124,67 +169,11 @@ export function UsefulLinksListPage() {
     setFiltered(filtered);
   }
 
-  function handleAddLink() {
-    setFormData({
-      ...formData,
-      links: [...formData.links, { platform: 'instagram', url: '', label: '' }],
-    });
-  }
-
-  function handleRemoveLink(index) {
-    const newLinks = formData.links.filter((_, i) => i !== index);
-    setFormData({ ...formData, links: newLinks });
-  }
-
-  function handleLinkChange(index, field, value) {
-    const newLinks = [...formData.links];
-    newLinks[index] = { ...newLinks[index], [field]: value };
-    setFormData({ ...formData, links: newLinks });
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    if (!hasValue(formData.name)) return;
-
-    const newItem = {
-      id: Date.now().toString(),
-      name: safeText(formData.name),
-      description: safeText(formData.description),
-      links: formData.links
-        .filter(l => hasValue(l.url))
-        .map(l => ({
-          platform: safeText(l.platform) || 'instagram',
-          url: safeText(l.url),
-          label: safeText(l.label) || safeText(l.platform) || 'Link',
-        })),
-      createdAt: new Date().toISOString(),
-    };
-
-    const updated = [...items, newItem];
-    setItems(updated);
-    setFiltered(updated);
-    saveCache(`useful_links_${category}`, 'global', updated);
-    
-    // Reset form
-    setFormData({
-      name: '',
-      description: '',
-      links: [{ platform: 'instagram', url: '', label: '' }],
-    });
-    setShowAddForm(false);
-  }
-
-  function handleDelete(id) {
-    if (!confirm(t('confirmDelete'))) return;
-    const updated = items.filter(item => item.id !== id);
-    setItems(updated);
-    setFiltered(updated);
-    saveCache(`useful_links_${category}`, 'global', updated);
-  }
-
   function openModal(item) {
     // Only open modal for personalities (actors category)
     if (category === 'actors') {
+      // Salva o ID do item para poder atualizar quando o idioma mudar
+      selectedIdRef.current = item.id;
       setSelected(item);
       setModalOpen(true);
     }
@@ -211,115 +200,7 @@ export function UsefulLinksListPage() {
           <div className="font-bold text-base leading-tight">
             {categoryLabel}
           </div>
-          <button
-            onClick={() => setShowAddForm(!showAddForm)}
-            className="btn-ghost flex items-center gap-2"
-          >
-            <Plus className="w-4 h-4" />
-            <span>{t('addItem')}</span>
-          </button>
         </div>
-
-        {showAddForm && (
-          <div className="card mb-4">
-            <form onSubmit={handleSubmit} className="space-y-3">
-              <div>
-                <label className="block text-xs text-toku-muted mb-1.5">{t('itemName')} *</label>
-                <input
-                  type="text"
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="input-search"
-                  placeholder={t('itemNamePlaceholder')}
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-toku-muted mb-1.5">{t('itemDescription')}</label>
-                <textarea
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="input-search resize-none"
-                  rows="3"
-                  placeholder={t('itemDescriptionPlaceholder')}
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs text-toku-muted mb-1.5">{t('socialLinks')}</label>
-                {formData.links.map((link, index) => (
-                  <div key={index} className="flex gap-2 mb-2">
-                    <select
-                      value={link.platform}
-                      onChange={(e) => handleLinkChange(index, 'platform', e.target.value)}
-                      className="select-filter flex-shrink-0 w-32"
-                    >
-                      <option value="instagram">Instagram</option>
-                      <option value="youtube">YouTube</option>
-                      <option value="twitter">Twitter</option>
-                      <option value="x">X (Twitter)</option>
-                      <option value="other">Outro</option>
-                    </select>
-                    <input
-                      type="text"
-                      value={link.label}
-                      onChange={(e) => handleLinkChange(index, 'label', e.target.value)}
-                      className="input-search flex-1"
-                      placeholder={t('linkLabelPlaceholder')}
-                    />
-                    <input
-                      type="url"
-                      value={link.url}
-                      onChange={(e) => handleLinkChange(index, 'url', e.target.value)}
-                      className="input-search flex-1"
-                      placeholder={t('linkUrlPlaceholder')}
-                    />
-                    {formData.links.length > 1 && (
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveLink(index)}
-                        className="btn-ghost px-2"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                ))}
-                <button
-                  type="button"
-                  onClick={handleAddLink}
-                  className="btn-ghost text-xs"
-                >
-                  + {t('addAnotherLink')}
-                </button>
-              </div>
-
-              <div className="flex gap-2">
-                <button
-                  type="submit"
-                  className="btn-primary flex-1"
-                >
-                  {t('save')}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setShowAddForm(false);
-                    setFormData({
-                      name: '',
-                      description: '',
-                      links: [{ platform: 'instagram', url: '', label: '' }],
-                    });
-                  }}
-                  className="btn-ghost"
-                >
-                  {t('cancel')}
-                </button>
-              </div>
-            </form>
-          </div>
-        )}
 
         <div className="flex gap-2.5 items-center mb-3">
           <div className="relative flex-1">
@@ -361,16 +242,6 @@ export function UsefulLinksListPage() {
                       </div>
                     )}
                   </div>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDelete(item.id);
-                    }}
-                    className="btn-ghost p-1 flex-shrink-0"
-                    title={t('remove')}
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
                 </div>
 
                 {item.links && item.links.length > 0 && (
@@ -406,6 +277,7 @@ export function UsefulLinksListPage() {
           onClose={() => {
             setModalOpen(false);
             setSelected(null);
+            selectedIdRef.current = null;
           }}
           title={selected?.name || t('modalDetails')}
           image={selected?.name ? imageUrlForPersonality(selected.name) : ''}
