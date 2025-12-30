@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - Henshin DB</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #e0e0e0;
+            background: #0b0e14;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #1a1f2e;
+        }
+        h1 {
+            color: #fff;
+            margin-bottom: 10px;
+        }
+        .lang-selector {
+            margin-top: 20px;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        .lang-btn {
+            padding: 8px 16px;
+            background: #1a1f2e;
+            border: 1px solid #2a2f3e;
+            color: #e0e0e0;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        .lang-btn:hover, .lang-btn.active {
+            background: #2a2f3e;
+            border-color: #3a3f4e;
+        }
+        .content {
+            display: none;
+        }
+        .content.active {
+            display: block;
+        }
+        h2 {
+            color: #fff;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.5em;
+        }
+        h3 {
+            color: #c0c0c0;
+            margin-top: 20px;
+            margin-bottom: 10px;
+            font-size: 1.2em;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        ul {
+            margin-left: 20px;
+            margin-bottom: 15px;
+        }
+        li {
+            margin-bottom: 8px;
+        }
+        .last-updated {
+            color: #888;
+            font-size: 0.9em;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #1a1f2e;
+        }
+        a {
+            color: #4a9eff;
+            text-decoration: none;
+        }
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Privacy Policy</h1>
+        <p>Política de Privacidade</p>
+        <p>プライバシーポリシー</p>
+        <div class="lang-selector">
+            <button class="lang-btn active" onclick="showLang('en')">English</button>
+            <button class="lang-btn" onclick="showLang('pt')">Português</button>
+            <button class="lang-btn" onclick="showLang('ja')">日本語</button>
+        </div>
+    </div>
+
+    <!-- English Version -->
+    <div id="content-en" class="content active">
+        <h2>Privacy Policy</h2>
+        <p><strong>Last Updated:</strong> December 21, 2024</p>
+
+        <h3>1. Introduction</h3>
+        <p>Henshin DB ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our mobile application and website (collectively, the "Service").</p>
+
+        <h3>2. Information We Collect</h3>
+        <h4>2.1. Automatically Collected Information</h4>
+        <ul>
+            <li><strong>Usage Data:</strong> We collect anonymous visit statistics to understand how our Service is used. This includes page views and general usage patterns.</li>
+            <li><strong>Device Information:</strong> We may collect information about your device, including device type, operating system, and browser type.</li>
+            <li><strong>Local Storage:</strong> The app uses local storage (localStorage) to cache data for offline access and to remember your language preferences.</li>
+        </ul>
+
+        <h4>2.2. Data Stored in Supabase</h4>
+        <p>Our Service uses Supabase (a third-party database service) to store and manage application data, including:</p>
+        <ul>
+            <li>Character information</li>
+            <li>Glossary entries</li>
+            <li>Publication data</li>
+            <li>Collectibles information</li>
+            <li>Useful links and community resources</li>
+            <li>Anonymous visit statistics</li>
+        </ul>
+        <p>All data stored in Supabase is publicly accessible content related to Tokusatsu media. We do not store personal information or user accounts.</p>
+
+        <h3>3. How We Use Your Information</h3>
+        <ul>
+            <li>To provide and maintain our Service</li>
+            <li>To improve and optimize the Service</li>
+            <li>To analyze usage patterns and trends</li>
+            <li>To enable offline functionality through local caching</li>
+            <li>To remember your language preferences</li>
+        </ul>
+
+        <h3>4. Service Worker and Caching</h3>
+        <p>Our Service uses a Service Worker to cache content for offline access. This means some data is stored locally on your device to improve performance and enable offline functionality. You can clear this cache through your browser or device settings.</p>
+
+        <h3>5. Third-Party Services</h3>
+        <h4>5.1. Supabase</h4>
+        <p>We use Supabase to host our database. Supabase's privacy practices are governed by their own privacy policy. For more information, please visit: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+
+        <h4>5.2. Netlify</h4>
+        <p>Our website is hosted on Netlify. Netlify's privacy practices are governed by their own privacy policy. For more information, please visit: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+
+        <h3>6. Data Security</h3>
+        <p>We implement appropriate technical and organizational measures to protect your information. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your information, we cannot guarantee absolute security.</p>
+
+        <h3>7. Your Rights</h3>
+        <p>Since we do not collect personal information or maintain user accounts, there is no personal data to access, modify, or delete. However, you can:</p>
+        <ul>
+            <li>Clear your browser's local storage to remove cached data</li>
+            <li>Disable the Service Worker through your browser settings</li>
+            <li>Uninstall the mobile app to remove all locally stored data</li>
+        </ul>
+
+        <h3>8. Children's Privacy</h3>
+        <p>Our Service is not directed to children under 13 years of age. We do not knowingly collect personal information from children under 13.</p>
+
+        <h3>9. Changes to This Privacy Policy</h3>
+        <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+
+        <h3>10. Contact Us</h3>
+        <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+        <ul>
+            <li>Website: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
+            <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
+        </ul>
+    </div>
+
+    <!-- Portuguese Version -->
+    <div id="content-pt" class="content">
+        <h2>Política de Privacidade</h2>
+        <p><strong>Última Atualização:</strong> 21 de Dezembro de 2024</p>
+
+        <h3>1. Introdução</h3>
+        <p>O Henshin DB ("nós", "nosso" ou "nos") está comprometido em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações quando você usa nosso aplicativo móvel e site (coletivamente, o "Serviço").</p>
+
+        <h3>2. Informações que Coletamos</h3>
+        <h4>2.1. Informações Coletadas Automaticamente</h4>
+        <ul>
+            <li><strong>Dados de Uso:</strong> Coletamos estatísticas de visitas anônimas para entender como nosso Serviço é usado. Isso inclui visualizações de página e padrões gerais de uso.</li>
+            <li><strong>Informações do Dispositivo:</strong> Podemos coletar informações sobre seu dispositivo, incluindo tipo de dispositivo, sistema operacional e tipo de navegador.</li>
+            <li><strong>Armazenamento Local:</strong> O aplicativo usa armazenamento local (localStorage) para armazenar dados em cache para acesso offline e para lembrar suas preferências de idioma.</li>
+        </ul>
+
+        <h4>2.2. Dados Armazenados no Supabase</h4>
+        <p>Nosso Serviço usa Supabase (um serviço de banco de dados de terceiros) para armazenar e gerenciar dados do aplicativo, incluindo:</p>
+        <ul>
+            <li>Informações de personagens</li>
+            <li>Entradas do glossário</li>
+            <li>Dados de publicações</li>
+            <li>Informações de colecionáveis</li>
+            <li>Links úteis e recursos da comunidade</li>
+            <li>Estatísticas anônimas de visitas</li>
+        </ul>
+        <p>Todos os dados armazenados no Supabase são conteúdo publicamente acessível relacionado à mídia Tokusatsu. Não armazenamos informações pessoais ou contas de usuários.</p>
+
+        <h3>3. Como Usamos Suas Informações</h3>
+        <ul>
+            <li>Para fornecer e manter nosso Serviço</li>
+            <li>Para melhorar e otimizar o Serviço</li>
+            <li>Para analisar padrões e tendências de uso</li>
+            <li>Para habilitar funcionalidade offline através de cache local</li>
+            <li>Para lembrar suas preferências de idioma</li>
+        </ul>
+
+        <h3>4. Service Worker e Cache</h3>
+        <p>Nosso Serviço usa um Service Worker para armazenar conteúdo em cache para acesso offline. Isso significa que alguns dados são armazenados localmente no seu dispositivo para melhorar o desempenho e habilitar funcionalidade offline. Você pode limpar este cache através das configurações do seu navegador ou dispositivo.</p>
+
+        <h3>5. Serviços de Terceiros</h3>
+        <h4>5.1. Supabase</h4>
+        <p>Usamos Supabase para hospedar nosso banco de dados. As práticas de privacidade do Supabase são regidas por sua própria política de privacidade. Para mais informações, visite: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+
+        <h4>5.2. Netlify</h4>
+        <p>Nosso site é hospedado no Netlify. As práticas de privacidade do Netlify são regidas por sua própria política de privacidade. Para mais informações, visite: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+
+        <h3>6. Segurança dos Dados</h3>
+        <p>Implementamos medidas técnicas e organizacionais apropriadas para proteger suas informações. No entanto, nenhum método de transmissão pela Internet ou armazenamento eletrônico é 100% seguro. Embora nos esforcemos para usar meios comercialmente aceitáveis para proteger suas informações, não podemos garantir segurança absoluta.</p>
+
+        <h3>7. Seus Direitos</h3>
+        <p>Como não coletamos informações pessoais ou mantemos contas de usuários, não há dados pessoais para acessar, modificar ou excluir. No entanto, você pode:</p>
+        <ul>
+            <li>Limpar o armazenamento local do seu navegador para remover dados em cache</li>
+            <li>Desabilitar o Service Worker através das configurações do seu navegador</li>
+            <li>Desinstalar o aplicativo móvel para remover todos os dados armazenados localmente</li>
+        </ul>
+
+        <h3>8. Privacidade de Crianças</h3>
+        <p>Nosso Serviço não é direcionado a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos.</p>
+
+        <h3>9. Alterações nesta Política de Privacidade</h3>
+        <p>Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data de "Última Atualização".</p>
+
+        <h3>10. Entre em Contato</h3>
+        <p>Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco em:</p>
+        <ul>
+            <li>Site: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
+            <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
+        </ul>
+    </div>
+
+    <!-- Japanese Version -->
+    <div id="content-ja" class="content">
+        <h2>プライバシーポリシー</h2>
+        <p><strong>最終更新日:</strong> 2024年12月21日</p>
+
+        <h3>1. はじめに</h3>
+        <p>Henshin DB（「当社」「私たち」）は、お客様のプライバシーを保護することに取り組んでいます。本プライバシーポリシーは、モバイルアプリケーションおよびウェブサイト（総称して「サービス」）を使用する際に、当社がお客様の情報をどのように収集、使用、保護するかを説明します。</p>
+
+        <h3>2. 収集する情報</h3>
+        <h4>2.1. 自動的に収集される情報</h4>
+        <ul>
+            <li><strong>使用データ:</strong> サービスがどのように使用されているかを理解するために、匿名の訪問統計を収集します。これには、ページビューと一般的な使用パターンが含まれます。</li>
+            <li><strong>デバイス情報:</strong> デバイスの種類、オペレーティングシステム、ブラウザの種類など、デバイスに関する情報を収集する場合があります。</li>
+            <li><strong>ローカルストレージ:</strong> アプリはローカルストレージ（localStorage）を使用して、オフラインアクセス用にデータをキャッシュし、言語設定を記憶します。</li>
+        </ul>
+
+        <h4>2.2. Supabaseに保存されるデータ</h4>
+        <p>当社のサービスは、Supabase（サードパーティのデータベースサービス）を使用して、アプリケーションデータを保存および管理します。これには以下が含まれます：</p>
+        <ul>
+            <li>キャラクター情報</li>
+            <li>用語集エントリ</li>
+            <li>出版物データ</li>
+            <li>コレクタブル情報</li>
+            <li>便利なリンクとコミュニティリソース</li>
+            <li>匿名の訪問統計</li>
+        </ul>
+        <p>Supabaseに保存されるすべてのデータは、特撮メディアに関連する公開アクセス可能なコンテンツです。個人情報やユーザーアカウントは保存しません。</p>
+
+        <h3>3. 情報の使用方法</h3>
+        <ul>
+            <li>サービスの提供と維持</li>
+            <li>サービスの改善と最適化</li>
+            <li>使用パターンと傾向の分析</li>
+            <li>ローカルキャッシュによるオフライン機能の有効化</li>
+            <li>言語設定の記憶</li>
+        </ul>
+
+        <h3>4. サービスワーカーとキャッシュ</h3>
+        <p>当社のサービスは、オフラインアクセス用にコンテンツをキャッシュするためにサービスワーカーを使用します。これは、パフォーマンスを向上させ、オフライン機能を有効にするために、一部のデータがデバイスにローカルに保存されることを意味します。ブラウザまたはデバイスの設定を通じて、このキャッシュをクリアできます。</p>
+
+        <h3>5. サードパーティサービス</h3>
+        <h4>5.1. Supabase</h4>
+        <p>データベースをホストするためにSupabaseを使用しています。Supabaseのプライバシー慣行は、独自のプライバシーポリシーによって管理されています。詳細については、以下をご覧ください: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+
+        <h4>5.2. Netlify</h4>
+        <p>当社のウェブサイトはNetlifyでホストされています。Netlifyのプライバシー慣行は、独自のプライバシーポリシーによって管理されています。詳細については、以下をご覧ください: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+
+        <h3>6. データセキュリティ</h3>
+        <p>お客様の情報を保護するために、適切な技術的および組織的措置を実装しています。ただし、インターネット経由の送信や電子ストレージの方法は100%安全ではありません。お客様の情報を保護するために商業的に受け入れられる手段を使用するよう努めていますが、絶対的なセキュリティを保証することはできません。</p>
+
+        <h3>7. お客様の権利</h3>
+        <p>個人情報を収集したり、ユーザーアカウントを維持したりしないため、アクセス、変更、または削除する個人データはありません。ただし、以下を実行できます：</p>
+        <ul>
+            <li>ブラウザのローカルストレージをクリアしてキャッシュされたデータを削除</li>
+            <li>ブラウザの設定を通じてサービスワーカーを無効化</li>
+            <li>モバイルアプリをアンインストールして、ローカルに保存されたすべてのデータを削除</li>
+        </ul>
+
+        <h3>8. 児童のプライバシー</h3>
+        <p>当社のサービスは、13歳未満の子供を対象としていません。13歳未満の子供から意図的に個人情報を収集することはありません。</p>
+
+        <h3>9. 本プライバシーポリシーの変更</h3>
+        <p>本プライバシーポリシーを随時更新する場合があります。このページに新しいプライバシーポリシーを投稿し、「最終更新日」を更新することにより、変更を通知します。</p>
+
+        <h3>10. お問い合わせ</h3>
+        <p>本プライバシーポリシーについてご質問がある場合は、以下までお問い合わせください：</p>
+        <ul>
+            <li>ウェブサイト: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
+            <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
+        </ul>
+    </div>
+
+    <div class="last-updated">
+        <p><strong>Last Updated / Última Atualização / 最終更新日:</strong> December 21, 2024 / 21 de Dezembro de 2024 / 2024年12月21日</p>
+    </div>
+
+    <script>
+        function showLang(lang) {
+            // Hide all content
+            document.querySelectorAll('.content').forEach(content => {
+                content.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.lang-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected content
+            document.getElementById('content-' + lang).classList.add('active');
+            
+            // Add active class to clicked button
+            event.target.classList.add('active');
+        }
+    </script>
+</body>
+</html>
+
+
+
+
+
+
+
+
+

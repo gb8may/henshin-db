@@ -31,3 +31,22 @@ scripts/
 android/.gradle
 android/app/build
 ios/App/Pods
+
+# Android Keystore (não commitar!)
+*.keystore
+android/keystore.properties
+
+# Build output
+www/
+
+# Screenshots e assets de publicação (local only)
+screenshots/
+ASSETS_*.md
+SCREENSHOTS_*.md
+GOOGLE_PLAY_*.md
+PUBLICATION_*.md
+PRIVACY_POLICY_INFO.md
+android/BUILD_SUMMARY.md
+android/KEYSTORE_SETUP.md
+android/PROGUARD_RULES.md
+android/VERSIONING.md
