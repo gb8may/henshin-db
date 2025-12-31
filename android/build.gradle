@@ -23,18 +23,19 @@ allprojects {
         mavenCentral()
     }
     
-    // Sobrescrever Java version para todos os subprojetos (incluindo Capacitor)
+    // Configurar Java 21 para compatibilidade com AdMob plugin
     afterEvaluate { project ->
         if (project.hasProperty('android')) {
             project.android {
                 compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_17
-                    targetCompatibility JavaVersion.VERSION_17
+                    sourceCompatibility JavaVersion.VERSION_21
+                    targetCompatibility JavaVersion.VERSION_21
                 }
             }
         }
     }
 }
+
 
 task clean(type: Delete) {
     delete rootProject.buildDir
