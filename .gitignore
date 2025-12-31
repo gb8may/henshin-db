@@ -50,3 +50,20 @@ android/BUILD_SUMMARY.md
 android/KEYSTORE_SETUP.md
 android/PROGUARD_RULES.md
 android/VERSIONING.md
+
+# Manuais e guias de publicação (local only)
+*_GUIDE.md
+*_FIX.md
+*_EXPLAINED.md
+*_DECLARATION.md
+*_LOCATIONS.md
+*_NOTES.md
+TESTING_*.md
+FIX_*.md
+android/*_GUIDE.md
+android/*_FIX.md
+android/*_VERIFY.md
+android/build-*.sh
+scripts/generate-*.sh
+scripts/capture-*.sh
+scripts/create-*.sh

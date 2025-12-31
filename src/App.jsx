@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-ro
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { VisitCounter } from './components/VisitCounter';
+import { AdBanner } from './components/AdBanner';
 import { Home } from './pages/Home';
 import { FranchiseHub } from './pages/FranchiseHub';
 import { CharactersPage } from './pages/CharactersPage';
@@ -17,6 +18,7 @@ import { StatsPage } from './pages/StatsPage';
 import { useLanguage } from './hooks/useLanguage';
 import { supabase } from './lib/supabase';
 import { formatFranchise } from './lib/i18n';
+import { initializeAdMob } from './lib/admob';
 
 function AppContent() {
   const location = useLocation();
@@ -24,6 +26,11 @@ function AppContent() {
   const { t } = useLanguage();
   const [connectionStatus, setConnectionStatus] = useState('offline');
   const [subtitle, setSubtitle] = useState('');
+
+  // Inicializar AdMob quando app monta (apenas em plataforma nativa)
+  useEffect(() => {
+    initializeAdMob().catch(console.error);
+  }, []);
 
   useEffect(() => {
     // Update subtitle based on route
@@ -122,6 +129,7 @@ function AppContent() {
       </main>
       <Footer />
       <VisitCounter />
+      <AdBanner />
     </div>
   );
 }
