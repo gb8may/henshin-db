@@ -20,6 +20,9 @@
 
   #root {
     @apply h-full;
+    /* Safe area insets - ensure content doesn't overlap system bars */
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
   }
 }
 
@@ -102,6 +105,8 @@
     text-wrap: balance;
   }
 }
+
+
 
 
 

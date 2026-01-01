@@ -50,7 +50,7 @@ export function Header({ subtitle, connectionStatus }) {
   };
 
   return (
-    <header className="px-4 py-3.5 pb-2.5 border-b border-toku-border bg-[rgba(0,0,0,0.35)] backdrop-blur-lg sticky top-0 z-40">
+    <header className="px-4 py-3.5 pb-2.5 border-b border-toku-border bg-[rgba(0,0,0,0.35)] backdrop-blur-lg sticky top-0 z-40" style={{ paddingTop: `calc(env(safe-area-inset-top) + 1.5rem)` }}>
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex flex-col gap-0.5">
           <div className="font-bold tracking-wide text-base leading-tight">

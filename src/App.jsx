@@ -1,5 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, useLocation, useNavigate } from 'react-router-dom';
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
 import { VisitCounter } from './components/VisitCounter';
@@ -27,9 +30,15 @@ function AppContent() {
   const [connectionStatus, setConnectionStatus] = useState('offline');
   const [subtitle, setSubtitle] = useState('');
 
-  // Inicializar AdMob quando app monta (apenas em plataforma nativa)
+  // Configurar Status Bar quando app monta (apenas em plataforma nativa)
   useEffect(() => {
-    initializeAdMob().catch(console.error);
+    if (Capacitor.isNativePlatform()) {
+      // Configure status bar
+      StatusBar.setStyle({ style: Style.Dark });
+      StatusBar.setBackgroundColor({ color: '#00000000' }); // Transparent
+      StatusBar.setOverlaysWebView({ overlay: true });
+    }
+    // AdMob será inicializado pelo componente AdBanner após a view estar pronta
   }, []);
 
   useEffect(() => {
@@ -109,6 +118,27 @@ function AppContent() {
     };
   }, []);
 
+  // Handle Android back button
+  useEffect(() => {
+    if (!Capacitor.isNativePlatform()) {
+      return; // Only handle on native platforms
+    }
+
+    const backButtonHandler = App.addListener('backButton', () => {
+      // If we're not on the home page, navigate back
+      if (location.pathname !== '/') {
+        navigate(-1);
+      } else {
+        // If we're on the home page, exit the app
+        App.exitApp();
+      }
+    });
+
+    return () => {
+      backButtonHandler.remove();
+    };
+  }, [location.pathname, navigate]);
+
   return (
     <div className="h-full flex flex-col">
       <Header subtitle={subtitle} connectionStatus={connectionStatus} />
@@ -134,7 +164,7 @@ function AppContent() {
   );
 }
 
-function App() {
+function AppRoot() {
   return (
     <BrowserRouter>
       <AppContent />
@@ -142,5 +172,5 @@ function App() {
   );
 }
 
-export default App;
+export default AppRoot;
 

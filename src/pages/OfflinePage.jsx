@@ -26,7 +26,7 @@ export function OfflinePage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-3.5 py-3.5 pb-[90px] overflow-auto flex-1 -webkit-overflow-scrolling-touch">
+      <div className="px-3.5 py-3.5 pb-[180px] overflow-auto flex-1 -webkit-overflow-scrolling-touch">
         <div className="font-bold text-base leading-tight mb-2.5 px-0.5">
           {t('offlineTitle')}
         </div>

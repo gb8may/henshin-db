@@ -1,14 +1,38 @@
-import React, { useEffect } from 'react';
-import { showBanner, removeBanner } from '../lib/admob';
+import React, { useEffect, useState } from 'react';
+import { Capacitor } from '@capacitor/core';
+import { showBanner, removeBanner, initializeAdMob } from '../lib/admob';
 
 export function AdBanner() {
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
-    // Mostra banner quando componente monta
-    showBanner();
+    if (!Capacitor.isNativePlatform()) {
+      return;
+    }
+
+    // Inicializa AdMob e depois mostra o banner
+    const initAndShow = async () => {
+      try {
+        // Garante que o AdMob está inicializado
+        await initializeAdMob();
+        
+        // Aguarda um pouco mais para garantir que a view está pronta
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        await showBanner();
+        setIsReady(true);
+      } catch (error) {
+        console.error('Error initializing and showing banner:', error);
+      }
+    };
+
+    initAndShow();
 
     // Remove banner quando componente desmonta
     return () => {
-      removeBanner();
+      if (isReady) {
+        removeBanner();
+      }
     };
   }, []);
 
@@ -16,5 +40,7 @@ export function AdBanner() {
   // O banner é renderizado nativamente pelo AdMob
   return null;
 }
+
+
 
 
