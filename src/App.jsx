@@ -21,6 +21,7 @@ import { StatsPage } from './pages/StatsPage';
 import { useLanguage } from './hooks/useLanguage';
 import { supabase } from './lib/supabase';
 import { formatFranchise } from './lib/i18n';
+import { initializeAdMob } from './lib/admob';
 
 function AppContent() {
   const location = useLocation();
