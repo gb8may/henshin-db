@@ -51,16 +51,20 @@ export async function showBanner() {
   }
 
   try {
+    // Aguarda um pouco para garantir que a Activity esteja pronta
+    await new Promise(resolve => setTimeout(resolve, 500));
+    
     await AdMob.showBanner({
       adId: AD_UNITS.banner,
       adSize: 'BANNER',
       position: 'BOTTOM_CENTER',
-      margin: 0,
+      margin: 50, // Margem superior para não cobrir o rodapé
       isTesting: false,
     });
     console.log('Banner ad shown');
   } catch (error) {
     console.error('Error showing banner:', error);
+    // Não lança o erro para não quebrar o app
   }
 }
 

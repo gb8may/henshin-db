@@ -186,7 +186,7 @@ export function UsefulLinksListPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <div className="px-3.5 py-3.5 pb-[90px] overflow-auto flex-1 -webkit-overflow-scrolling-touch relative">
+      <div className="px-3.5 py-3.5 pb-[180px] overflow-auto flex-1 -webkit-overflow-scrolling-touch relative">
         <div className="flex gap-2.5 items-center mb-3">
           <button
             onClick={() => navigate('/useful-links')}
