@@ -70,11 +70,11 @@ export function Modal({ isOpen, onClose, title, image, imageAlt, children, linkU
         </div>
 
         {hasImage && image && !imageError && (
-          <div className="w-full aspect-[4/5] rounded-card border border-toku-border bg-[rgba(255,255,255,0.05)] overflow-hidden mb-2.5 flex items-center justify-center p-2.5">
+          <div className="w-full max-w-full rounded-card border border-toku-border bg-[rgba(255,255,255,0.05)] overflow-hidden mb-2.5 flex items-center justify-center p-2.5">
             <img
               src={image}
               alt={imageAlt || ''}
-              className="w-full h-full object-contain block"
+              className="max-w-full max-h-[60vh] w-auto h-auto object-contain block"
               onError={() => {
                 setImageError(true);
                 setHasImage(false);

@@ -5,8 +5,8 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Header } from './components/Header';
 import { Footer } from './components/Footer';
-import { VisitCounter } from './components/VisitCounter';
 import { AdBanner } from './components/AdBanner';
+import { ScrollToTop } from './components/ScrollToTop';
 import { Home } from './pages/Home';
 import { FranchiseHub } from './pages/FranchiseHub';
 import { CharactersPage } from './pages/CharactersPage';
@@ -15,6 +15,7 @@ import { PublicationsPage } from './pages/PublicationsPage';
 import { CollectiblesPage } from './pages/CollectiblesPage';
 import { UsefulLinksPage } from './pages/UsefulLinksPage';
 import { UsefulLinksListPage } from './pages/UsefulLinksListPage';
+import { TokumapPage } from './pages/TokumapPage';
 import { AdminPage } from './pages/AdminPage';
 import { OfflinePage } from './pages/OfflinePage';
 import { StatsPage } from './pages/StatsPage';
@@ -151,6 +152,7 @@ function AppContent() {
           <Route path="/franchise/:franchise/publications" element={<PublicationsPage />} />
           <Route path="/franchise/:franchise/collectibles" element={<CollectiblesPage />} />
           <Route path="/useful-links" element={<UsefulLinksPage />} />
+          <Route path="/useful-links/tokumap" element={<TokumapPage />} />
           <Route path="/useful-links/:category" element={<UsefulLinksListPage />} />
           <Route path="/admin" element={<AdminPage />} />
           <Route path="/stats" element={<StatsPage />} />
@@ -158,8 +160,8 @@ function AppContent() {
         </Routes>
       </main>
       <Footer />
-      <VisitCounter />
       <AdBanner />
+      <ScrollToTop />
     </div>
   );
 }
