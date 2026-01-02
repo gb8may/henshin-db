@@ -13,16 +13,20 @@ export function AdBanner() {
     // Inicializa AdMob e depois mostra o banner
     const initAndShow = async () => {
       try {
+        // Aguarda mais tempo para garantir que a Activity e WebView estão completamente prontas
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
         // Garante que o AdMob está inicializado
         await initializeAdMob();
         
-        // Aguarda um pouco mais para garantir que a view está pronta
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Aguarda mais um pouco após inicialização
+        await new Promise(resolve => setTimeout(resolve, 1500));
         
         await showBanner();
         setIsReady(true);
       } catch (error) {
         console.error('Error initializing and showing banner:', error);
+        // Não propaga o erro para não quebrar o app
       }
     };
 
