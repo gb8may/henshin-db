@@ -20,6 +20,12 @@ export async function initializeAdMob() {
     return;
   }
 
+  // Verifica se o plugin está disponível
+  if (!AdMob) {
+    console.error('AdMob: Plugin not available');
+    return;
+  }
+
   try {
     // No Android, não precisamos verificar trackingAuthorizationStatus
     // Isso pode causar problemas, então vamos sempre usar false
@@ -52,33 +58,59 @@ export async function initializeAdMob() {
 // Banner Ad
 export async function showBanner() {
   if (!isNativePlatform()) {
+    console.log('showBanner: Not native platform, skipping');
     return; // Não mostra anúncios na web
   }
+
+  // Verifica se o plugin está disponível
+  if (!AdMob) {
+    console.error('showBanner: AdMob plugin not available');
+    return;
+  }
+
+  console.log('showBanner: Starting banner display...');
+  console.log('showBanner: Ad ID:', AD_UNITS.banner);
 
   try {
     // Remove qualquer banner existente antes de criar um novo
     try {
+      console.log('showBanner: Removing existing banner...');
       await AdMob.removeBanner();
       // Aguarda um tempo maior para garantir que o banner foi completamente removido
       await new Promise(resolve => setTimeout(resolve, 1000));
+      console.log('showBanner: Existing banner removed');
     } catch (e) {
+      console.log('showBanner: No existing banner to remove:', e.message);
       // Ignora erro se não houver banner para remover
       await new Promise(resolve => setTimeout(resolve, 500));
     }
     
     // Aguarda um pouco para garantir que a Activity esteja pronta
+    console.log('showBanner: Waiting 500ms for Activity...');
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    await AdMob.showBanner({
+    console.log('showBanner: Calling AdMob.showBanner with config:', {
       adId: AD_UNITS.banner,
       adSize: 'BANNER',
       position: 'BOTTOM_CENTER',
-      margin: 60, // Margem para posicionar acima do rodapé (altura do rodapé ~50px + pequeno espaçamento)
+      margin: 45,
+      isTesting: false
+    });
+    
+    const result = await AdMob.showBanner({
+      adId: AD_UNITS.banner,
+      adSize: 'BANNER',
+      position: 'BOTTOM_CENTER',
+      margin: 45, // Margem para posicionar acima do rodapé
       isTesting: false,
     });
-    console.log('Banner ad shown with margin 150px');
+    
+    console.log('showBanner: AdMob.showBanner returned:', result);
+    console.log('Banner ad shown with margin 45px');
   } catch (error) {
-    console.error('Error showing banner:', error);
+    console.error('showBanner: Error showing banner:', error);
+    console.error('showBanner: Error message:', error.message);
+    console.error('showBanner: Error stack:', error.stack);
     // Não lança o erro para não quebrar o app
   }
 }

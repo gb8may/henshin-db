@@ -8,6 +8,7 @@ const SECTIONS = [
   { key: 'community', labelKey: 'usefulCommunity', hintKey: 'usefulSearch' },
   { key: 'lives', labelKey: 'usefulLives', hintKey: 'usefulSearch' },
   { key: 'collectibles', labelKey: 'usefulCollectibles', hintKey: 'usefulSearch' },
+  { key: 'tokumap', labelKey: 'usefulTokumap', hintKey: 'usefulTokumapHint' },
 ];
 
 export function UsefulLinksPage() {
@@ -39,7 +40,13 @@ export function UsefulLinksPage() {
               key={section.key}
               label={t(section.labelKey)}
               hint={t(section.hintKey)}
-              onClick={() => navigate(`/useful-links/${section.key}`)}
+              onClick={() => {
+                if (section.key === 'tokumap') {
+                  navigate('/useful-links/tokumap');
+                } else {
+                  navigate(`/useful-links/${section.key}`);
+                }
+              }}
               className="group hover:border-toku-rider-primary/50 transition-all"
             />
           ))}
