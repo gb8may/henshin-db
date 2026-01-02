@@ -21,14 +21,19 @@ export async function initializeAdMob() {
   }
 
   try {
-    // trackingAuthorizationStatus pode não estar disponível no Android
+    // No Android, não precisamos verificar trackingAuthorizationStatus
+    // Isso pode causar problemas, então vamos sempre usar false
     let requestTrackingAuth = false;
-    try {
-      const { status } = await AdMob.trackingAuthorizationStatus();
-      requestTrackingAuth = status.status === 'notDetermined';
-    } catch (e) {
-      // No Android, isso pode falhar, então ignoramos
-      console.log('AdMob: trackingAuthorizationStatus not available (Android?)');
+    
+    // Só tenta verificar trackingAuthorizationStatus se estiver no iOS
+    if (Capacitor.getPlatform() === 'ios') {
+      try {
+        const { status } = await AdMob.trackingAuthorizationStatus();
+        requestTrackingAuth = status.status === 'notDetermined';
+      } catch (e) {
+        // Ignora erros no iOS também
+        console.log('AdMob: trackingAuthorizationStatus not available');
+      }
     }
     
     await AdMob.initialize({
@@ -51,6 +56,16 @@ export async function showBanner() {
   }
 
   try {
+    // Remove qualquer banner existente antes de criar um novo
+    try {
+      await AdMob.removeBanner();
+      // Aguarda um tempo maior para garantir que o banner foi completamente removido
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    } catch (e) {
+      // Ignora erro se não houver banner para remover
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
     // Aguarda um pouco para garantir que a Activity esteja pronta
     await new Promise(resolve => setTimeout(resolve, 500));
     
@@ -58,10 +73,10 @@ export async function showBanner() {
       adId: AD_UNITS.banner,
       adSize: 'BANNER',
       position: 'BOTTOM_CENTER',
-      margin: 50, // Margem superior para não cobrir o rodapé
+      margin: 60, // Margem para posicionar acima do rodapé (altura do rodapé ~50px + pequeno espaçamento)
       isTesting: false,
     });
-    console.log('Banner ad shown');
+    console.log('Banner ad shown with margin 150px');
   } catch (error) {
     console.error('Error showing banner:', error);
     // Não lança o erro para não quebrar o app
