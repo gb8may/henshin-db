@@ -4,9 +4,9 @@ import { useLanguage } from '../hooks/useLanguage';
 import { MapPin, ExternalLink } from 'lucide-react';
 
 // Link do mapa público do Google Maps
-const TOKUMAP_URL = 'https://www.google.com/maps/d/u/0/edit?mid=1wvhKAM0vYtGE8VXKP8w5zzouA2hKpug&usp=sharing';
+const TOKUMAP_URL = 'https://www.google.com/maps/d/u/2/edit?mid=1gy8DvVgiHzYwxHVFMWTCaonYP3lfHls&usp=sharing';
 // noprof=1 remove informações do autor/perfil do mapa
-const TOKUMAP_EMBED_URL = 'https://www.google.com/maps/d/u/0/embed?mid=1wvhKAM0vYtGE8VXKP8w5zzouA2hKpug&ehbc=2E312F&noprof=1';
+const TOKUMAP_EMBED_URL = 'https://www.google.com/maps/d/u/2/embed?mid=1gy8DvVgiHzYwxHVFMWTCaonYP3lfHls&ehbc=2E312F&noprof=1';
 
 export function TokumapPage() {
   const navigate = useNavigate();
@@ -33,6 +33,9 @@ export function TokumapPage() {
         </div>
         <div className="text-toku-muted text-[13px] leading-tight mb-4 px-0.5">
           {t('usefulTokumapHint')}
+          <div className="text-[11px] italic mt-1.5 opacity-80">
+            {t('usefulTokumapCredit')}
+          </div>
         </div>
 
         {/* Preview do mapa */}
@@ -50,23 +53,13 @@ export function TokumapPage() {
         </div>
 
         {/* Botão para abrir no Google Maps */}
-        <div className="card">
-          <div className="flex flex-col items-center gap-3 py-4">
-            <div className="text-center">
-              <div className="text-toku-muted text-xs leading-relaxed px-4 mb-3">
-                {t('usefulTokumapHint')}
-              </div>
-            </div>
-
-            <button
-              onClick={handleOpenMap}
-              className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-button border border-toku-border bg-[rgba(255,255,255,0.06)] text-toku-text font-bold hover:bg-[rgba(255,255,255,0.1)] transition-colors"
-            >
-              <ExternalLink className="w-4 h-4" />
-              {t('modalOpenLink')}
-            </button>
-          </div>
-        </div>
+        <button
+          onClick={handleOpenMap}
+          className="w-full inline-flex items-center justify-center gap-2 px-6 py-3 rounded-button border border-toku-border bg-[rgba(255,255,255,0.06)] text-toku-text font-bold hover:bg-[rgba(255,255,255,0.1)] transition-colors"
+        >
+          <ExternalLink className="w-4 h-4" />
+          {t('modalOpenLink')}
+        </button>
       </div>
     </div>
   );
