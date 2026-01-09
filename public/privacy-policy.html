@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Privacy Policy - Henshin DB</title>
+    <title>Privacy Policy - Pocket Henshin</title>
     <style>
         * {
             margin: 0;
@@ -28,6 +28,18 @@
         h1 {
             color: #fff;
             margin-bottom: 10px;
+        }
+        .disclaimer-box {
+            background: #1a1f2e;
+            border: 2px solid #ff6b35;
+            border-radius: 8px;
+            padding: 15px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        .disclaimer-box strong {
+            color: #ff6b35;
+            font-size: 1.1em;
         }
         .lang-selector {
             margin-top: 20px;
@@ -67,6 +79,12 @@
             margin-bottom: 10px;
             font-size: 1.2em;
         }
+        h4 {
+            color: #a0a0a0;
+            margin-top: 15px;
+            margin-bottom: 8px;
+            font-size: 1em;
+        }
         p {
             margin-bottom: 15px;
         }
@@ -91,13 +109,29 @@
         a:hover {
             text-decoration: underline;
         }
+        .highlight {
+            background: #1a1f2e;
+            padding: 10px 15px;
+            border-radius: 6px;
+            border-left: 3px solid #ff6b35;
+            margin: 15px 0;
+        }
     </style>
 </head>
 <body>
     <div class="header">
         <h1>Privacy Policy</h1>
-        <p>Política de Privacidade</p>
-        <p>プライバシーポリシー</p>
+        <p>Política de Privacidade | プライバシーポリシー</p>
+        
+        <div class="disclaimer-box">
+            <strong>⚠️ DISCLAIMER / AVISO / 免責事項</strong><br>
+            <small>
+                <strong>EN:</strong> This is a FAN-MADE, UNOFFICIAL application. Not affiliated with Toei, Bandai, Tsuburaya, or any official entity.<br>
+                <strong>PT:</strong> Este é um aplicativo FAN-MADE, NÃO OFICIAL. Sem afiliação com Toei, Bandai, Tsuburaya ou qualquer entidade oficial.<br>
+                <strong>JP:</strong> これはファンメイドの非公式アプリです。東映、バンダイ、円谷プロとは一切関係ありません。
+            </small>
+        </div>
+        
         <div class="lang-selector">
             <button class="lang-btn active" onclick="showLang('en')">English</button>
             <button class="lang-btn" onclick="showLang('pt')">Português</button>
@@ -108,71 +142,94 @@
     <!-- English Version -->
     <div id="content-en" class="content active">
         <h2>Privacy Policy</h2>
-        <p><strong>Last Updated:</strong> December 21, 2024</p>
+        <p><strong>Last Updated:</strong> January 9, 2026</p>
 
-        <h3>1. Introduction</h3>
-        <p>Henshin DB ("we", "our", or "us") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your information when you use our mobile application and website (collectively, the "Service").</p>
+        <div class="highlight">
+            <strong>Important Notice:</strong> Pocket Henshin is a FAN-MADE, UNOFFICIAL reference application created by fans for fans. This app is NOT affiliated with, endorsed by, or connected to Toei Company, Bandai Namco, Tsuburaya Productions, or any other official rights holders of Tokusatsu content. All trademarks and copyrights belong to their respective owners.
+        </div>
+
+        <h3>1. About This Application</h3>
+        <p>Pocket Henshin is an independent, fan-created educational reference tool that provides:</p>
+        <ul>
+            <li><strong>Glossary:</strong> Japanese-to-English/Portuguese terminology translations for Tokusatsu fans</li>
+            <li><strong>Character Database:</strong> Fan-compiled information about Tokusatsu characters</li>
+            <li><strong>TokuMap:</strong> Community-sourced filming location guide</li>
+            <li><strong>Community Links:</strong> Curated links to fan communities, content creators, and artists</li>
+            <li><strong>Offline Access:</strong> Data caching for use without internet connection</li>
+            <li><strong>Multi-language Support:</strong> Interface available in English, Portuguese, and Japanese</li>
+        </ul>
+        <p>All content is fan-compiled for educational and entertainment purposes. This is NOT an official catalog or licensed product.</p>
 
         <h3>2. Information We Collect</h3>
         <h4>2.1. Automatically Collected Information</h4>
         <ul>
-            <li><strong>Usage Data:</strong> We collect anonymous visit statistics to understand how our Service is used. This includes page views and general usage patterns.</li>
-            <li><strong>Device Information:</strong> We may collect information about your device, including device type, operating system, and browser type.</li>
-            <li><strong>Local Storage:</strong> The app uses local storage (localStorage) to cache data for offline access and to remember your language preferences.</li>
+            <li><strong>Usage Data:</strong> Anonymous visit statistics to understand how our app is used (page views, general usage patterns).</li>
+            <li><strong>Device Information:</strong> Device type, operating system, and app version for compatibility purposes.</li>
+            <li><strong>Local Storage:</strong> The app uses local storage (localStorage) to cache data for offline access and remember your language preferences.</li>
         </ul>
 
-        <h4>2.2. Data Stored in Supabase</h4>
-        <p>Our Service uses Supabase (a third-party database service) to store and manage application data, including:</p>
+        <h4>2.2. Advertising Data (Google AdMob)</h4>
+        <p>This app displays advertisements through Google AdMob. Google may collect and use data for personalized advertising. This may include:</p>
         <ul>
-            <li>Character information</li>
-            <li>Glossary entries</li>
-            <li>Publication data</li>
+            <li>Device identifiers (Advertising ID)</li>
+            <li>IP address</li>
+            <li>General location (country/region level)</li>
+            <li>App usage information</li>
+        </ul>
+        <p>For more information about how Google uses data, please visit: <a href="https://policies.google.com/privacy" target="_blank">Google Privacy Policy</a></p>
+        <p>You can opt out of personalized advertising in your device settings.</p>
+
+        <h4>2.3. Data Stored in Supabase</h4>
+        <p>Our app uses Supabase (a third-party database service) to store publicly accessible content:</p>
+        <ul>
+            <li>Character information (fan-compiled)</li>
+            <li>Glossary entries (community translations)</li>
+            <li>Publication references</li>
             <li>Collectibles information</li>
-            <li>Useful links and community resources</li>
+            <li>Community links and resources</li>
             <li>Anonymous visit statistics</li>
         </ul>
-        <p>All data stored in Supabase is publicly accessible content related to Tokusatsu media. We do not store personal information or user accounts.</p>
+        <p><strong>We do NOT store personal information, user accounts, or login credentials.</strong></p>
 
         <h3>3. How We Use Your Information</h3>
         <ul>
-            <li>To provide and maintain our Service</li>
-            <li>To improve and optimize the Service</li>
-            <li>To analyze usage patterns and trends</li>
+            <li>To provide and maintain the app functionality</li>
+            <li>To improve app performance and user experience</li>
+            <li>To display relevant advertisements (via Google AdMob)</li>
             <li>To enable offline functionality through local caching</li>
             <li>To remember your language preferences</li>
         </ul>
 
-        <h3>4. Service Worker and Caching</h3>
-        <p>Our Service uses a Service Worker to cache content for offline access. This means some data is stored locally on your device to improve performance and enable offline functionality. You can clear this cache through your browser or device settings.</p>
+        <h3>4. Third-Party Services</h3>
+        <h4>4.1. Google AdMob</h4>
+        <p>We use Google AdMob to display advertisements. AdMob's privacy practices are governed by Google's Privacy Policy: <a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></p>
 
-        <h3>5. Third-Party Services</h3>
-        <h4>5.1. Supabase</h4>
-        <p>We use Supabase to host our database. Supabase's privacy practices are governed by their own privacy policy. For more information, please visit: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+        <h4>4.2. Supabase</h4>
+        <p>We use Supabase to host our database. Supabase's privacy policy: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
 
-        <h4>5.2. Netlify</h4>
-        <p>Our website is hosted on Netlify. Netlify's privacy practices are governed by their own privacy policy. For more information, please visit: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+        <h3>5. Data Security</h3>
+        <p>We implement appropriate security measures to protect information. However, no method of transmission over the Internet is 100% secure.</p>
 
-        <h3>6. Data Security</h3>
-        <p>We implement appropriate technical and organizational measures to protect your information. However, no method of transmission over the Internet or electronic storage is 100% secure. While we strive to use commercially acceptable means to protect your information, we cannot guarantee absolute security.</p>
-
-        <h3>7. Your Rights</h3>
-        <p>Since we do not collect personal information or maintain user accounts, there is no personal data to access, modify, or delete. However, you can:</p>
+        <h3>6. Your Rights</h3>
+        <p>Since we do not collect personal information or maintain user accounts, there is no personal data to access, modify, or delete. You can:</p>
         <ul>
-            <li>Clear your browser's local storage to remove cached data</li>
-            <li>Disable the Service Worker through your browser settings</li>
-            <li>Uninstall the mobile app to remove all locally stored data</li>
+            <li>Clear your device's local storage to remove cached data</li>
+            <li>Opt out of personalized ads in your device settings</li>
+            <li>Uninstall the app to remove all locally stored data</li>
         </ul>
 
-        <h3>8. Children's Privacy</h3>
-        <p>Our Service is not directed to children under 13 years of age. We do not knowingly collect personal information from children under 13.</p>
+        <h3>7. Children's Privacy</h3>
+        <p>This app is not directed to children under 13. We do not knowingly collect personal information from children under 13.</p>
 
-        <h3>9. Changes to This Privacy Policy</h3>
-        <p>We may update this Privacy Policy from time to time. We will notify you of any changes by posting the new Privacy Policy on this page and updating the "Last Updated" date.</p>
+        <h3>8. Intellectual Property Notice</h3>
+        <p>All Tokusatsu-related trademarks, character names, and related content are the property of their respective owners (including but not limited to Toei Company, Bandai Namco, Tsuburaya Productions). This fan-made app is created for educational and entertainment purposes only and does not claim ownership of any copyrighted material.</p>
+
+        <h3>9. Changes to This Policy</h3>
+        <p>We may update this Privacy Policy periodically. Changes will be posted on this page with an updated date.</p>
 
         <h3>10. Contact Us</h3>
-        <p>If you have any questions about this Privacy Policy, please contact us at:</p>
+        <p>For questions about this Privacy Policy:</p>
         <ul>
-            <li>Website: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
             <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
         </ul>
     </div>
@@ -180,71 +237,94 @@
     <!-- Portuguese Version -->
     <div id="content-pt" class="content">
         <h2>Política de Privacidade</h2>
-        <p><strong>Última Atualização:</strong> 21 de Dezembro de 2024</p>
+        <p><strong>Última Atualização:</strong> 9 de Janeiro de 2026</p>
 
-        <h3>1. Introdução</h3>
-        <p>O Henshin DB ("nós", "nosso" ou "nos") está comprometido em proteger sua privacidade. Esta Política de Privacidade explica como coletamos, usamos e protegemos suas informações quando você usa nosso aplicativo móvel e site (coletivamente, o "Serviço").</p>
+        <div class="highlight">
+            <strong>Aviso Importante:</strong> Pocket Henshin é um aplicativo de referência FAN-MADE (feito por fãs), NÃO OFICIAL. Este aplicativo NÃO é afiliado, endossado ou conectado à Toei Company, Bandai Namco, Tsuburaya Productions ou qualquer outro detentor oficial de direitos de conteúdo Tokusatsu. Todas as marcas registradas e direitos autorais pertencem aos seus respectivos proprietários.
+        </div>
+
+        <h3>1. Sobre Este Aplicativo</h3>
+        <p>Pocket Henshin é uma ferramenta de referência educacional independente, criada por fãs, que oferece:</p>
+        <ul>
+            <li><strong>Glossário:</strong> Traduções de terminologia japonesa para português/inglês para fãs de Tokusatsu</li>
+            <li><strong>Banco de Personagens:</strong> Informações compiladas por fãs sobre personagens de Tokusatsu</li>
+            <li><strong>TokuMap:</strong> Guia de locais de filmagem compilado pela comunidade</li>
+            <li><strong>Links da Comunidade:</strong> Links curados para comunidades de fãs, criadores de conteúdo e artistas</li>
+            <li><strong>Acesso Offline:</strong> Cache de dados para uso sem conexão com a internet</li>
+            <li><strong>Suporte Multi-idioma:</strong> Interface disponível em inglês, português e japonês</li>
+        </ul>
+        <p>Todo o conteúdo é compilado por fãs para fins educacionais e de entretenimento. Este NÃO é um catálogo oficial ou produto licenciado.</p>
 
         <h3>2. Informações que Coletamos</h3>
         <h4>2.1. Informações Coletadas Automaticamente</h4>
         <ul>
-            <li><strong>Dados de Uso:</strong> Coletamos estatísticas de visitas anônimas para entender como nosso Serviço é usado. Isso inclui visualizações de página e padrões gerais de uso.</li>
-            <li><strong>Informações do Dispositivo:</strong> Podemos coletar informações sobre seu dispositivo, incluindo tipo de dispositivo, sistema operacional e tipo de navegador.</li>
-            <li><strong>Armazenamento Local:</strong> O aplicativo usa armazenamento local (localStorage) para armazenar dados em cache para acesso offline e para lembrar suas preferências de idioma.</li>
+            <li><strong>Dados de Uso:</strong> Estatísticas anônimas de visitas para entender como o app é usado.</li>
+            <li><strong>Informações do Dispositivo:</strong> Tipo de dispositivo, sistema operacional e versão do app.</li>
+            <li><strong>Armazenamento Local:</strong> O app usa armazenamento local para cache de dados offline e preferências de idioma.</li>
         </ul>
 
-        <h4>2.2. Dados Armazenados no Supabase</h4>
-        <p>Nosso Serviço usa Supabase (um serviço de banco de dados de terceiros) para armazenar e gerenciar dados do aplicativo, incluindo:</p>
+        <h4>2.2. Dados de Publicidade (Google AdMob)</h4>
+        <p>Este app exibe anúncios através do Google AdMob. O Google pode coletar e usar dados para publicidade personalizada, incluindo:</p>
         <ul>
-            <li>Informações de personagens</li>
-            <li>Entradas do glossário</li>
-            <li>Dados de publicações</li>
+            <li>Identificadores de dispositivo (ID de Publicidade)</li>
+            <li>Endereço IP</li>
+            <li>Localização geral (nível país/região)</li>
+            <li>Informações de uso do app</li>
+        </ul>
+        <p>Para mais informações: <a href="https://policies.google.com/privacy" target="_blank">Política de Privacidade do Google</a></p>
+        <p>Você pode desativar a publicidade personalizada nas configurações do seu dispositivo.</p>
+
+        <h4>2.3. Dados Armazenados no Supabase</h4>
+        <p>O app usa Supabase para armazenar conteúdo publicamente acessível:</p>
+        <ul>
+            <li>Informações de personagens (compiladas por fãs)</li>
+            <li>Entradas do glossário (traduções da comunidade)</li>
+            <li>Referências de publicações</li>
             <li>Informações de colecionáveis</li>
-            <li>Links úteis e recursos da comunidade</li>
+            <li>Links e recursos da comunidade</li>
             <li>Estatísticas anônimas de visitas</li>
         </ul>
-        <p>Todos os dados armazenados no Supabase são conteúdo publicamente acessível relacionado à mídia Tokusatsu. Não armazenamos informações pessoais ou contas de usuários.</p>
+        <p><strong>NÃO armazenamos informações pessoais, contas de usuário ou credenciais de login.</strong></p>
 
         <h3>3. Como Usamos Suas Informações</h3>
         <ul>
-            <li>Para fornecer e manter nosso Serviço</li>
-            <li>Para melhorar e otimizar o Serviço</li>
-            <li>Para analisar padrões e tendências de uso</li>
+            <li>Para fornecer e manter a funcionalidade do app</li>
+            <li>Para melhorar o desempenho e experiência do usuário</li>
+            <li>Para exibir anúncios relevantes (via Google AdMob)</li>
             <li>Para habilitar funcionalidade offline através de cache local</li>
             <li>Para lembrar suas preferências de idioma</li>
         </ul>
 
-        <h3>4. Service Worker e Cache</h3>
-        <p>Nosso Serviço usa um Service Worker para armazenar conteúdo em cache para acesso offline. Isso significa que alguns dados são armazenados localmente no seu dispositivo para melhorar o desempenho e habilitar funcionalidade offline. Você pode limpar este cache através das configurações do seu navegador ou dispositivo.</p>
+        <h3>4. Serviços de Terceiros</h3>
+        <h4>4.1. Google AdMob</h4>
+        <p>Usamos Google AdMob para exibir anúncios. Política de privacidade: <a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></p>
 
-        <h3>5. Serviços de Terceiros</h3>
-        <h4>5.1. Supabase</h4>
-        <p>Usamos Supabase para hospedar nosso banco de dados. As práticas de privacidade do Supabase são regidas por sua própria política de privacidade. Para mais informações, visite: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+        <h4>4.2. Supabase</h4>
+        <p>Usamos Supabase para hospedar nosso banco de dados. Política de privacidade: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
 
-        <h4>5.2. Netlify</h4>
-        <p>Nosso site é hospedado no Netlify. As práticas de privacidade do Netlify são regidas por sua própria política de privacidade. Para mais informações, visite: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+        <h3>5. Segurança dos Dados</h3>
+        <p>Implementamos medidas de segurança apropriadas. No entanto, nenhum método de transmissão pela Internet é 100% seguro.</p>
 
-        <h3>6. Segurança dos Dados</h3>
-        <p>Implementamos medidas técnicas e organizacionais apropriadas para proteger suas informações. No entanto, nenhum método de transmissão pela Internet ou armazenamento eletrônico é 100% seguro. Embora nos esforcemos para usar meios comercialmente aceitáveis para proteger suas informações, não podemos garantir segurança absoluta.</p>
-
-        <h3>7. Seus Direitos</h3>
-        <p>Como não coletamos informações pessoais ou mantemos contas de usuários, não há dados pessoais para acessar, modificar ou excluir. No entanto, você pode:</p>
+        <h3>6. Seus Direitos</h3>
+        <p>Como não coletamos informações pessoais, não há dados pessoais para acessar, modificar ou excluir. Você pode:</p>
         <ul>
-            <li>Limpar o armazenamento local do seu navegador para remover dados em cache</li>
-            <li>Desabilitar o Service Worker através das configurações do seu navegador</li>
-            <li>Desinstalar o aplicativo móvel para remover todos os dados armazenados localmente</li>
+            <li>Limpar o armazenamento local do dispositivo para remover dados em cache</li>
+            <li>Desativar anúncios personalizados nas configurações do dispositivo</li>
+            <li>Desinstalar o app para remover todos os dados armazenados localmente</li>
         </ul>
 
-        <h3>8. Privacidade de Crianças</h3>
-        <p>Nosso Serviço não é direcionado a crianças menores de 13 anos. Não coletamos intencionalmente informações pessoais de crianças menores de 13 anos.</p>
+        <h3>7. Privacidade de Crianças</h3>
+        <p>Este app não é direcionado a menores de 13 anos. Não coletamos intencionalmente informações pessoais de menores de 13 anos.</p>
 
-        <h3>9. Alterações nesta Política de Privacidade</h3>
-        <p>Podemos atualizar esta Política de Privacidade periodicamente. Notificaremos você sobre quaisquer alterações publicando a nova Política de Privacidade nesta página e atualizando a data de "Última Atualização".</p>
+        <h3>8. Aviso de Propriedade Intelectual</h3>
+        <p>Todas as marcas registradas relacionadas a Tokusatsu, nomes de personagens e conteúdo relacionado são propriedade de seus respectivos donos (incluindo, mas não limitado a, Toei Company, Bandai Namco, Tsuburaya Productions). Este app feito por fãs é criado apenas para fins educacionais e de entretenimento e não reivindica propriedade de qualquer material protegido por direitos autorais.</p>
+
+        <h3>9. Alterações nesta Política</h3>
+        <p>Podemos atualizar esta Política de Privacidade periodicamente. Alterações serão publicadas nesta página com data atualizada.</p>
 
         <h3>10. Entre em Contato</h3>
-        <p>Se você tiver alguma dúvida sobre esta Política de Privacidade, entre em contato conosco em:</p>
+        <p>Para dúvidas sobre esta Política de Privacidade:</p>
         <ul>
-            <li>Site: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
             <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
         </ul>
     </div>
@@ -252,108 +332,113 @@
     <!-- Japanese Version -->
     <div id="content-ja" class="content">
         <h2>プライバシーポリシー</h2>
-        <p><strong>最終更新日:</strong> 2024年12月21日</p>
+        <p><strong>最終更新日:</strong> 2026年1月9日</p>
 
-        <h3>1. はじめに</h3>
-        <p>Henshin DB（「当社」「私たち」）は、お客様のプライバシーを保護することに取り組んでいます。本プライバシーポリシーは、モバイルアプリケーションおよびウェブサイト（総称して「サービス」）を使用する際に、当社がお客様の情報をどのように収集、使用、保護するかを説明します。</p>
+        <div class="highlight">
+            <strong>重要なお知らせ:</strong> Pocket Henshinは、ファンがファンのために作成した非公式のファンメイド参照アプリケーションです。このアプリは、東映株式会社、バンダイナムコ、円谷プロダクション、またはその他の特撮コンテンツの公式権利者とは一切関係がなく、承認や提携もしていません。すべての商標と著作権は、それぞれの所有者に帰属します。
+        </div>
+
+        <h3>1. このアプリケーションについて</h3>
+        <p>Pocket Henshinは、ファンが作成した独立した教育参照ツールであり、以下を提供します：</p>
+        <ul>
+            <li><strong>用語集:</strong> 特撮ファンのための日本語から英語/ポルトガル語への用語翻訳</li>
+            <li><strong>キャラクターデータベース:</strong> ファンが編集した特撮キャラクター情報</li>
+            <li><strong>トクマップ:</strong> コミュニティがまとめた撮影ロケーションガイド</li>
+            <li><strong>コミュニティリンク:</strong> ファンコミュニティ、コンテンツクリエイター、アーティストへの厳選リンク</li>
+            <li><strong>オフラインアクセス:</strong> インターネット接続なしで使用するためのデータキャッシュ</li>
+            <li><strong>多言語サポート:</strong> 英語、ポルトガル語、日本語で利用可能なインターフェース</li>
+        </ul>
+        <p>すべてのコンテンツは、教育およびエンターテインメント目的でファンによって編集されています。これは公式カタログやライセンス製品ではありません。</p>
 
         <h3>2. 収集する情報</h3>
         <h4>2.1. 自動的に収集される情報</h4>
         <ul>
-            <li><strong>使用データ:</strong> サービスがどのように使用されているかを理解するために、匿名の訪問統計を収集します。これには、ページビューと一般的な使用パターンが含まれます。</li>
-            <li><strong>デバイス情報:</strong> デバイスの種類、オペレーティングシステム、ブラウザの種類など、デバイスに関する情報を収集する場合があります。</li>
-            <li><strong>ローカルストレージ:</strong> アプリはローカルストレージ（localStorage）を使用して、オフラインアクセス用にデータをキャッシュし、言語設定を記憶します。</li>
+            <li><strong>使用データ:</strong> アプリの使用状況を理解するための匿名の訪問統計。</li>
+            <li><strong>デバイス情報:</strong> 互換性のためのデバイスの種類、OS、アプリバージョン。</li>
+            <li><strong>ローカルストレージ:</strong> アプリはオフラインアクセスと言語設定のためにローカルストレージを使用します。</li>
         </ul>
 
-        <h4>2.2. Supabaseに保存されるデータ</h4>
-        <p>当社のサービスは、Supabase（サードパーティのデータベースサービス）を使用して、アプリケーションデータを保存および管理します。これには以下が含まれます：</p>
+        <h4>2.2. 広告データ（Google AdMob）</h4>
+        <p>このアプリはGoogle AdMobを通じて広告を表示します。Googleはパーソナライズド広告のためにデータを収集・使用する場合があります：</p>
         <ul>
-            <li>キャラクター情報</li>
-            <li>用語集エントリ</li>
-            <li>出版物データ</li>
+            <li>デバイス識別子（広告ID）</li>
+            <li>IPアドレス</li>
+            <li>一般的な位置情報（国/地域レベル）</li>
+            <li>アプリ使用情報</li>
+        </ul>
+        <p>詳細については：<a href="https://policies.google.com/privacy" target="_blank">Googleプライバシーポリシー</a></p>
+        <p>デバイスの設定でパーソナライズド広告をオプトアウトできます。</p>
+
+        <h4>2.3. Supabaseに保存されるデータ</h4>
+        <p>アプリはSupabaseを使用して公開アクセス可能なコンテンツを保存します：</p>
+        <ul>
+            <li>キャラクター情報（ファン編集）</li>
+            <li>用語集エントリ（コミュニティ翻訳）</li>
+            <li>出版物参照</li>
             <li>コレクタブル情報</li>
-            <li>便利なリンクとコミュニティリソース</li>
+            <li>コミュニティリンクとリソース</li>
             <li>匿名の訪問統計</li>
         </ul>
-        <p>Supabaseに保存されるすべてのデータは、特撮メディアに関連する公開アクセス可能なコンテンツです。個人情報やユーザーアカウントは保存しません。</p>
+        <p><strong>個人情報、ユーザーアカウント、ログイン資格情報は保存しません。</strong></p>
 
         <h3>3. 情報の使用方法</h3>
         <ul>
-            <li>サービスの提供と維持</li>
-            <li>サービスの改善と最適化</li>
-            <li>使用パターンと傾向の分析</li>
+            <li>アプリ機能の提供と維持</li>
+            <li>パフォーマンスとユーザー体験の向上</li>
+            <li>関連広告の表示（Google AdMob経由）</li>
             <li>ローカルキャッシュによるオフライン機能の有効化</li>
             <li>言語設定の記憶</li>
         </ul>
 
-        <h3>4. サービスワーカーとキャッシュ</h3>
-        <p>当社のサービスは、オフラインアクセス用にコンテンツをキャッシュするためにサービスワーカーを使用します。これは、パフォーマンスを向上させ、オフライン機能を有効にするために、一部のデータがデバイスにローカルに保存されることを意味します。ブラウザまたはデバイスの設定を通じて、このキャッシュをクリアできます。</p>
+        <h3>4. サードパーティサービス</h3>
+        <h4>4.1. Google AdMob</h4>
+        <p>広告表示にGoogle AdMobを使用しています。プライバシーポリシー：<a href="https://policies.google.com/privacy" target="_blank">https://policies.google.com/privacy</a></p>
 
-        <h3>5. サードパーティサービス</h3>
-        <h4>5.1. Supabase</h4>
-        <p>データベースをホストするためにSupabaseを使用しています。Supabaseのプライバシー慣行は、独自のプライバシーポリシーによって管理されています。詳細については、以下をご覧ください: <a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
+        <h4>4.2. Supabase</h4>
+        <p>データベースホスティングにSupabaseを使用しています。プライバシーポリシー：<a href="https://supabase.com/privacy" target="_blank">https://supabase.com/privacy</a></p>
 
-        <h4>5.2. Netlify</h4>
-        <p>当社のウェブサイトはNetlifyでホストされています。Netlifyのプライバシー慣行は、独自のプライバシーポリシーによって管理されています。詳細については、以下をご覧ください: <a href="https://www.netlify.com/privacy/" target="_blank">https://www.netlify.com/privacy/</a></p>
+        <h3>5. データセキュリティ</h3>
+        <p>適切なセキュリティ対策を実施しています。ただし、インターネット経由の送信は100%安全ではありません。</p>
 
-        <h3>6. データセキュリティ</h3>
-        <p>お客様の情報を保護するために、適切な技術的および組織的措置を実装しています。ただし、インターネット経由の送信や電子ストレージの方法は100%安全ではありません。お客様の情報を保護するために商業的に受け入れられる手段を使用するよう努めていますが、絶対的なセキュリティを保証することはできません。</p>
-
-        <h3>7. お客様の権利</h3>
-        <p>個人情報を収集したり、ユーザーアカウントを維持したりしないため、アクセス、変更、または削除する個人データはありません。ただし、以下を実行できます：</p>
+        <h3>6. お客様の権利</h3>
+        <p>個人情報を収集しないため、アクセス、変更、削除する個人データはありません。以下を実行できます：</p>
         <ul>
-            <li>ブラウザのローカルストレージをクリアしてキャッシュされたデータを削除</li>
-            <li>ブラウザの設定を通じてサービスワーカーを無効化</li>
-            <li>モバイルアプリをアンインストールして、ローカルに保存されたすべてのデータを削除</li>
+            <li>デバイスのローカルストレージをクリアしてキャッシュデータを削除</li>
+            <li>デバイス設定でパーソナライズド広告をオプトアウト</li>
+            <li>アプリをアンインストールしてローカル保存データをすべて削除</li>
         </ul>
 
-        <h3>8. 児童のプライバシー</h3>
-        <p>当社のサービスは、13歳未満の子供を対象としていません。13歳未満の子供から意図的に個人情報を収集することはありません。</p>
+        <h3>7. 児童のプライバシー</h3>
+        <p>このアプリは13歳未満の子供を対象としていません。13歳未満の子供から意図的に個人情報を収集することはありません。</p>
 
-        <h3>9. 本プライバシーポリシーの変更</h3>
-        <p>本プライバシーポリシーを随時更新する場合があります。このページに新しいプライバシーポリシーを投稿し、「最終更新日」を更新することにより、変更を通知します。</p>
+        <h3>8. 知的財産権に関する通知</h3>
+        <p>すべての特撮関連商標、キャラクター名、関連コンテンツは、それぞれの所有者（東映株式会社、バンダイナムコ、円谷プロダクションを含むがこれに限定されない）の財産です。このファンメイドアプリは、教育およびエンターテインメント目的のみで作成されており、著作権で保護された素材の所有権を主張するものではありません。</p>
+
+        <h3>9. 本ポリシーの変更</h3>
+        <p>本プライバシーポリシーを定期的に更新する場合があります。変更は更新日とともにこのページに掲載されます。</p>
 
         <h3>10. お問い合わせ</h3>
-        <p>本プライバシーポリシーについてご質問がある場合は、以下までお問い合わせください：</p>
+        <p>本プライバシーポリシーについてのご質問：</p>
         <ul>
-            <li>ウェブサイト: <a href="https://henshindb.netlify.app">https://henshindb.netlify.app</a></li>
             <li>GitHub: <a href="https://github.com/gb8may/henshin-db/issues">https://github.com/gb8may/henshin-db/issues</a></li>
         </ul>
     </div>
 
     <div class="last-updated">
-        <p><strong>Last Updated / Última Atualização / 最終更新日:</strong> December 21, 2024 / 21 de Dezembro de 2024 / 2024年12月21日</p>
+        <p><strong>Last Updated / Última Atualização / 最終更新日:</strong> January 9, 2026 / 9 de Janeiro de 2026 / 2026年1月9日</p>
     </div>
 
     <script>
         function showLang(lang) {
-            // Hide all content
             document.querySelectorAll('.content').forEach(content => {
                 content.classList.remove('active');
             });
-            
-            // Remove active class from all buttons
             document.querySelectorAll('.lang-btn').forEach(btn => {
                 btn.classList.remove('active');
             });
-            
-            // Show selected content
             document.getElementById('content-' + lang).classList.add('active');
-            
-            // Add active class to clicked button
             event.target.classList.add('active');
         }
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
