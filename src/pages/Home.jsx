@@ -1,7 +1,6 @@
 import React from 'react';
 import { useLanguage } from '../hooks/useLanguage';
 import { CategoryButton } from '../components/Button';
-import { Globe } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const FRANCHISES = [
@@ -45,8 +44,6 @@ export function Home() {
           >
             <CategoryButton
               label={t('usefulLinks')}
-              hint={t('usefulHint')}
-              icon={<Globe className="w-6 h-6" />}
               className="group hover:border-toku-rider-primary/50 transition-all"
             />
           </Link>
