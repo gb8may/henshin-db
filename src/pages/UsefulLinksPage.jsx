@@ -7,7 +7,8 @@ const SECTIONS = [
   { key: 'actors', labelKey: 'usefulActors', hintKey: 'usefulSearch' },
   { key: 'community', labelKey: 'usefulCommunity', hintKey: 'usefulSearch' },
   { key: 'lives', labelKey: 'usefulLives', hintKey: 'usefulSearch' },
-  { key: 'collectibles', labelKey: 'usefulCollectibles', hintKey: 'usefulSearch' },
+  { key: 'creators', labelKey: 'usefulCreators', hintKey: 'usefulSearch' },
+  { key: 'artists', labelKey: 'usefulArtists', hintKey: 'usefulSearch' },
   { key: 'tokumap', labelKey: 'usefulTokumap', hintKey: 'usefulTokumapHint' },
 ];
 

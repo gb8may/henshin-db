@@ -182,7 +182,9 @@ export function UsefulLinksListPage() {
   const categoryLabel = category === 'community' ? t('usefulCommunity') :
                        category === 'actors' ? t('usefulActors') :
                        category === 'lives' ? t('usefulLives') :
-                       t('usefulCollectibles');
+                       category === 'creators' ? t('usefulCreators') :
+                       category === 'artists' ? t('usefulArtists') :
+                       '';
 
   return (
     <div className="flex flex-col h-full">
