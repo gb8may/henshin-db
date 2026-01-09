@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['favicon.ico', 'robots.txt', 'icons/*.png', 'icons/*.svg'],
       manifest: {
-        name: 'Henshin DB',
-        short_name: 'Henshin DB',
+        name: 'Pocket Henshin',
+        short_name: 'Pocket Henshin',
         description: 'A Tokusatsu database: characters, glossary, publications, collectibles',
         theme_color: '#0b0e14',
         background_color: '#0b0e14',

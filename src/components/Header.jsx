@@ -54,7 +54,7 @@ export function Header({ subtitle, connectionStatus }) {
       <div className="flex items-center justify-between gap-2.5">
         <div className="flex flex-col gap-0.5">
           <div className="font-bold tracking-wide text-base leading-tight">
-            Henshin DB
+            Pocket Henshin
           </div>
           <div className="text-xs text-toku-muted leading-tight">
             {subtitle || translate('home')}
