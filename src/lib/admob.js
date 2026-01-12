@@ -93,7 +93,7 @@ export async function showBanner() {
       adId: AD_UNITS.banner,
       adSize: 'BANNER',
       position: 'BOTTOM_CENTER',
-      margin: 45,
+      margin: 60,
       isTesting: false
     });
     
@@ -101,12 +101,12 @@ export async function showBanner() {
       adId: AD_UNITS.banner,
       adSize: 'BANNER',
       position: 'BOTTOM_CENTER',
-      margin: 45, // Margem para posicionar acima do rodapé
+      margin: 60, // Margem para posicionar acima do rodapé
       isTesting: false,
     });
     
     console.log('showBanner: AdMob.showBanner returned:', result);
-    console.log('Banner ad shown with margin 45px');
+    console.log('Banner ad shown with margin 60px');
   } catch (error) {
     console.error('showBanner: Error showing banner:', error);
     console.error('showBanner: Error message:', error.message);

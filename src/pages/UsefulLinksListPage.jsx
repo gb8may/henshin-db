@@ -48,10 +48,12 @@ function mapItemsToLang(rawItems, lang) {
   return rawItems.map(item => {
     const nameKey = `name_${lang}`;
     const noteKey = `note_${lang}`;
+    const workTypeKey = `work_type_${lang}`;
     return {
       id: item.id.toString(),
       name: item[nameKey] || item.name_pt || item.name_en || item.name_jp || '',
       description: item[noteKey] || item.note_pt || item.note_en || item.note_jp || '',
+      workType: item[workTypeKey] || item.work_type_pt || item.work_type_en || item.work_type_jp || '',
       links: Array.isArray(item.links) ? item.links : [],
       // Mantém os dados brutos para remapear quando o idioma mudar
       _raw: item,
@@ -101,7 +103,7 @@ export function UsefulLinksListPage() {
       try {
         const { data, error } = await supabase
           .from('useful_links')
-          .select('id,category,name_pt,name_en,name_jp,note_pt,note_en,note_jp,links,is_active,sort_order')
+          .select('id,category,name_pt,name_en,name_jp,note_pt,note_en,note_jp,work_type_pt,work_type_en,work_type_jp,links,is_active,sort_order')
           .eq('category', category)
           .eq('is_active', true)
           .order('sort_order', { ascending: true });
@@ -145,6 +147,9 @@ export function UsefulLinksListPage() {
           note_pt: item.description,
           note_en: item.description,
           note_jp: item.description,
+          work_type_pt: item.workType || '',
+          work_type_en: item.workType || '',
+          work_type_jp: item.workType || '',
           links: item.links || [],
         }));
         setRawItems(reconstructed);
@@ -161,6 +166,7 @@ export function UsefulLinksListPage() {
     const filtered = items.filter((item) => {
       const haystack = [
         item.name,
+        item.workType,
         item.description,
         ...(item.links || []).map(l => l.label || l.platform || l.url),
       ].map(x => safeText(x).toLowerCase()).join(' ');
@@ -238,6 +244,11 @@ export function UsefulLinksListPage() {
                     <div className="font-bold text-sm leading-tight mb-1">
                       {item.name}
                     </div>
+                    {item.workType && (
+                      <div className="inline-block px-2 py-0.5 rounded-full bg-toku-rider-primary/20 text-toku-rider-primary text-[11px] font-medium mb-1.5">
+                        {item.workType}
+                      </div>
+                    )}
                     {item.description && (
                       <div className="text-toku-muted text-[13px] leading-snug">
                         {item.description}
